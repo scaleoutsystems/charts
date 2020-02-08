@@ -1,0 +1,62 @@
+# Default values for alliance-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+controller:
+  image:
+    repository: registry.demo.scaleout.se/chart-controller
+    pullPolicy: Always
+
+imagePullSecrets:
+  - name: regcred
+
+nameOverride: ""
+fullnameOverride: ""
+
+cluster_config: |-
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: "local"
+      cluster:
+        server: "your.server.here"
+    users:
+    - name: "local"
+      user:
+        token: "your.token.here"
+
+    contexts:
+    - name: "local"
+      context:
+        user: "local"
+        cluster: "local"
+
+    current-context: "local"
+
+service:
+  type: ClusterIP
+  #port: 30080
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - ok
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-secret
+    nginx.ingress.kubernetes.io/auth-type: basic
+  hosts:
+    - host: chart-controller.demo.scaleout.se
+
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - chart-controller.demo.scaleout.se

@@ -1,0 +1,62 @@
+# Default values for alliance-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+global:
+  domain: alliance.demo.scaleout.se
+
+alliance:
+  user: morgan
+  project: test
+  apiUrl: "http://studio:8080"
+
+minio:
+  access_key: minio
+  secret_key: minio123
+
+controller:
+  image:
+    repository: registry.demo.scaleout.se/controller
+    tag: latest
+    pullPolicy: Always
+
+monitor:
+  image:
+    repository: registry.demo.scaleout.se/monitor
+    tag: latest
+    pullPolicy: Always
+
+member:
+  image:
+    repository: registry.demo.scaleout.se/member
+    tag: latest
+    pullPolicy: Always
+
+orchestrator:
+  image:
+    repository: registry.demo.scaleout.se/orchestrator-controller
+    tag: latest
+    pullPolicy: Always
+
+
+imagePullSecrets:
+  - name: regcred
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+service:
+  type: NodePort
+  controller: 30280
+  minio: 30281
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

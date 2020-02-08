@@ -1,0 +1,120 @@
+# Default values for scaleout stack.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Each component supports a field "enabled: true/false"; disabled components are not installed
+
+
+minio:
+    enabled: true
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+        path: /
+        hosts:
+            - minio.stack.your.domain.name
+        tls:
+            - secretName: ingress-secret
+              hosts:
+                  - minio.your.domain.name
+    accessKey: "youraccesskeyhere"
+    secretKey: "yoursecrethere"
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 10Gi
+
+docker-registry:
+    enabled: true
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+        hosts:
+            - registry.stack.your.domain.name
+        tls:
+            - secretName: ingress-secret
+              hosts:
+                  - registry.stack.your.domain.name
+
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 10Gi
+argo:
+  enabled: true
+  ui:
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+        hosts:
+            - workflow.stack.your.domain.name
+        tls:
+            - secretName: ingress-secret
+              hosts:
+                  - workflow.stack.your.domain.name
+
+argo-events:
+  enabled: true
+  namespace: argo-events
+  singleNamespace: false
+
+
+jupyterhub:
+    enabled: true
+    proxy:
+      # Generate a unique token!
+      secretToken: "956403d9cb95e6243d99d9026304dce0d7db0b7531aa732194bf8cffec94a43b"
+      service:
+          type: ClusterIP
+    ingress:
+      enabled: true
+      hosts:
+        - lab.stack.your.domain.name
+      tls:
+          - secretName: ingress-secret
+            hosts:
+              - lab.stack.your.domain.name
+    singleuser:
+      defaultUrl: "/lab"
+      memory:
+          limit: 4G
+          guarantee: 512M
+      storage:
+          dynamic:
+            storageClass: gp2
+            capacity: 2Gi
+
+    rbac:
+      enabled: true
+    #debug:
+    #  enabled: true
+
+    hub:
+     extraConfig:
+         jupyterlab: |
+                 c.Spawner.cmd = ['jupyter-labhub']
+
+openfaas:
+    functionNamespace: teststack
+    exposeServices: true
+    async: true
+    rbac: true
+    psp: false
+    securityContext: true
+    basic_auth: false
+    operator:
+        create: true
+    ingress:
+      enabled: true
+      hosts:
+        - host: serve.stack.your.domain.name
+          serviceName: gateway
+          servicePort: 8080
+          path: /
+      #annotations: {}
+      tls:
+        - secretName: ingress-secret
+          hosts:
+            - serve.stack.your.domain.name

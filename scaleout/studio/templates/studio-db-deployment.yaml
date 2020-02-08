@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: studio-db
+  name: studio-db
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: studio-db
+    spec:
+      containers:
+      - env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        - name: POSTGRES_DB
+          value: {{ .Values.postgres.db.name }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgres.db.password }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgres.db.user }}
+        image: postgres
+        name: studio-db
+        resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.20.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: {{ .Release.Name }}-controller
+  name: {{ .Release.Name }}-controller
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.20.0 ()
+      creationTimestamp: null
+      labels:
+        io.kompose.service: {{ .Release.Name }}-controller
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+      - args:
+        - python
+        - server.py
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
+        name: {{ .Release.Name }}-controller
+        ports:
+        - containerPort: 12080
+          name: grpc
+        resources: {}
+      restartPolicy: Always
+
+status: {}

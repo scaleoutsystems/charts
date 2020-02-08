@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: ingress
+  name: ingress
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 ()
+      creationTimestamp: null
+      labels:
+        io.kompose.service: ingress
+    spec:
+      containers:
+      - env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        image: {{ .Values.ingress.image.repository }}
+        {{- if .Values.ingress.image.pullPolicy -}}
+        imagePullPolicy: {{ .Values.ingress.image.pullPolicy }}
+        {{- end }}
+        name: ingress
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  cp /var/secret/nginx.conf /etc/nginx/nginx.conf
+                  cp /var/secret2/auth /var/www/html/git/repos/htpasswd
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/secret2/
+          name: git-auth-secret
+          readOnly: true
+        - mountPath: /var/secret/
+          name: nginx-conf-secret
+          readOnly: true
+        - mountPath: /var/www/html/git/repos
+          name: data-repositories
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      restartPolicy: Always
+      volumes:
+      - name: nginx-conf-secret
+        secret:
+          secretName: nginx-config-secret
+      - name: git-auth-secret
+        secret:
+          secretName: git-auth-secret
+      - name: data-repositories
+        persistentVolumeClaim:
+          claimName: data-repositories
+status: {}

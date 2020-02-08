@@ -1,0 +1,58 @@
+# Default values for alliance-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+studio:
+  image:
+    repository: registry.demo.scaleout.se/studio
+    pullPolicy: Always
+
+imagePullSecrets:
+  - name: regcred
+
+nameOverride: ""
+fullnameOverride: ""
+
+nginx-config-secret: nginx-config-secret #file for holding the nginx config file
+git-auth-secret: git-auth-secret #file for storing credentials for users
+
+service:
+  type: ClusterIP
+  #port: 30080
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# REQUIREMENT: set a storage class with ability to serve ReadWriteMany
+repositories:
+  storageClassName: aws-efs
+
+postgres:
+  db:
+    name: postgres
+    user: postgres
+    password: postgres
+
+ingress:
+  enabled: true
+  image:
+    repository: registry.demo.scaleout.se/ingress:latest
+    pullPolicy: Always
+  annotations:
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - ok
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-secret
+    nginx.ingress.kubernetes.io/auth-type: basic
+  hosts:
+    - host: chart-controller.demo.scaleout.se
+
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - chart-controller.demo.scaleout.se
