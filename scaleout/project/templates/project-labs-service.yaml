@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-labs-service
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Release.Name }}-labs-app
+  ports:
+  - protocol: TCP
+    port: 8888
+    targetPort: 8888
