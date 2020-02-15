@@ -4,8 +4,9 @@
 
 replicaCount: 1
 
+
 global:
-  domain: alliance.demo.scaleout.se
+  domain: alliance.scaleout.se
 
 alliance:
   user: morgan
@@ -18,31 +19,26 @@ minio:
 
 controller:
   image:
-    repository: registry.demo.scaleout.se/controller
+    repository: scaleoutsystems/controller
     tag: latest
     pullPolicy: Always
 
 monitor:
   image:
-    repository: registry.demo.scaleout.se/monitor
-    tag: latest
-    pullPolicy: Always
-
-member:
-  image:
-    repository: registry.demo.scaleout.se/member
+    repository: scaleoutsystems/monitor
     tag: latest
     pullPolicy: Always
 
 orchestrator:
+  repository: "git@github.com:scaleoutsystems/scaleout-alliance-orchestrator-sdk.git"
   image:
-    repository: registry.demo.scaleout.se/orchestrator-controller
+    repository: scaleoutsystems/orchestrator
     tag: latest
     pullPolicy: Always
 
 
-imagePullSecrets:
-  - name: regcred
+#imagePullSecrets:
+#  - name: regcred
 
 nameOverride: ""
 fullnameOverride: ""
@@ -50,8 +46,8 @@ fullnameOverride: ""
 
 service:
   type: NodePort
-  controller: 30280
-  minio: 30281
+  controller: 30398
+  minio: 30397
 
 resources: {}
 
