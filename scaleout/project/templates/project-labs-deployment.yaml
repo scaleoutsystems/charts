@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-labs-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-labs-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-labs-app
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        runAsUser: 65533  # to allow read of ssh key
+        #runAsUser: 1000
+        #runAsGroup: 3000
+        #fsGroup: 2000
+      initContainers:
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.1
+        env:
+        - name: GIT_SYNC_REPO
+          value: {{ .Values.labs.repository | quote }}
+        #- name: GIT_SYNC_ROOT
+        #  value: /tmp/git
+        - name: GIT_SYNC_BRANCH
+          value: master
+        - name: GIT_SYNC_DEST
+          value: orchestrator
+        - name: GIT_SSH_KEY_FILE
+          value: /etc/git-secret/ssh
+        - name: GIT_SYNC_SSH
+          value: "true"
+        - name: GIT_KNOWN_HOSTS
+          value: "false"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        volumeMounts:
+        - name: git
+          mountPath: /tmp/git
+        - name: git-secret
+          mountPath: /etc/git-secret/
+      containers:
+      - name: {{ .Release.Name }}-labs-app
+        image: {{ .Values.labs.image }}
+        ports:
+        - containerPort: 8888
+        env:
+        - name: JUPYTER_ENABLE_LAB
+          value: "yes"
+        command: ["start-notebook.sh"]
+        args: ["--NotebookApp.token=''"]
+        resources:
+            requests:
+                memory: "256Mi"
+                cpu: "200m"
+            limits:
+                memory: "1Gi"
+                cpu: "500m"
+        volumeMounts:
+        - name: git
+          mountPath: /home/jovyan/
+        securityContext:
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: git
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName: orchestrator-ssh-secret

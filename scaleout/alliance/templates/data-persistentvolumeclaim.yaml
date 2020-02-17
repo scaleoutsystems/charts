@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: {{ .Release.Name }}-data
+  name: {{ .Release.Name }}-data
+spec:
+  storageClassName: aws-efs
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+status: {}

@@ -1,0 +1,18 @@
+
+
+
+
+labs:
+  image: jupyter/minimal-notebook:latest
+  repository: "git@github.com:scaleoutsystems/scaleout-alliance-orchestrator-sdk.git"
+
+global:
+  domain: platform.demo.scaleout.se
+
+minio:
+  access_key: minio
+  secret_key: minio123
+
+
+service:
+  type: ClusterIP

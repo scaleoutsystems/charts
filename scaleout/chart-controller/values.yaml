@@ -48,7 +48,7 @@ tolerations: []
 affinity: {}
 
 ingress:
-  enabled: true
+  enabled: false
   annotations:
     nginx.ingress.kubernetes.io/auth-realm: Authentication Required - ok
     nginx.ingress.kubernetes.io/auth-secret: basic-auth-secret

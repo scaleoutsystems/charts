@@ -25,10 +25,42 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      securityContext:
+        runAsUser: 65533  # to allow read of ssh key
+        #runAsUser: 1000
+        #runAsGroup: 3000
+        #fsGroup: 2000
+      initContainers:
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.1
+        env:
+        - name: GIT_SYNC_REPO
+          value: {{ .Values.orchestrator.repository | quote }}
+        #- name: GIT_SYNC_ROOT
+        #  value: /tmp/git
+        - name: GIT_SYNC_BRANCH
+          value: master
+        - name: GIT_SYNC_DEST
+          value: orchestrator
+        - name: GIT_SSH_KEY_FILE
+          value: /etc/git-secret/ssh
+        - name: GIT_SYNC_SSH
+          value: "true"
+        - name: GIT_KNOWN_HOSTS
+          value: "false"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        volumeMounts:
+        - name: git
+          mountPath: /tmp/git
+        - name: git-secret
+          mountPath: /etc/git-secret/
       containers:
-      - args:
+      - name: {{ .Release.Name }}-orchestrator
+        image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag }}"
+        args:
         - sh
-        - ./runweb.sh
+        - ./run.sh
         env:
         - name: GET_HOSTS_FROM
           value: dns
@@ -36,20 +68,31 @@ spec:
           value: {{ .Release.Name }}-minio
         - name: CONTROLLER_HOST
           value: {{ .Release.Name }}-controller
-        image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag }}"
-        name: {{ .Release.Name }}-orchestrator
-        resources: {}
-      #  volumeMounts:
-      #  - mountPath: /app/
-      #    name: orchestrator-claim0
-      #  - mountPath: /app/data
-      #    name: orchestrator-claim1
+        volumeMounts:
+        - name: git
+          mountPath: /app/orchestrator
+          subPath: orchestrator/federatedaveraging
+        - name: project
+          mountPath: /app/orchestrator/project.yaml
+          subPath: project.yaml
+        - name: project
+          mountPath: /app/project.yaml
+          subPath: project.yaml
+        securityContext:
+          runAsUser: 0
+          #allowPrivilegeEscalation: false
       restartPolicy: Always
-      #volumes:
-      #- name: orchestrator-claim0
-      #  persistentVolumeClaim:
-      #    claimName: orchestrator-claim0
-      #- name: orchestrator-claim1
-      #  persistentVolumeClaim:
-      #    claimName: orchestrator-claim1
+      volumes:
+      - name: git
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-data
+      - name: git-secret
+        secret:
+          secretName: orchestrator-ssh-secret
+      - name: project
+        configMap:
+          name: {{ .Release.Name }}-orchestrator-configmap
+
+
+
 status: {}
