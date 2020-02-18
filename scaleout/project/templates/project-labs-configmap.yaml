@@ -19,15 +19,12 @@ data:
     c.NotebookApp.ip = '0.0.0.0'
     c.NotebookApp.port = 8888
     c.NotebookApp.open_browser = False
+    c.NotebookApp.tornado_settings={'headers':{'Content-Security-Policy': 'frame-ancestors self http://{{ .Values.global.domain }}',} }
 
     # https://github.com/jupyter/notebook/issues/3130
     c.FileContentsManager.delete_to_trash = False
 
-    c.Spawner.args = ['--NotebookApp.tornado_settings={
-        'headers':{
-            'Content-Security-Policy': 'frame-ancestors self http://{{ .Values.global.domain }}',
-        }
-    }']
+
 
     # Generate a self-signed certificate
     if 'GEN_CERT' in os.environ:
