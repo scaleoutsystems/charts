@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.19.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: studio
-  name: studio
+    io.kompose.service: {{ .Release.Name }}-studio
+  name: {{ .Release.Name }}-studio
 spec:
   replicas: 1
   strategy:
@@ -19,7 +19,7 @@ spec:
         kompose.version: 1.19.0 ()
       creationTimestamp: null
       labels:
-        io.kompose.service: studio
+        io.kompose.service: {{ .Release.Name }}-studio
     spec:
       containers:
       - args:
@@ -28,15 +28,17 @@ spec:
         env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: registry.demo.scaleout.se/studio:latest
+        image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
-        name: studio
+        name: {{ .Release.Name }}-studio
         resources: {}
         volumeMounts:
         - mountPath: /app/repos
           name: data-repositories
+      {{- if .Values.imagePullSecret }}
       imagePullSecrets:
-        - name: basic-auth-key
+        - name: {{ .Values.imagePullSecret }}
+      {{- end }}
       restartPolicy: Always
       volumes:
       - name: data-repositories

@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.19.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: ingress
-  name: ingress
+    io.kompose.service: {{ .Release.Name }}-ingress
+  name: {{ .Release.Name }}-ingress
 spec:
   replicas: 1
   strategy:
@@ -19,17 +19,15 @@ spec:
         kompose.version: 1.19.0 ()
       creationTimestamp: null
       labels:
-        io.kompose.service: ingress
+        io.kompose.service: {{ .Release.Name }}-ingress
     spec:
       containers:
       - env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: {{ .Values.ingress.image.repository }}
-        {{- if .Values.ingress.image.pullPolicy -}}
-        imagePullPolicy: {{ .Values.ingress.image.pullPolicy }}
-        {{- end }}
-        name: ingress
+        image: registry.demo.scaleout.se/ingress:latest
+
+        name: {{ .Release.Name }}-ingress
         lifecycle:
           postStart:
             exec:
@@ -41,7 +39,6 @@ spec:
                   cp /var/secret2/auth /var/www/html/git/repos/htpasswd
         ports:
         - containerPort: 80
-        resources: {}
         volumeMounts:
         - mountPath: /var/secret2/
           name: git-auth-secret
@@ -51,8 +48,10 @@ spec:
           readOnly: true
         - mountPath: /var/www/html/git/repos
           name: data-repositories
+      {{- if .Values.imagePullSecret }}
       imagePullSecrets:
-        - name: {{ .Values.imagePullSecrets }}
+        - name: {{ .Values.imagePullSecret }}
+      {{- end }}
       restartPolicy: Always
       volumes:
       - name: nginx-conf-secret
@@ -64,4 +63,3 @@ spec:
       - name: data-repositories
         persistentVolumeClaim:
           claimName: data-repositories
-status: {}

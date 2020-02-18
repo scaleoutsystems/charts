@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.19.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: ingress
-  name: ingress
+    io.kompose.service: {{ .Release.Name }}-ingress
+  name: {{ .Release.Name }}-ingress
 spec:
   ports:
   - name: "8080"
     port: 8080
     targetPort: 80
   selector:
-    io.kompose.service: ingress
+    io.kompose.service: {{ .Release.Name }}-ingress
 status:
   loadBalancer: {}
