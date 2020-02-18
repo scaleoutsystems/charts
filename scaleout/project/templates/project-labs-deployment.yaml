@@ -66,6 +66,9 @@ spec:
         volumeMounts:
         - name: git
           mountPath: /home/jovyan/
+        - name: jupyterconf
+          mountPath: /etc/jupyter/jupyter_notebook_config.py
+          subPath: jupyter_notebook_config.py
         securityContext:
           allowPrivilegeEscalation: false
       volumes:
@@ -74,3 +77,6 @@ spec:
       - name: git-secret
         secret:
           secretName: orchestrator-ssh-secret
+      - name: jupyterconf
+        configMap:
+          name: {{ .Release.Name }}-jupyter-configmap
