@@ -4,7 +4,7 @@
 
 labs:
   image: jupyter/minimal-notebook:latest
-  repository: "git@github.com:scaleoutsystems/scaleout-alliance-orchestrator-sdk.git"
+  repository: "git@github.com:scaleoutsystems/digits-example-project.git"
 
 global:
   domain: platform.demo.scaleout.se
