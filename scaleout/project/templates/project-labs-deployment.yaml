@@ -76,7 +76,7 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName: orchestrator-ssh-secret
+          secretName: digits-example-ssh-secret
       - name: jupyterconf
         configMap:
           name: {{ .Release.Name }}-jupyter-configmap
