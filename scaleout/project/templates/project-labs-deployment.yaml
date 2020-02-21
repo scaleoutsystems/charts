@@ -32,7 +32,7 @@ spec:
         - name: GIT_SYNC_BRANCH
           value: master
         - name: GIT_SYNC_DEST
-          value: orchestrator
+          value: work
         - name: GIT_SSH_KEY_FILE
           value: /etc/git-secret/ssh
         - name: GIT_SYNC_SSH
