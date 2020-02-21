@@ -18,7 +18,6 @@ spec:
         kompose.version: 1.20.0 ()
       creationTimestamp: null
       labels:
-        io.kompose.network/internal_network: "true"
         io.kompose.service: {{ .Release.Name }}-rabbit
     spec:
       containers:
