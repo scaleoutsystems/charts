@@ -56,3 +56,12 @@ ingress:
     - secretName: platform-tls-secret
       hosts:
         - platform.demo.scaleout.se
+
+rabbit:
+  username: admin
+  password: sp3ctr4l
+
+celery:
+  image:
+    repository: registry.demo.scaleout.se/celery:beta5
+    pullPolicy: Always
