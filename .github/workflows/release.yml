@@ -22,6 +22,5 @@ jobs:
         uses: helm/chart-releaser-action@v1.0.0-alpha.2
         with:
           charts_dir: scaleout
-
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
