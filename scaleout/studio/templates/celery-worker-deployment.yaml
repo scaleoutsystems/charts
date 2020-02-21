@@ -28,7 +28,7 @@ spec:
         env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: {{ .Values.celery.image.repository }}
+        image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         name: {{ .Release.Name }}-celery-worker
         resources: {}

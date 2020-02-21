@@ -60,8 +60,3 @@ ingress:
 rabbit:
   username: admin
   password: sp3ctr4l
-
-celery:
-  image:
-    repository: registry.demo.scaleout.se/celery:beta5
-    pullPolicy: Always
