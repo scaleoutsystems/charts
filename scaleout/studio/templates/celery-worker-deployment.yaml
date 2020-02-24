@@ -34,14 +34,14 @@ spec:
         resources: {}
         volumeMounts:
         - mountPath: /app/celery
-          name: data-repositories
+          name: celery-worker-claim0
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       {{- end }}
       restartPolicy: Always
       volumes:
-      - name: data-repositories
+      - name: celery-worker-claim0
         persistentVolumeClaim:
-          claimName: data-repositories
+          claimName: celery-worker-claim0
 status: {}
