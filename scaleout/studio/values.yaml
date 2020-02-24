@@ -56,3 +56,7 @@ ingress:
     - secretName: platform-tls-secret
       hosts:
         - platform.demo.scaleout.se
+
+rabbit:
+  username: admin
+  password: LJqEG9RE4Fd+ZbVWoJzZ+/IOQEI=
