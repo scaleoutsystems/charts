@@ -23,7 +23,7 @@ spec:
       containers:
       - env:
         - name: RABBITMQ_DEFAULT_PASS
-          value: {{ .Values.rabbit.password }}
+          value: {{ .Values.rabbit.password | quote }}
         - name: RABBITMQ_DEFAULT_USER
           value: {{ .Values.rabbit.username }}
         image: rabbitmq
