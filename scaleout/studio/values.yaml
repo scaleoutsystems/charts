@@ -37,18 +37,14 @@ ingress:
     repository: registry.demo.scaleout.se/ingress:latest
     pullPolicy: Always
   annotations:
-    kubernetes.io/tls-acme: 'true'
-#    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - ok
-#    nginx.ingress.kubernetes.io/auth-secret: basic-auth-secret
-#    nginx.ingress.kubernetes.io/auth-type: basic
   hosts:
-    - host: platform.demo.scaleout.se
+    - host: platform.local
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
-    tls:
-    - secretName: platform-tls-secret
-      hosts:
-        - platform.demo.scaleout.se
+    #tls:
+    #- secretName: platform-tls-secret
+    #  hosts:
+    #    - platform.local
 
 
 service:
