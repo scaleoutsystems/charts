@@ -16,3 +16,6 @@ minio:
 
 service:
   type: ClusterIP
+
+
+#storageClassName: aws-efs

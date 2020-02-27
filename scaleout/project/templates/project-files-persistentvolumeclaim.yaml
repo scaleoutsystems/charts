@@ -8,7 +8,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: aws-efs
+  storageClassName: {{ .Values.storageClassName | default "hostpath" }}
   resources:
     requests:
       storage: 1Gi
