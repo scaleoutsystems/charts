@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
+chartcontroller: chart-controller-controller
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
 ## Name: imagePullSecret
 ## Description: Secret to pull images from our private repository.
@@ -17,11 +17,13 @@ imagePullSecret: regcred
 storageClassName: hostpath
 
 studio:
+  servicename: studio
   image: #tell which image to deploy for studio
     repository: registry.demo.scaleout.se/studio:latest # point to the latest beta image
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
+domain: platform.local
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
