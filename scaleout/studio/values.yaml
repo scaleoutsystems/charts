@@ -7,23 +7,14 @@
 ## Name: imagePullSecret
 ## Description: Secret to pull images from our private repository.
 imagePullSecret: regcred
-## to create a regcred 
+## to create a regcred
 ## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
-
-## Name: nginx-config-secret
-## Description: Secret that names the config file that the <ingress> image is using for routing traffic. (it is a secret since it may contain certificate information)
-nginx-config-secret: nginx-config-secret
-## Name: git-auth-secret
-## Description: Secret that contain the git-auth-file credentials for accessing local repository file data.
-## Note: __DEPRICATED__ (will be removed) in future releases
-git-auth-secret: git-auth-secret #file for storing credentials for users
 
 # REQUIREMENT: set a storage class with ability to serve ReadWriteMany
 # Name: storageClassName
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 # Default: hostpath (works with docker-for-desktop)
-repositories:
-  storageClassName: hostpath
+storageClassName: hostpath
 
 studio:
   image: #tell which image to deploy for studio

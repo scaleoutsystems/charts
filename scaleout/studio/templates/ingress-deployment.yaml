@@ -36,18 +36,12 @@ spec:
                 - -c
                 - |
                   cp /var/secret/nginx.conf /etc/nginx/nginx.conf
-                  cp /var/secret2/auth /var/www/html/git/repos/htpasswd
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: /var/secret2/
-          name: git-auth-secret
-          readOnly: true
         - mountPath: /var/secret/
           name: nginx-conf-secret
           readOnly: true
-        - mountPath: /var/www/html/git/repos
-          name: data-repositories
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
@@ -57,9 +51,3 @@ spec:
       - name: nginx-conf-secret
         secret:
           secretName: nginx-config-secret
-      - name: git-auth-secret
-        secret:
-          secretName: git-auth-secret
-      - name: data-repositories
-        persistentVolumeClaim:
-          claimName: data-repositories

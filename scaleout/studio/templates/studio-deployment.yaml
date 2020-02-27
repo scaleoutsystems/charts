@@ -32,15 +32,8 @@ spec:
         imagePullPolicy: Always
         name: {{ .Release.Name }}-studio
         resources: {}
-        volumeMounts:
-        - mountPath: /app/repos
-          name: data-repositories
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       {{- end }}
       restartPolicy: Always
-      volumes:
-      - name: data-repositories
-        persistentVolumeClaim:
-          claimName: data-repositories

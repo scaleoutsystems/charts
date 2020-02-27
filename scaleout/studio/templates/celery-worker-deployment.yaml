@@ -32,16 +32,9 @@ spec:
         imagePullPolicy: Always
         name: {{ .Release.Name }}-celery-worker
         resources: {}
-        volumeMounts:
-        - mountPath: /app/celery
-          name: celery-worker-claim0
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       {{- end }}
       restartPolicy: Always
-      volumes:
-      - name: celery-worker-claim0
-        persistentVolumeClaim:
-          claimName: celery-worker-claim0
 status: {}
