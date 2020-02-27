@@ -27,7 +27,7 @@ repositories:
 
 studio:
   image: #tell which image to deploy for studio
-    repository: registry.demo.scaleout.se/studio:beta6 # point to the latest beta image
+    repository: registry.demo.scaleout.se/studio:latest # point to the latest beta image
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
