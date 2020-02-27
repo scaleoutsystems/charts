@@ -2,17 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
-
-studio:
-  image:
-    repository: registry.demo.scaleout.se/studio:beta6
-    pullPolicy: Always
 
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
 ## Name: imagePullSecret
 ## Description: Secret to pull images from our private repository.
 imagePullSecret: regcred
+## to create a regcred 
+## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
+
 ## Name: nginx-config-secret
 ## Description: Secret that names the config file that the <ingress> image is using for routing traffic. (it is a secret since it may contain certificate information)
 nginx-config-secret: nginx-config-secret
@@ -21,37 +18,22 @@ nginx-config-secret: nginx-config-secret
 ## Note: __DEPRICATED__ (will be removed) in future releases
 git-auth-secret: git-auth-secret #file for storing credentials for users
 
-service:
-  type: ClusterIP #override if you want to use NodePort instead to access cluster services
-
-# override if certain resource requirements should apply
-resources: {}
-
-# override if certain nodes should be used for the deployed resources.
-nodeSelector: {}
-
-# override if declaring that some criteria is tolerated for resource co-existing.
-tolerations: []
-
-affinity: {}
-
 # REQUIREMENT: set a storage class with ability to serve ReadWriteMany
 # Name: storageClassName
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
+# Default: hostpath (works with docker-for-desktop)
 repositories:
-  storageClassName: aws-efs
+  storageClassName: hostpath
 
-# Postgres default credentials for backend DB. Override for security!
-postgres:
-  db:
-    name: postgres
-    user: postgres
-    password: postgres
+studio:
+  image: #tell which image to deploy for studio
+    repository: registry.demo.scaleout.se/studio:beta6 # point to the latest beta image
+    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 ingress:
   enabled: true
-  image:
+  image: #tell which image to deploy for studio
     repository: registry.demo.scaleout.se/ingress:latest
     pullPolicy: Always
   annotations:
@@ -67,6 +49,34 @@ ingress:
     - secretName: platform-tls-secret
       hosts:
         - platform.demo.scaleout.se
+
+
+service:
+  type: ClusterIP #override if you want to use NodePort instead to access cluster services
+
+#override if you want to try out a HA (HIGH AVAILABILITY) setup.
+replicaCount: 1
+
+# override if certain resource requirements should apply
+resources: {}
+
+# override if certain nodes should be used for the deployed resources.
+nodeSelector: {}
+
+# override if declaring that some criteria is tolerated for resource co-existing.
+tolerations: []
+
+affinity: {}
+
+
+
+# Postgres default credentials for backend DB. Override for security!
+postgres:
+  db:
+    name: postgres
+    user: postgres
+    password: postgres
+
 
 # default credentials for rabbitmq. override in production!
 rabbit:
