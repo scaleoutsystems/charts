@@ -49,5 +49,5 @@ spec:
       restartPolicy: Always
       volumes:
       - name: nginx-conf-secret
-        secret:
-          secretName: nginx-config-secret
+        configMap:
+          name: nginx-config-secret
