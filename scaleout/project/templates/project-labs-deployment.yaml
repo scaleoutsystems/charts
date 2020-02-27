@@ -21,6 +21,7 @@ spec:
         #runAsUser: 1000
         #runAsGroup: 3000
         #fsGroup: 2000
+      {{ if .Values.labs.repository }}
       initContainers:
       - name: git-sync
         image: k8s.gcr.io/git-sync:v3.1.1
@@ -46,6 +47,7 @@ spec:
           mountPath: /tmp/git
         - name: git-secret
           mountPath: /etc/git-secret/
+      {{ end }}
       containers:
       - name: {{ .Release.Name }}-labs-app
         image: {{ .Values.labs.image }}
@@ -74,9 +76,11 @@ spec:
       volumes:
       - name: git
         emptyDir: {}
+      {{ if .Values.labs.repository }}
       - name: git-secret
         secret:
           secretName: digits-example-ssh-secret
+      {{ end }}
       - name: jupyterconf
         configMap:
           name: {{ .Release.Name }}-jupyter-configmap

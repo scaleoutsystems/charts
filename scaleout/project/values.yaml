@@ -7,7 +7,7 @@ labs:
   repository: "git@github.com:scaleoutsystems/digits-example-project.git"
 
 global:
-  domain: platform.demo.scaleout.se
+  domain: platform.local
 
 minio:
   access_key: minio
