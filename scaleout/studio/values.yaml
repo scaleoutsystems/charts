@@ -6,39 +6,49 @@ replicaCount: 1
 
 studio:
   image:
-    repository: registry.demo.scaleout.se/studio:beta5
+    repository: registry.demo.scaleout.se/studio:beta6
     pullPolicy: Always
 
+### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
+## Name: imagePullSecret
+## Description: Secret to pull images from our private repository.
 imagePullSecret: regcred
-
-nameOverride: ""
-fullnameOverride: ""
-
-nginx-config-secret: nginx-config-secret #file for holding the nginx config file
+## Name: nginx-config-secret
+## Description: Secret that names the config file that the <ingress> image is using for routing traffic. (it is a secret since it may contain certificate information)
+nginx-config-secret: nginx-config-secret
+## Name: git-auth-secret
+## Description: Secret that contain the git-auth-file credentials for accessing local repository file data.
+## Note: __DEPRICATED__ (will be removed) in future releases
 git-auth-secret: git-auth-secret #file for storing credentials for users
 
 service:
-  type: ClusterIP
-  #port: 30080
+  type: ClusterIP #override if you want to use NodePort instead to access cluster services
 
+# override if certain resource requirements should apply
 resources: {}
 
+# override if certain nodes should be used for the deployed resources.
 nodeSelector: {}
 
+# override if declaring that some criteria is tolerated for resource co-existing.
 tolerations: []
 
 affinity: {}
 
 # REQUIREMENT: set a storage class with ability to serve ReadWriteMany
+# Name: storageClassName
+# Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 repositories:
   storageClassName: aws-efs
 
+# Postgres default credentials for backend DB. Override for security!
 postgres:
   db:
     name: postgres
     user: postgres
     password: postgres
 
+# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 ingress:
   enabled: true
   image:
@@ -52,11 +62,13 @@ ingress:
   hosts:
     - host: platform.demo.scaleout.se
 
-  tls:
+  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
+    tls:
     - secretName: platform-tls-secret
       hosts:
         - platform.demo.scaleout.se
 
+# default credentials for rabbitmq. override in production!
 rabbit:
   username: admin
   password: LJqEG9RE4Fd+ZbVWoJzZ+/IOQEI=
