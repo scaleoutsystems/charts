@@ -1,4 +1,5 @@
 {{- if .Values.ingress }}
+{{- if .Values.ingress.enabled }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -34,4 +35,5 @@ spec:
             serviceName: {{ $.Release.Name }}-controller
             servicePort: http
   {{- end }}
+{{- end }}
 {{- end }}
