@@ -33,8 +33,8 @@ spec:
         name: {{ .Release.Name }}-studio
         resources: {}
         volumeMounts:
-          - mountPath: /app/studio
-            #subPath: settings.py
+          - mountPath: /app/studio/setings.py
+            subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
 
       {{- if .Values.imagePullSecret }}

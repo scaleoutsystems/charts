@@ -1,0 +1,15 @@
+# Default values for scaleout stack.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Each component supports a field "enabled: true/false"; disabled components are not installed
+
+
+ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+    path: /
+    hosts:
+        - minio.stack.your.domain.name
+accessKey: "youraccesskeyhere"
+secretKey: "yoursecrethere"
