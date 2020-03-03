@@ -70,4 +70,4 @@ postgres:
 # default credentials for rabbitmq. override in production!
 rabbit:
   username: admin
-  password: LJqEG9RE4Fd+ZbVWoJzZ+/IOQEI=
+  password: LJqEG9RE4FdZbVWoJzZIOQEI
