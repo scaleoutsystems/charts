@@ -201,7 +201,7 @@ data:
     REDIS_DB = 0
     REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', 'redis')
 
-    CELERY_BROKER_URL = 'amqp://admin:sp3ctr4l@rabbit:5672//'
+    CELERY_BROKER_URL = 'amqp://{{ .Values.rabbit.username }}:{{ .Values.rabbit.password }}@{{ .Release.Name }}-rabbit:5672//'
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'

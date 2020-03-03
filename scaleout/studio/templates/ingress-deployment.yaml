@@ -26,21 +26,13 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         image: registry.demo.scaleout.se/ingress:latest
-
         name: {{ .Release.Name }}-ingress
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - |
-                  cp /var/secret/nginx.conf /etc/nginx/nginx.conf
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: /var/secret/
-          name: nginx-conf-secret
+        - mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          name: nginx-conf
           readOnly: true
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
@@ -48,6 +40,9 @@ spec:
       {{- end }}
       restartPolicy: Always
       volumes:
-      - name: nginx-conf-secret
+      - name: nginx-conf
         configMap:
-          name: nginx-config-secret
+          name: nginx-config-configmap
+          items:
+          - key: nginx.conf
+            path: nginx.conf
