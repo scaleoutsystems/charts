@@ -33,7 +33,7 @@ spec:
         name: {{ .Release.Name }}-celery-worker
         resources: {}
         volumeMounts:
-          - mountPath: /app/studio/setings.py
+          - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
       {{- if .Values.imagePullSecret }}
