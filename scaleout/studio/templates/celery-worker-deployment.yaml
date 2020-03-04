@@ -32,9 +32,21 @@ spec:
         imagePullPolicy: Always
         name: {{ .Release.Name }}-celery-worker
         resources: {}
+        volumeMounts:
+          - mountPath: /app/studio/settings.py
+            subPath: settings.py
+            name: {{ .Release.Name}}-settings-configmap
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       {{- end }}
       restartPolicy: Always
+      volumes:
+      - name: {{ .Release.Name}}-settings-configmap
+        configMap:
+          name: {{ .Release.Name}}-settings-configmap
+          items:
+          - key: settings.py
+            path: settings.py
+
 status: {}
