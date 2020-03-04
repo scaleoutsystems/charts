@@ -83,7 +83,6 @@ jupyterhub:
           guarantee: 512M
       storage:
           dynamic:
-            storageClass: gp2
             capacity: 2Gi
 
     rbac:
@@ -97,7 +96,7 @@ jupyterhub:
                  c.Spawner.cmd = ['jupyter-labhub']
 
 openfaas:
-    functionNamespace: teststack
+    functionNamespace: stack-fn
     exposeServices: true
     async: true
     rbac: true
