@@ -2,23 +2,20 @@ dependencies:
 - name: jupyterhub
   repository: https://jupyterhub.github.io/helm-chart/
   version: 0.8.2
-- name: rabbitmq
-  repository: https://kubernetes-charts.storage.googleapis.com
-  version: 6.4.4
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com
   version: 2.5.13
 - name: openfaas
   repository: https://openfaas.github.io/faas-netes/
-  version: 4.6.3
+  version: 5.5.6
 - name: argo-events
   repository: https://argoproj.github.io/argo-helm
-  version: 0.5.0
+  version: 0.7.0
 - name: argo
   repository: https://argoproj.github.io/argo-helm
-  version: 0.6.1
+  version: 0.6.8
 - name: docker-registry
   repository: https://kubernetes-charts.storage.googleapis.com
   version: 1.9.1
-digest: sha256:50891f6d4678c50e6e0f916be56ab9c686cd0cea9740c53c46dcc453dcb50a8c
-generated: "2020-02-01T22:57:08.309625+01:00"
+digest: sha256:ca30e82d8140fa2ba6b299f0b7ed3d8fde204a04e6feb85ac715620fdeee7e4a
+generated: "2020-03-07T14:15:05.43473+01:00"

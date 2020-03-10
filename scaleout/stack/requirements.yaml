@@ -5,28 +5,23 @@ dependencies:
     repository: "https://jupyterhub.github.io/helm-chart/"
     condition: jupyterhub.enabled
 
-  - name: rabbitmq
-    version: 6.4.4
-    repository: "https://kubernetes-charts.storage.googleapis.com"
-    condition: rabbitmq.enabled
-
   - name: minio
     version: 2.5.13
     repository: "https://kubernetes-charts.storage.googleapis.com"
     condition: minio.enabled
 
   - name: openfaas
-    version: 4.6.3
+    version: 5.5.6
     repository: "https://openfaas.github.io/faas-netes/"
     condition: openfaas.enabled
 
   - name: argo-events
-    version: 0.5.0
+    version: 0.7.0
     repository: "https://argoproj.github.io/argo-helm"
     condition: argo-events.enabled
 
   - name: argo
-    version: 0.6.1
+    version: 0.6.8
     repository: "https://argoproj.github.io/argo-helm"
     condition: argo.enabled
 
