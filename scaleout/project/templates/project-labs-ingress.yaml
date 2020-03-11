@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-labs-ingress
   annotations:
     kubernetes.io/tls-acme: 'true'
+    nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
     #nginx.ingress.kubernetes.io/auth-url: "/auth/"
     #ingress.kubernetes.io/rewrite-target: /
     #nginx.ingress.kubernetes.io/ssl-redirect: "false"
