@@ -11,5 +11,5 @@ spec:
   storageClassName: {{ .Values.storageClassName | default "hostpath" }}
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
 status: {}
