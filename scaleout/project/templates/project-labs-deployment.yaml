@@ -75,7 +75,8 @@ spec:
           allowPrivilegeEscalation: false
       volumes:
       - name: git
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-project-files
       {{ if .Values.labs.repository }}
       - name: git-secret
         secret:
