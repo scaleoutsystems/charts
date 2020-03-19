@@ -71,7 +71,7 @@ spec:
       volumes:
       - name: git
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-project-files
+          claimName: {{ .Values.project.name }}-project-files
       {{ if .Values.labs.repository }}
       - name: git-secret
         secret:

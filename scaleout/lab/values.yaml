@@ -1,4 +1,6 @@
 
+project:
+  name: test
 labs:
   image: jupyter/minimal-notebook:latest
   repository: "git@github.com:scaleoutsystems/digits-example-project.git"
