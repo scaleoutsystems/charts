@@ -13,3 +13,6 @@ labs:
 
 global:
   domain: platform.local
+
+imagePullSecrets:
+  - name: regcred
