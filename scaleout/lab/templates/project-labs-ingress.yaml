@@ -5,18 +5,14 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: 'true'
     nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
-    #nginx.ingress.kubernetes.io/auth-url: "/auth/"
-    #ingress.kubernetes.io/rewrite-target: /
-    #nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    #nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    #nginx.ingress.kubernetes.io/rewrite-target: /
+
 spec:
   tls:
   - hosts:
-    - labs.{{ .Release.Name }}.{{ .Values.global.domain }}
+    - {{ .Release.Name }}.labs.{{ .Values.global.domain }}
     secretName: {{ .Release.Name }}-labs-tls-secret
   rules:
-  - host: labs.{{ .Release.Name }}.{{ .Values.global.domain }}
+  - host: {{ .Release.Name }}.labs.{{ .Values.global.domain }}
     http:
       paths:
         - path: /
