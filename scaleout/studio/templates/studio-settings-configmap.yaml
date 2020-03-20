@@ -65,6 +65,9 @@ data:
         'reports',
         'files',
         'datasets',
+        'workflows',
+        'experiments',
+        'deployments',
         'alliance_admin',
         'platform_module',
         'bootstrap_modal_forms'
@@ -190,8 +193,6 @@ data:
     CHART_CONTROLLER_URL = 'http://{{ .Values.chartcontroller }}'
     STUDIO_URL = 'http://{{ .Values.studio.servicename }}:8080'
 
-    DEMO_PLATFORM_URL = 'https://{{ .Values.domain }}'
-
     try:
         from .settings_local import *
     except ImportError as e:
@@ -208,3 +209,5 @@ data:
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TIMEZONE = "UTC"
     CELERY_ENABLE_UTC = True
+
+    EXTERNAL_KUBECONF = False
