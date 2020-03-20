@@ -15,5 +15,3 @@ $ helm install --name studio --namespace your-namespace --set domain=your.domain
 ```
 
 
-
-.
