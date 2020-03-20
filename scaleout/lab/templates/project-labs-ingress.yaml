@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.project.name }}.labs.{{ .Values.global.domain }}
+    - {{ .Release.Name }}.labs.{{ .Values.global.domain }}
     secretName: {{ .Release.Name }}-labs-tls-secret
   rules:
-  - host: {{ .Values.project.name }}.labs.{{ .Values.global.domain }}
+  - host: {{ .Release.Name }}.labs.{{ .Values.global.domain }}
     http:
       paths:
         - path: /
