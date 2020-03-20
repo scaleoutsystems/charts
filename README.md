@@ -13,3 +13,5 @@ Deploy a chart
 ```bash
 $ helm install --name studio --namespace your-namespace --set domain=your.domain.name scaleout/studio
 ```
+
+

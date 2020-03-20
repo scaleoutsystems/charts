@@ -34,5 +34,6 @@ jobs:
         uses: helm/chart-releaser-action@v1.0.0-alpha.2
         with:
           charts_dir: scaleout
+          charts_repo_url: https://scaleoutsystems.github.io/charts
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
