@@ -29,5 +29,9 @@ spec:
           backend:
             serviceName: {{ $.Release.Name }}-ingress
             servicePort: 8080
+        - path: /static/
+          backend:
+            serviceName: {{ $.Release.Name }}-ingress
+            servicePort: 8080
   {{- end }}
 {{- end }}

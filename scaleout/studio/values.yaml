@@ -29,7 +29,7 @@ ingress:
   image: #tell which image to deploy for studio
     repository: registry.demo.scaleout.se/ingress:latest
     pullPolicy: Always
-  annotations:
+  annotations: {}
   hosts:
     - host: platform.local
 
