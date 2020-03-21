@@ -5,11 +5,11 @@ labs:
   image: jupyter/minimal-notebook:latest
   repository: "git@github.com:scaleoutsystems/digits-example-project.git"
   requests:
-    memory: 1Gi
+    memory: 256m
     cpu: 200m
-  limits:
-    memory: 1Gi
-    cpu: 500m
+#  limits:
+#    memory: 1Gi
+#    cpu: 500m
 
 global:
   domain: platform.local

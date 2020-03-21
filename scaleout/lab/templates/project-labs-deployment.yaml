@@ -54,12 +54,16 @@ spec:
         command: ["start-notebook.sh"]
         args: ["--NotebookApp.token=''"]
         resources:
+            {{ if .Values.labs.requests }}
             requests:
                 memory: "{{ .Values.labs.requests.memory }}"
                 cpu: "{{ .Values.labs.requests.cpu }}"
+            {{ end }}
+            {{ if .Values.labs.limits}}
             limits:
                 memory: "{{ .Values.labs.limits.memory }}"
                 cpu: "{{ .Values.labs.limits.cpu }}"
+            {{ end }}
         volumeMounts:
         - name: git
           mountPath: /home/jovyan/
