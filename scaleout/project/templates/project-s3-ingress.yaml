@@ -22,4 +22,4 @@ spec:
     # https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/PREREQUISITES.md#tls-certificates
     - secretName: prod-ingress
       hosts:
-        - {{ .Release.Name }}.minio.{{ .Values.global.domain }}
+        - {{ .Release.Name }}.resources.{{ .Values.global.domain }}
