@@ -33,6 +33,10 @@ spec:
         volumeMounts:
         - mountPath: /app/work
           name: project-files
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret }}
+      {{- end }}
       volumes:
       - name: project-files
         persistentVolumeClaim:
