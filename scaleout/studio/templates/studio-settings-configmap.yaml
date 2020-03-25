@@ -211,3 +211,5 @@ data:
     CELERY_ENABLE_UTC = True
 
     EXTERNAL_KUBECONF = False
+
+    NAMESPACE = {{ .Values.namespace | default "default" | quote }}

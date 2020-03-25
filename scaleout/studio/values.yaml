@@ -15,6 +15,7 @@ imagePullSecret: regcred
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 # Default: hostpath (works with docker-for-desktop)
 storageClassName: hostpath
+namespace: default
 
 studio:
   servicename: studio
