@@ -211,5 +211,6 @@ data:
     CELERY_ENABLE_UTC = True
 
     EXTERNAL_KUBECONF = False
+    STORAGECLASS = {{ .Values.storageClassName | default "aws-efs" | quote }}
 
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
