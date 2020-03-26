@@ -17,5 +17,5 @@ minio:
 service:
   type: ClusterIP
 
-
+imagePullSecret: regcred
 #storageClassName: aws-efs
