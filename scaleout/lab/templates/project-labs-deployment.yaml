@@ -62,8 +62,8 @@ spec:
         env:
         - name: JUPYTER_ENABLE_LAB
           value: "yes"
-        command: ["start-notebook.sh"]
-        args: ["--NotebookApp.token=''"]
+        #command: ["start-notebook.sh"]
+        #args: ["--NotebookApp.token=''"]
         resources:
             {{ if .Values.labs.requests }}
             requests:
@@ -72,8 +72,15 @@ spec:
             {{ end }}
             {{ if .Values.labs.limits}}
             limits:
+                {{ if .Values.labs.limits.memory }}
                 memory: "{{ .Values.labs.limits.memory }}"
+                {{ end }}
+                {{ if .Values.labs.limits.cpu }}
                 cpu: "{{ .Values.labs.limits.cpu }}"
+                {{ end }}
+                {{ if .Values.labs.limits.gpu }}
+                nvidia.com/gpu: "{{ .Values.labs.limits.gpu }}"
+                {{ end }}
             {{ end }}
         volumeMounts:
         - name: git
@@ -82,7 +89,7 @@ spec:
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
         securityContext:
-          allowPrivilegeEscalation: false
+          allowPrivilegeEscalation: true
       volumes:
       - name: git
         persistentVolumeClaim:
