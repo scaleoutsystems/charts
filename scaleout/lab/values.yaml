@@ -7,6 +7,7 @@ labs:
   requests:
     memory: 256m
     cpu: 200m
+  gpu: ""
 #  limits:
 #    memory: 1Gi
 #    cpu: 500m

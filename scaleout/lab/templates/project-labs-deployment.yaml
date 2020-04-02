@@ -12,6 +12,17 @@ spec:
       labels:
         app: {{ .Release.Name }}-labs-app
     spec:
+    {{ if .Values.labs.gpu }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: acceleration
+                operator: In
+                values:
+                - gpu
+    {{ end }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
