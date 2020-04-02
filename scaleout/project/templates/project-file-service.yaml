@@ -7,7 +7,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: {{ .Release.Name }}-file-controller
-  name: {{ .Release.Name }}file-controller
+  name: {{ .Release.Name }}-file-controller
 spec:
   type: {{ .Values.service.type }}
   ports:
