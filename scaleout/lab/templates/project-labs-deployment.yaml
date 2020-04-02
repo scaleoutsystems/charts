@@ -67,8 +67,12 @@ spec:
         resources:
             {{ if .Values.labs.requests }}
             requests:
+                {{ if .Values.labs.requests.memory }}
                 memory: "{{ .Values.labs.requests.memory }}"
+                {{ end }}
+                {{ if .Values.labs.requests.cpu }}
                 cpu: "{{ .Values.labs.requests.cpu }}"
+                {{ end }}
             {{ end }}
             {{ if .Values.labs.limits}}
             limits:
