@@ -2,11 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-chartcontroller: chart-controller-controller
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
 ## Name: imagePullSecret
 ## Description: Secret to pull images from our private repository.
-imagePullSecret: regcred
+imagePullSecrets:
+  - name: regcred
+
 ## to create a regcred
 ## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
 
@@ -72,3 +73,30 @@ postgres:
 rabbit:
   username: admin
   password: LJqEG9RE4FdZbVWoJzZIOQEI
+
+chart-controller:
+  image:
+    repository: registry.demo.scaleout.se/chart-controller:latest
+    pullPolicy: Always
+
+
+
+cluster_config: |-
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: "local"
+      cluster:
+        server: "your.server.here"
+    users:
+    - name: "local"
+      user:
+        token: "your.token.here"
+
+    contexts:
+    - name: "local"
+      context:
+        user: "local"
+        cluster: "local"
+
+    current-context: "local"
