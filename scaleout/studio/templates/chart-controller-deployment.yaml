@@ -28,7 +28,7 @@ spec:
       - env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: "{{ .Values.chart-controller.image.repository }}"
+        image: {{ .Values.chartcontroller.image.repository }}
         name: {{ .Release.Name }}-chart-controller
         ports:
         - containerPort: 80

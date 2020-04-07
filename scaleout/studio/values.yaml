@@ -74,7 +74,7 @@ rabbit:
   username: admin
   password: LJqEG9RE4FdZbVWoJzZIOQEI
 
-chart-controller:
+chartcontroller:
   image:
     repository: registry.demo.scaleout.se/chart-controller:latest
     pullPolicy: Always
