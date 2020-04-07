@@ -25,7 +25,7 @@ studio:
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: platform.local
+domain: 192.168.32.161.nip.io
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
@@ -33,7 +33,7 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: platform.local
+    - host: 192.168.32.161.nip.io
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
@@ -109,11 +109,11 @@ docker-registry:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
         hosts:
-            - registry.stack.your.domain.name
+            - registry.192.168.32.161.nip.io
         tls:
             - secretName: ingress-secret
               hosts:
-                  - registry.stack.your.domain.name
+                  - registry.192.168.32.161.nip.io
 
     persistence:
       enabled: true
@@ -129,11 +129,11 @@ argo:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: 1000m
         hosts:
-            - workflow.stack.your.domain.name
+            - workflow.192.168.32.161.nip.io
         tls:
             - secretName: ingress-secret
               hosts:
-                  - workflow.stack.your.domain.name
+                  - workflow.192.168.32.161.nip.io
 
 argo-events:
   enabled: true
@@ -155,7 +155,7 @@ openfaas:
     ingress:
       enabled: true
       hosts:
-        - host: serve.stack.your.domain.name
+        - host: serve.192.168.32.161.nip.io
           serviceName: gateway
           servicePort: 8080
           path: /
@@ -163,4 +163,4 @@ openfaas:
       tls:
         - secretName: ingress-secret
           hosts:
-            - serve.stack.your.domain.name
+            - serve.192.168.32.161.nip.io
