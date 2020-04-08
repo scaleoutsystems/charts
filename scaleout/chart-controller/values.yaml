@@ -6,6 +6,7 @@ controller:
   image:
     repository: registry.demo.scaleout.se/chart-controller
     pullPolicy: Always
+  branch: master 
 
 imagePullSecrets:
   - name: regcred

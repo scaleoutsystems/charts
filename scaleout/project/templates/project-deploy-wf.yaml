@@ -28,7 +28,7 @@ data:
         - name: model-name
           value: test-model
         - name: model-version
-          value: v0.0.1
+          value: v0
       volumes:
         - name: kaniko-secret
           secret:

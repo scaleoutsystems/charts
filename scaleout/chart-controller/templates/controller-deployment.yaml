@@ -28,6 +28,8 @@ spec:
       - env:
         - name: GET_HOSTS_FROM
           value: dns
+        - name: BRANCH
+          value: {{ .Values.controller.branch }}
         image: "{{ .Values.controller.image.repository }}:{{ .Chart.AppVersion }}"
         name: {{ .Release.Name }}-controller
         ports:
