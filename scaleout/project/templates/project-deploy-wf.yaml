@@ -32,9 +32,9 @@ data:
       volumes:
         - name: kaniko-secret
           secret:
-            secretName: registry-docker-registry-secret
+            secretName: regcred
             items:
-              - key: haSharedSecret
+              - key: .dockerconfigjson
                 path: config.json
       templates:
       - name: check-input
@@ -102,7 +102,7 @@ data:
 
           args: [ "--dockerfile=Dockerfile",
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                  "--destination=registry.{{ .Values.global.domain }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+                  "--destination=registry.demo.scaleout.se/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
           volumeMounts:
             - name: kaniko-secret
               mountPath: /kaniko/.docker
@@ -139,7 +139,7 @@ data:
                 namespace: serving
             spec:
                 name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                image: "registry.{{ .Values.global.domain }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
+                image: "registry.demo.scaleout.se/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
       - name: deploy-wf
         steps:
         - - name: check-input
