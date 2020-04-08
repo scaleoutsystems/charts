@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: {{ .Release.Name }}-minio-sensor
+  labels:
+    sensors.argoproj.io/sensor-controller-instanceid: argo-events
+spec:
+  template:
+    spec:
+      containers:
+        - name: sensor
+          image: argoproj/sensor:v0.13.0-rc
+          imagePullPolicy: Always
+      serviceAccountName: argo-events-sa
+  dependencies:
+    - name: test-dep
+      gatewayName: {{ .Release.Name }}-webhook-gateway
+      eventName: model-deploy-event
+  subscription:
+    http:
+      port: 9300
+  triggers:
+  - template:
+      name: minio-workflow-trigger
+      k8s:
+        group: argoproj.io
+        version: v1alpha1
+        resource: workflows
+        operation: create
+        source:
+          configmap:
+            name: {{ .Release.Name }}-trigger-store
+            namespace: {{ .Release.Namespace }}
+            key: workflow
+        parameters:
+        - src:
+            dependencyName: test-dep
+            dataKey: body.context_bucket
+          dest: spec.arguments.parameters.0.value
+        - src:
+            dependencyName: test-dep
+            dataKey: body.context_file
+          dest: spec.arguments.parameters.1.value
+        - src:
+            dependencyName: test-dep
+            dataKey: body.model_bucket
+          dest: spec.arguments.parameters.2.value
+        - src:
+            dependencyName: test-dep
+            dataKey: body.model_file
+          dest: spec.arguments.parameters.3.value
+        - src:
+            dependencyName: test-dep
+            dataKey: body.model_name
+          dest: spec.arguments.parameters.4.value
+        - src:
+            dependencyName: test-dep
+            dataKey: body.model_version
+          dest: spec.arguments.parameters.5.value
+       
