@@ -34,7 +34,7 @@ data:
           secret:
             secretName: registry-docker-registry-secret
             items:
-              - key: .dockerconfigjson
+              - key: haSharedSecret
                 path: config.json
       templates:
       - name: check-input
