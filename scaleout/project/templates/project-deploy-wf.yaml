@@ -14,7 +14,7 @@ data:
       entrypoint: deploy-wf
       serviceAccountName: argo-events-sa
       imagePullSecrets:
-        - name: registry-docker-registry-secret
+        - name: regcred
       arguments:
         parameters:
         - name: context-bucket
