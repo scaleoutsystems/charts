@@ -20,4 +20,4 @@ service:
 registry: registry.demo.scaleout.se
 imagePullSecret: regcred
 #storageClassName: aws-efs
-serving-namespace: serving
+serving_namespace: serving

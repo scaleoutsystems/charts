@@ -136,7 +136,7 @@ data:
             kind: Function
             metadata:
                 name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                namespace: {{.Values.serving-namespace}}
+                namespace: {{.Values.serving_namespace}}
             spec:
                 name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
                 image: "{{.Values.registry}}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
