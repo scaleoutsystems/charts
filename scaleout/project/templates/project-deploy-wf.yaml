@@ -57,9 +57,9 @@ data:
           command: [echo]
           args: ["{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
                  "{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}"]
-      - name: get-metadata
+      - name: package-model
         container:
-          image: registry.{{ .Values.global.domain }}/get_metadata:latest
+          image: {{.Values.registry}}/package-model:latest
           env:
             - name: S3_ACCESS_KEY_ID
               valueFrom:
@@ -102,7 +102,7 @@ data:
 
           args: [ "--dockerfile=Dockerfile",
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                  "--destination=registry.demo.scaleout.se/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+                  "--destination={{ .Values.registry }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
           volumeMounts:
             - name: kaniko-secret
               mountPath: /kaniko/.docker
@@ -136,32 +136,32 @@ data:
             kind: Function
             metadata:
                 name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                namespace: serving
+                namespace: {{.Values.serving-namespace}}
             spec:
                 name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                image: "registry.demo.scaleout.se/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
+                image: "{{.Values.registry}}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
       - name: deploy-wf
         steps:
         - - name: check-input
             template: check-input
-        - - name: get-metadata
-            template: get-metadata
+        - - name: package-model
+            template: package-model
         - - name: check-output
             template: check-output
             arguments:
               parameters:
               - name: build-file
-                value: "{{ "{{" }}steps.get-metadata.outputs.parameters.build-file{{ "}}" }}"
+                value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file{{ "}}" }}"
               - name: build-file-bucket
-                value: "{{ "{{" }}steps.get-metadata.outputs.parameters.build-file-bucket{{ "}}" }}"
+                value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file-bucket{{ "}}" }}"
         - - name: build-deployment
             template: build-deployment
             arguments:
               parameters:
               - name: build-file
-                value: "{{ "{{" }}steps.get-metadata.outputs.parameters.build-file{{ "}}" }}"
+                value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file{{ "}}" }}"
               - name: build-file-bucket
-                value: "{{ "{{" }}steps.get-metadata.outputs.parameters.build-file-bucket{{ "}}" }}"
+                value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file-bucket{{ "}}" }}"
         - - name: deploy
             template: deploy
 
