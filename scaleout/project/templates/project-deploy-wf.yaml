@@ -102,10 +102,10 @@ data:
 
           args: [ "--dockerfile=Dockerfile",
                   {{ if not .Values.registry.secure }}
-                  "--insecure-registry",
+                  "--insecure-registry {{ .Values.registry.host | default "registry.{{.Values.global.domain}}"}}",
                   {{ end }}
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                  "--destination={{ .Values.registry | default "registry.{{.Values.global.domain}}"}}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+                  "--destination={{ .Values.registry.host | default "registry.{{.Values.global.domain}}"}}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
           volumeMounts:
             - name: kaniko-secret
               mountPath: /kaniko/.docker
