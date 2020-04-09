@@ -22,6 +22,7 @@ service:
 # secure: False can be used for local testing
 registry:
   secure: False
+  host: registry.platform.local
 
 imagePullSecret: regcred
 #storageClassName: aws-efs
