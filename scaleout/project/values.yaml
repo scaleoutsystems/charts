@@ -17,6 +17,12 @@ minio:
 service:
   type: ClusterIP
 
+# Registry for local images, e.g. model containers.
+# Default host is registry.global.domain
+# secure: False can be used for local testing
+registry:
+  secure: False
+
 imagePullSecret: regcred
 #storageClassName: aws-efs
 serving_namespace: serving
