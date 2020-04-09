@@ -105,7 +105,7 @@ data:
                   "--insecure",
                   {{ end }}
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                  "--destination={{ .Values.registry.host }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+                  "--destination=http://registry-docker-registry:5000/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
         #   volumeMounts:
         #     - name: kaniko-secret
         #       mountPath: /kaniko/.docker
