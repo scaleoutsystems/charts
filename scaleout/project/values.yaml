@@ -17,7 +17,6 @@ minio:
 service:
   type: ClusterIP
 
-registry: registry.demo.scaleout.se
 imagePullSecret: regcred
 #storageClassName: aws-efs
 serving_namespace: serving
