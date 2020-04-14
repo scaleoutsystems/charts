@@ -104,7 +104,7 @@ data:
                   {{ if not .Values.registry.secure }}
                   "--insecure",       
                   "--insecure-registry",
-                  "stack-docker-registry.default:5000",
+                  "registry-docker-registry:5000",
                   {{ end }}
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
                   "--destination=registry-docker-registry:5000/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
