@@ -29,13 +29,13 @@ data:
           value: test-model
         - name: model-version
           value: v0
-    #   volumes:
-    #     - name: kaniko-secret
-    #       secret:
-    #         secretName: regcred
-    #         items:
-    #           - key: .dockerconfigjson
-    #             path: config.json
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
       templates:
       - name: check-input
         container:
@@ -102,13 +102,15 @@ data:
 
           args: [ "--dockerfile=Dockerfile",
                   {{ if not .Values.registry.secure }}
-                  "--insecure",
+                  "--insecure",       
+                  "--insecure-registry",
+                  "stack-docker-registry.default:5000",
                   {{ end }}
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                  "--destination=http://registry-docker-registry:5000/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
-        #   volumeMounts:
-        #     - name: kaniko-secret
-        #       mountPath: /kaniko/.docker
+                  "--destination=registry-docker-registry:5000/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+          volumeMounts:
+            - name: kaniko-secret
+              mountPath: /kaniko/.docker
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
