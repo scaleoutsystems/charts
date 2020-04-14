@@ -14,7 +14,7 @@ data:
       entrypoint: deploy-wf
       serviceAccountName: argo-events-sa
       imagePullSecrets:
-        - name: regcred
+        - name: {{ .Values.imagePullSecret }}
       arguments:
         parameters:
         - name: context-bucket
@@ -32,7 +32,7 @@ data:
       volumes:
         - name: kaniko-secret
           secret:
-            secretName: regcred
+            secretName: {{ .Values.imagePullSecret }}
             items:
               - key: .dockerconfigjson
                 path: config.json
