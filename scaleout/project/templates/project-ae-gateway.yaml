@@ -1,32 +1,3 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Gateway
-# metadata:
-#   name: {{ .Release.Name }}-minio-gateway
-#   labels:
-#     # gateway controller with instanceId "argo-events" will process this gateway
-#     gateways.argoproj.io/gateway-controller-instanceid: argo-events
-# spec:
-#   type: minio
-#   eventSourceRef:
-#     name: {{ .Release.Name }}-project-ae-es
-#   template:
-#     metadata:
-#       name: {{ .Release.Name }}-minio-gateway
-#       labels:
-#         gateway-name: {{ .Release.Name }}-minio-gateway
-#     spec:
-#       containers:
-#         - name: {{ .Release.Name }}-gateway-client
-#           image: argoproj/gateway-client:v0.13.0-rc
-#           imagePullPolicy: Always
-#           command: ["/bin/gateway-client"]
-#         - name: {{ .Release.Name }}-minio-events
-#           image: argoproj/artifact-gateway:v0.13.0-rc
-#           imagePullPolicy: Always
-#       serviceAccountName: argo-events-sa
-#   subscribers:
-#     http:
-#       - "http://{{ .Release.Name }}-minio-sensor:9300/"
 apiVersion: argoproj.io/v1alpha1
 kind: Gateway
 metadata:
