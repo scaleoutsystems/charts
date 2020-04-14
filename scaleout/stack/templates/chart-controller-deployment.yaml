@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.20.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: {{ .Release.Name }}-controller
-  name: {{ .Release.Name }}-controller
+    io.kompose.service: {{ .Release.Name }}-chart-controller
+  name: {{ .Release.Name }}-chart-controller
 spec:
   replicas: 1
   strategy: {}
@@ -18,7 +18,7 @@ spec:
         kompose.version: 1.20.0 ()
       creationTimestamp: null
       labels:
-        io.kompose.service: {{ .Release.Name }}-controller
+        io.kompose.service: {{ .Release.Name }}-chart-controller
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -29,9 +29,9 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         - name: BRANCH
-          value: {{ .Values.controller.branch | default master}}
-        image: "{{ .Values.controller.image.repository }}:{{ .Chart.AppVersion }}"
-        name: {{ .Release.Name }}-controller
+          value: {{ .Values.chartcontroller.branch | default master}}
+        image: {{ .Values.chartcontroller.image.repository }}
+        name: {{ .Release.Name }}-chart-controller
         ports:
         - containerPort: 80
         resources: {}
@@ -43,7 +43,7 @@ spec:
       volumes:
       - name: config
         secret:
-          secretName: {{ .Release.Name }}-clusterconfig-secret
+          secretName: {{ .Release.Name }}-chart-controller-secret
 
 
 status: {}

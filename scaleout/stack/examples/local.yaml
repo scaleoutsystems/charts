@@ -2,11 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-chartcontroller: chart-controller-controller
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
 ## Name: imagePullSecret
 ## Description: Secret to pull images from our private repository.
-imagePullSecret: regcred
+imagePullSecrets:
+  - name: regcred
+
 ## to create a regcred
 ## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
 
@@ -24,7 +25,7 @@ studio:
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: platform.local
+domain: 192.168.32.161.nip.io
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
@@ -32,7 +33,7 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: platform.local
+    - host: 192.168.32.161.nip.io
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
@@ -72,3 +73,94 @@ postgres:
 rabbit:
   username: admin
   password: LJqEG9RE4FdZbVWoJzZIOQEI
+
+chartcontroller:
+  image:
+    repository: registry.demo.scaleout.se/chart-controller:latest
+    pullPolicy: Always
+
+
+
+cluster_config: |-
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: "local"
+      cluster:
+        server: "your.server.here"
+    users:
+    - name: "local"
+      user:
+        token: "your.token.here"
+
+    contexts:
+    - name: "local"
+      context:
+        user: "local"
+        cluster: "local"
+
+    current-context: "local"
+
+
+docker-registry:
+    enabled: true
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+        hosts:
+            - registry.192.168.32.161.nip.io
+        tls:
+            - secretName: ingress-secret
+              hosts:
+                  - registry.192.168.32.161.nip.io
+
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 10Gi
+
+argo:
+  installCRD: false
+  enabled: true
+  ui:
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+        hosts:
+            - workflow.192.168.32.161.nip.io
+        tls:
+            - secretName: ingress-secret
+              hosts:
+                  - workflow.192.168.32.161.nip.io
+
+argo-events:
+  enabled: true
+  installCRD: false
+  namespace: argo-events
+  singleNamespace: false
+
+
+openfaas:
+    functionNamespace: stack-fn
+    exposeServices: true
+    async: true
+    rbac: false
+    psp: false
+    securityContext: true
+    basic_auth: false
+    operator:
+        create: true
+    ingress:
+      enabled: true
+      hosts:
+        - host: serve.192.168.32.161.nip.io
+          serviceName: gateway
+          servicePort: 8080
+          path: /
+      #annotations: {}
+      tls:
+        - secretName: ingress-secret
+          hosts:
+            - serve.192.168.32.161.nip.io

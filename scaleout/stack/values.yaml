@@ -1,28 +1,107 @@
-# Default values for scaleout stack.
+# Default values for alliance-chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-# Each component supports a field "enabled: true/false"; disabled components are not installed
+
+### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
+## Name: imagePullSecret
+## Description: Secret to pull images from our private repository.
+imagePullSecrets:
+  - name: regcred
+
+## to create a regcred
+## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
+
+# REQUIREMENT: set a storage class with ability to serve ReadWriteMany
+# Name: storageClassName
+# Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
+# Default: hostpath (works with docker-for-desktop)
+storageClassName: hostpath
+namespace: default
+
+studio:
+  servicename: studio
+  image: #tell which image to deploy for studio
+    repository: registry.demo.scaleout.se/studio:latest # point to the latest beta image
+    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
+
+# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
+domain: platform.local
+ingress:
+  enabled: true
+  image: #tell which image to deploy for studio
+    repository: registry.demo.scaleout.se/ingress:latest
+    pullPolicy: Always
+  annotations: {}
+  hosts:
+    - host: platform.local
+
+  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
+    #tls:
+    #- secretName: platform-tls-secret
+    #  hosts:
+    #    - platform.local
 
 
-minio:
-    enabled: true
-    ingress:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
-        path: /
-        hosts:
-            - minio.stack.your.domain.name
-        tls:
-            - secretName: ingress-secret
-              hosts:
-                  - minio.your.domain.name
-    accessKey: "youraccesskeyhere"
-    secretKey: "yoursecrethere"
-    persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
-      size: 10Gi
+service:
+  type: ClusterIP #override if you want to use NodePort instead to access cluster services
+
+#override if you want to try out a HA (HIGH AVAILABILITY) setup.
+replicaCount: 1
+
+# override if certain resource requirements should apply
+resources: {}
+
+# override if certain nodes should be used for the deployed resources.
+nodeSelector: {}
+
+# override if declaring that some criteria is tolerated for resource co-existing.
+tolerations: []
+
+affinity: {}
+
+
+
+# Postgres default credentials for backend DB. Override for security!
+postgres:
+  db:
+    name: postgres
+    user: postgres
+    password: postgres
+
+
+# default credentials for rabbitmq. override in production!
+rabbit:
+  username: admin
+  password: LJqEG9RE4FdZbVWoJzZIOQEI
+
+chartcontroller:
+  image:
+    repository: registry.demo.scaleout.se/chart-controller:latest
+    pullPolicy: Always
+  branch: master
+
+
+
+cluster_config: |-
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: "local"
+      cluster:
+        server: "your.server.here"
+    users:
+    - name: "local"
+      user:
+        token: "your.token.here"
+
+    contexts:
+    - name: "local"
+      context:
+        user: "local"
+        cluster: "local"
+
+    current-context: "local"
+
 
 docker-registry:
     enabled: true
@@ -41,6 +120,7 @@ docker-registry:
       enabled: true
       accessMode: ReadWriteOnce
       size: 10Gi
+
 argo:
   installCRD: false
   enabled: true
@@ -62,40 +142,6 @@ argo-events:
   namespace: argo-events
   singleNamespace: false
 
-
-jupyterhub:
-    enabled: true
-    proxy:
-      # Generate a unique token!
-      secretToken: "956403d9cb95e6243d99d9026304dce0d7db0b7531aa732194bf8cffec94a43b"
-      service:
-          type: ClusterIP
-    ingress:
-      enabled: true
-      hosts:
-        - lab.stack.your.domain.name
-      tls:
-          - secretName: ingress-secret
-            hosts:
-              - lab.stack.your.domain.name
-    singleuser:
-      defaultUrl: "/lab"
-      memory:
-          limit: 4G
-          guarantee: 512M
-      storage:
-          dynamic:
-            capacity: 2Gi
-
-    rbac:
-      enabled: true
-    #debug:
-    #  enabled: true
-
-    hub:
-     extraConfig:
-         jupyterlab: |
-                 c.Spawner.cmd = ['jupyter-labhub']
 
 openfaas:
     functionNamespace: stack-fn

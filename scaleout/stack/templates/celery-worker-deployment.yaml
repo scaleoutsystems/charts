@@ -36,10 +36,10 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-      {{- if .Values.imagePullSecret }}
+    {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        - name: {{ .Values.imagePullSecret }}
-      {{- end }}
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       restartPolicy: Always
       volumes:
       - name: {{ .Release.Name}}-settings-configmap

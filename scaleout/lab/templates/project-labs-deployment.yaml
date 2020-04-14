@@ -62,6 +62,10 @@ spec:
         env:
         - name: JUPYTER_ENABLE_LAB
           value: "yes"
+        - name: NOTEBOOK_PASSWD_SHA1
+          value: ""
+        - name: NOTEBOOK_TOKEN
+          value: ""
         #command: ["start-notebook.sh"]
         #args: ["--NotebookApp.token=''"]
         resources:

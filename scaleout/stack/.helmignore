@@ -10,6 +10,7 @@
 .hg/
 .hgignore
 .svn/
+*.lock
 # Common backup files
 *.swp
 *.bak
@@ -21,3 +22,4 @@
 *.tmproj
 .vscode/
 modules/
+examples/

@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+*.lock
 migrations/
 .idea/
 .DS_Store

@@ -190,8 +190,8 @@ data:
     GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
     GIT_REPOS_URL = '/repos/'
 
-    CHART_CONTROLLER_URL = 'http://{{ .Values.chartcontroller }}'
-    STUDIO_URL = 'http://{{ .Values.studio.servicename }}:8080'
+    CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
+    STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
 
     try:
         from .settings_local import *
