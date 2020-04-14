@@ -26,4 +26,4 @@ registry:
 
 imagePullSecret: regcred
 #storageClassName: aws-efs
-serving_namespace: serving
+serving_namespace: default #serving

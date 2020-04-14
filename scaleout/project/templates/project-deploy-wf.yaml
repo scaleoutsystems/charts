@@ -104,10 +104,10 @@ data:
                   {{ if not .Values.registry.secure }}
                   "--insecure",       
                   "--insecure-registry",
-                  "registry-docker-registry:5000",
+                  "{{ .Values.registry.host }}",
                   {{ end }}
                   "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                  "--destination=registry-docker-registry:5000/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+                  "--destination={{ .Values.registry.host }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
           volumeMounts:
             - name: kaniko-secret
               mountPath: /kaniko/.docker
