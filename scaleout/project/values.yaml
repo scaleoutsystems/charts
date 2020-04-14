@@ -24,9 +24,8 @@ service:
 # NOTE: It seems like the internal host name doesn't work for deployment.
 # I'm not sure why...
 registry:
-  secure: False
+  secure: True
   host: registry-docker-registry:5000
-  hostGlobal: registry.platform.local 
 
 imagePullSecret: regcred
 #storageClassName: aws-efs
