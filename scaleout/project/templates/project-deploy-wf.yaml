@@ -144,7 +144,7 @@ data:
                 namespace: {{.Values.serving_namespace}}
             spec:
                 name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                image: "{{ .Values.registry.host }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
+                image: "registry-docker-registry/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
       - name: deploy-wf
         steps:
         - - name: check-input
