@@ -22,7 +22,8 @@ service:
 # secure: False can be used for local testing
 
 # NOTE: It seems like the internal host name doesn't work for deployment.
-# I'm not sure why...
+# I'm not sure why... Deployment expects the registry hostname to be
+# registry.global.domain
 registry:
   secure: True
   host: registry-docker-registry:5000
