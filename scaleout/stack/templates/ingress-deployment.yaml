@@ -25,7 +25,7 @@ spec:
       - env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: registry.demo.scaleout.se/ingress:latest
+        image: {{ .Values.ingress.image.repository }} #registry.demo.scaleout.se/ingress:latest
         name: {{ .Release.Name }}-ingress
         ports:
         - containerPort: 80
@@ -34,10 +34,10 @@ spec:
           subPath: nginx.conf
           name: nginx-conf
           readOnly: true
-      {{- if .Values.imagePullSecret }}
+    {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        - name: {{ .Values.imagePullSecret }}
-      {{- end }}
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       restartPolicy: Always
       volumes:
       - name: nginx-conf
