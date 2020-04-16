@@ -76,7 +76,7 @@ rabbit:
 
 chartcontroller:
   image:
-    repository: registry.demo.scaleout.se/chart-controller:latest
+    repository: scaleoutsystems/chart-controller:master
     pullPolicy: Always
 
 
