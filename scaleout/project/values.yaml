@@ -4,7 +4,7 @@
 
 labs:
   image: jupyter/minimal-notebook:latest
-  repository: "git@github.com:scaleoutsystems/aml-example-project.git"
+  repository: "https://github.com/scaleoutsystems/aml-example-project.git"
   secret: ""
 
 global:
