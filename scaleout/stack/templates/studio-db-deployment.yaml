@@ -1,18 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
   creationTimestamp: null
   labels:
     io.kompose.service: studio-db
+    name: studio-db
   name: studio-db
 spec:
   replicas: 1
   strategy: {}
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-studio-db
   template:
     metadata:
       labels:
         io.kompose.service: studio-db
+        name: {{ .Release.Name }}-studio-db
     spec:
       containers:
       - env:
@@ -31,9 +36,8 @@ spec:
         - mountPath: "/var/lib/postgresql/data"
           name: db
       restartPolicy: Always
-
-  volumes:
-    - name: db
-      persistentVolumeClaim:
-        claimName: {{ .Release.Name }}-studio-db-pvc
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-studio-db-pvc
 status: {}
