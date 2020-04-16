@@ -31,14 +31,14 @@ spec:
           value: master
         - name: GIT_SYNC_DEST
           value: work
-        - name: GIT_KNOWN_HOSTS
-          value: "false"
         - name: GIT_SYNC_ONE_TIME
           value: "true"
         volumeMounts:
         - name: project-files
           mountPath: /tmp/git
         {{ if .Values.labs.secret }}
+        - name: GIT_KNOWN_HOSTS
+          value: "false"
         - name: GIT_SYNC_SSH
           value: "true"
         - name: GIT_SSH_KEY_FILE
@@ -50,7 +50,7 @@ spec:
       - env:
         - name: PROJECT_DIR
           value: /app/work
-        image: registry.demo.scaleout.se/file-controller:latest
+        image: scaleoutsystems/file-controller:master
         name: {{ .Release.Name }}-file-controller
         ports:
         - containerPort: 5000
