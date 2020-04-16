@@ -21,6 +21,31 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-file-controller
     spec:
+      initContainers:
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.1
+        env:
+        - name: GIT_SYNC_REPO
+          value: {{ .Values.labs.repository | quote }}
+        - name: GIT_SYNC_BRANCH
+          value: master
+        - name: GIT_SYNC_DEST
+          value: work
+        - name: GIT_SYNC_SSH
+          value: "true"
+        - name: GIT_KNOWN_HOSTS
+          value: "false"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        volumeMounts:
+        - name: project-files
+          mountPath: /tmp/git
+        {{ if .Values.labs.secret }}
+        - name: GIT_SSH_KEY_FILE
+          value: /etc/git-secret/ssh
+        - name: git-secret
+          mountPath: /etc/git-secret/
+        {{ end }}
       containers:
       - env:
         - name: PROJECT_DIR
@@ -41,4 +66,9 @@ spec:
       - name: project-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-project-files
+      {{ if .Values.labs.secret }}
+      - name: git-secret
+        secret:
+          secretName: digits-example-ssh-secret
+      {{ end }}
 status: {}
