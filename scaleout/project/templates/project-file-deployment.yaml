@@ -33,14 +33,14 @@ spec:
           value: work
         - name: GIT_SYNC_ONE_TIME
           value: "true"
+        - name: GIT_SYNC_SSH
+          value: "true"
         volumeMounts:
         - name: project-files
           mountPath: /tmp/git
         {{ if .Values.labs.secret }}
         - name: GIT_KNOWN_HOSTS
           value: "false"
-        - name: GIT_SYNC_SSH
-          value: "true"
         - name: GIT_SSH_KEY_FILE
           value: /etc/git-secret/ssh
         - name: git-secret
