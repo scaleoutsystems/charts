@@ -41,8 +41,6 @@ spec:
           value: ""
         - name: NOTEBOOK_TOKEN
           value: ""
-        #command: ["start-notebook.sh"]
-        #args: ["--NotebookApp.token=''"]
         resources:
             {{ if .Values.labs.requests }}
             requests:
@@ -77,6 +75,7 @@ spec:
       - name: homedir
         persistentVolumeClaim:
           claimName: {{ .Values.project.name }}-project-files
+
       - name: jupyterconf
         configMap:
           name: {{ .Release.Name }}-jupyter-configmap
