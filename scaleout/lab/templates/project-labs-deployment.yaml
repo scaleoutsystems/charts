@@ -29,31 +29,6 @@ spec:
     {{- end }}
       securityContext:
         runAsUser: 65533  # to allow read of ssh key
-      {{ if .Values.labs.repository }}
-      initContainers:
-      - name: git-sync
-        image: k8s.gcr.io/git-sync:v3.1.1
-        env:
-        - name: GIT_SYNC_REPO
-          value: {{ .Values.labs.repository | quote }}
-        - name: GIT_SYNC_BRANCH
-          value: master
-        - name: GIT_SYNC_DEST
-          value: work
-        - name: GIT_SSH_KEY_FILE
-          value: /etc/git-secret/ssh
-        - name: GIT_SYNC_SSH
-          value: "true"
-        - name: GIT_KNOWN_HOSTS
-          value: "false"
-        - name: GIT_SYNC_ONE_TIME
-          value: "true"
-        volumeMounts:
-        - name: git
-          mountPath: /tmp/git
-        - name: git-secret
-          mountPath: /etc/git-secret/
-      {{ end }}
       containers:
       - name: {{ .Release.Name }}-labs-app
         image: {{ .Values.labs.image }}
@@ -91,7 +66,7 @@ spec:
                 {{ end }}
             {{ end }}
         volumeMounts:
-        - name: git
+        - name: homedir
           mountPath: /home/jovyan/
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
@@ -99,14 +74,9 @@ spec:
         securityContext:
           allowPrivilegeEscalation: true
       volumes:
-      - name: git
+      - name: homedir
         persistentVolumeClaim:
           claimName: {{ .Values.project.name }}-project-files
-      {{ if .Values.labs.repository }}
-      - name: git-secret
-        secret:
-          secretName: digits-example-ssh-secret
-      {{ end }}
       - name: jupyterconf
         configMap:
           name: {{ .Release.Name }}-jupyter-configmap
