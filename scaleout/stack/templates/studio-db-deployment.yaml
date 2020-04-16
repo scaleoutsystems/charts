@@ -27,5 +27,13 @@ spec:
         image: postgres
         name: studio-db
         resources: {}
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: db
       restartPolicy: Always
+
+  volumes:
+    - name: db
+      persistentVolumeClaim:
+        claimName: {{ .Release.Name }}-studio-db-pvc
 status: {}
