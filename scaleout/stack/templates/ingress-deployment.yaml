@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
@@ -7,11 +7,15 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: {{ .Release.Name }}-ingress
+    name: {{ .Release.Name }}-ingress
   name: {{ .Release.Name }}-ingress
 spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-ingress
   template:
     metadata:
       annotations:
@@ -20,6 +24,7 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.service: {{ .Release.Name }}-ingress
+        name: {{ .Release.Name }}-ingress
     spec:
       containers:
       - env:

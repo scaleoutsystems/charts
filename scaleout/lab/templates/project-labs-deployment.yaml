@@ -27,34 +27,45 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      securityContext:
-        runAsUser: 65533  # to allow read of ssh key
-      {{ if .Values.labs.repository }}
-      initContainers:
-      - name: git-sync
-        image: k8s.gcr.io/git-sync:v3.1.1
-        env:
-        - name: GIT_SYNC_REPO
-          value: {{ .Values.labs.repository | quote }}
-        - name: GIT_SYNC_BRANCH
-          value: master
-        - name: GIT_SYNC_DEST
-          value: work
-        - name: GIT_SSH_KEY_FILE
-          value: /etc/git-secret/ssh
-        - name: GIT_SYNC_SSH
-          value: "true"
-        - name: GIT_KNOWN_HOSTS
-          value: "false"
-        - name: GIT_SYNC_ONE_TIME
-          value: "true"
-        volumeMounts:
-        - name: git
-          mountPath: /tmp/git
-        - name: git-secret
-          mountPath: /etc/git-secret/
-      {{ end }}
+      #securityContext:
+      #  runAsUser: 65533  # to allow read of ssh key
       containers:
+      - name: {{ .Release.Name }}-s3-sync
+        image: scaleoutsystems/s3-sync:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        resources:
+          limits:
+            cpu: 300m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        #lifecycle:
+        #  postStart:
+        #    exec:
+        #      command: ["mkdir","/home/jovyan/dataset"]
+        env:
+        - name: BUCKET
+          value: {{ .Values.minio.bucket | default "dataset" }}
+        - name: MOUNTPOINT
+          value: /data
+        - name: REPOURL
+          value: "http://{{ .Values.project.name }}-minio:9000"
+        - name: AWSACCESSKEYID
+          value: {{ .Values.minio.access_key }}
+        - name: AWSSECRETACCESSKEY
+          value: {{ .Values.minio.secret_key }}
+        volumeMounts:
+        - name: dataset
+          mountPath: /data
+          mountPropagation: Bidirectional
+        - name: devfuse
+          mountPath: /dev/fuse
       - name: {{ .Release.Name }}-labs-app
         image: {{ .Values.labs.image }}
         ports:
@@ -66,8 +77,7 @@ spec:
           value: ""
         - name: NOTEBOOK_TOKEN
           value: ""
-        #command: ["start-notebook.sh"]
-        #args: ["--NotebookApp.token=''"]
+
         resources:
             {{ if .Values.labs.requests }}
             requests:
@@ -91,22 +101,28 @@ spec:
                 {{ end }}
             {{ end }}
         volumeMounts:
-        - name: git
+        - name: homedir
           mountPath: /home/jovyan/
+        - name: dataset
+          mountPath: /home/jovyan/dataset/
+          mountPropagation: HostToContainer
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
         securityContext:
           allowPrivilegeEscalation: true
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
       volumes:
-      - name: git
+      - name: dataset
+        emptyDir: {}
+      - name: homedir
         persistentVolumeClaim:
           claimName: {{ .Values.project.name }}-project-files
-      {{ if .Values.labs.repository }}
-      - name: git-secret
-        secret:
-          secretName: digits-example-ssh-secret
-      {{ end }}
+      - name: devfuse
+        hostPath:
+          path: /dev/fuse
+
       - name: jupyterconf
         configMap:
           name: {{ .Release.Name }}-jupyter-configmap
