@@ -38,9 +38,6 @@ spec:
           value: work
         - name: GIT_SYNC_ONE_TIME
           value: "true"
-        volumeMounts:
-        - name: project-files
-          mountPath: /tmp/git
         {{ if .Values.labs.secret }}
         - name: GIT_SYNC_SSH
           value: "true"
@@ -51,12 +48,15 @@ spec:
         - name: git-secret
           mountPath: /etc/git-secret/
         {{ end }}
+        volumeMounts:
+        - name: project-files
+          mountPath: /tmp/git
       containers:
-      - env:
+      - name: {{ .Release.Name }}-file-controller
+        image: scaleoutsystems/file-controller:master
+        env:
         - name: PROJECT_DIR
           value: /app/work
-        image: scaleoutsystems/file-controller:master
-        name: {{ .Release.Name }}-file-controller
         ports:
         - containerPort: 5000
         resources: {}
@@ -67,6 +67,7 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       {{- end }}
+      volumes:
       - name: project-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-project-files
