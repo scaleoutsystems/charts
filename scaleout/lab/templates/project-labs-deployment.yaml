@@ -41,6 +41,10 @@ spec:
           value: ""
         - name: NOTEBOOK_TOKEN
           value: ""
+        lifecycle:
+          postStart:
+            exec:
+              command: ["mkdir","/home/jovyan/dataset"]
         resources:
             {{ if .Values.labs.requests }}
             requests:
