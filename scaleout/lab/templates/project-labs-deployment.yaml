@@ -67,6 +67,8 @@ spec:
         volumeMounts:
         - name: homedir
           mountPath: /home/jovyan/
+        - name: dataset
+          mountPath: /home/jovyan/dataset/
           mountPropagation: HostToContainer
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
@@ -93,29 +95,27 @@ spec:
         #    exec:
         #      command: ["mkdir","/home/jovyan/dataset"]
         env:
-        - name: DUMB_INIT_VER
-          value: 1.2.0
-        - name: S3_BUCKET
+        - name: BUCKET
           value: {{ .Values.minio.bucket | default "dataset" }}
-        #- name: S3_REGION
-        #  value: ap-southeast-2
-        - name: MNT_POINT
+        - name: MOUNTPOINT
           value: /home/jovyan/dataset
-        - name: AWS_URL
+        - name: S3URL
           value: http://test-minio:9000
-        - name: AWS_KEY
+        - name: AWSACCESSKEYID
           value: {{ .Values.minio.access_key }}
-        - name: AWS_SECRET_KEY
+        - name: AWSSECRETACCESSKEY
           value: {{ .Values.minio.secret_key }}
         volumeMounts:
-        - name: homedir
-          mountPath: /home/jovyan/
+        - name: dataset
+          mountPath: /home/jovyan/dataset/
           mountPropagation: Bidirectional
         - name: devfuse
           mountPath: /dev/fuse
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
+      - name: dataset
+        emptyDir: {}
       - name: homedir
         persistentVolumeClaim:
           claimName: {{ .Values.project.name }}-project-files
