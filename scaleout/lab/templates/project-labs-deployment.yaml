@@ -67,6 +67,7 @@ spec:
         volumeMounts:
         - name: homedir
           mountPath: /home/jovyan/
+          mountPropagation: HostToContainer
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
@@ -77,6 +78,9 @@ spec:
         imagePullPolicy: Always
         securityContext:
           privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
         resources:
           limits:
             cpu: 300m
