@@ -41,10 +41,7 @@ spec:
           value: ""
         - name: NOTEBOOK_TOKEN
           value: ""
-        lifecycle:
-          postStart:
-            exec:
-              command: ["mkdir","/home/jovyan/dataset"]
+
         resources:
             {{ if .Values.labs.requests }}
             requests:
@@ -87,6 +84,10 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi
+        lifecycle:
+          postStart:
+            exec:
+              command: ["mkdir","/home/jovyan/dataset"]
         env:
         - name: DUMB_INIT_VER
           value: 1.2.0
@@ -103,6 +104,8 @@ spec:
         - name: AWS_SECRET_KEY
           value: {{ .Values.minio.secret_key }}
         volumeMounts:
+        - name: homedir
+          mountPath: /home/jovyan/
         - name: devfuse
           mountPath: /dev/fuse
       securityContext: {}
