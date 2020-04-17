@@ -76,7 +76,7 @@ spec:
         securityContext:
           allowPrivilegeEscalation: true
       - name: {{ .Release.Name }}-s3-sync
-        image: registry.demo.scaleout.se/dataset-syncer:latest
+        image: scaleoutsystems/s3-sync:latest
         imagePullPolicy: Always
         securityContext:
           privileged: true
