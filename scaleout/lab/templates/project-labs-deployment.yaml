@@ -106,6 +106,7 @@ spec:
         volumeMounts:
         - name: homedir
           mountPath: /home/jovyan/
+          mountPropagation: Bidirectional
         - name: devfuse
           mountPath: /dev/fuse
       securityContext: {}
