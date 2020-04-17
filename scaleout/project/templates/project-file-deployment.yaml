@@ -63,44 +63,10 @@ spec:
         volumeMounts:
         - mountPath: /app/work
           name: project-files
-      - name: {{ .Release.Name }}-s3-sync
-        image: registry.demo.scaleout.se/dataset-syncer:latest
-        imagePullPolicy: Always
-        securityContext:
-          privileged: true
-        resources:
-          limits:
-            cpu: 300m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        env:
-        - name: DUMB_INIT_VER
-          value: 1.2.0
-        - name: S3_BUCKET
-          value: dataset
-        #- name: S3_REGION
-        #  value: ap-southeast-2
-        - name: MNT_POINT
-          value: /data
-        - name: AWS_URL
-          value: http://test-minio:9000
-        - name: AWS_KEY
-          value: {{ .Values.minio.access_key }}
-        - name: AWS_SECRET_KEY
-          value: {{ .Values.minio.secret_key }}
-        volumeMounts:
-        - name: devfuse
-          mountPath: /dev/fuse
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       {{- end }}
-      volumes:
-      - name: devfuse
-        hostPath:
-          path: /dev/fuse
       - name: project-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-project-files
