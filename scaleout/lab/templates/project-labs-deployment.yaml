@@ -27,8 +27,8 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      securityContext:
-        runAsUser: 65533  # to allow read of ssh key
+      #securityContext:
+      #  runAsUser: 65533  # to allow read of ssh key
       containers:
       - name: {{ .Release.Name }}-labs-app
         image: {{ .Values.labs.image }}
@@ -69,7 +69,7 @@ spec:
           mountPath: /home/jovyan/
         - name: dataset
           mountPath: /home/jovyan/dataset/
-          mountPropagation: HostToContainer
+          #mountPropagation: HostToContainer
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
@@ -98,7 +98,7 @@ spec:
         - name: BUCKET
           value: {{ .Values.minio.bucket | default "dataset" }}
         - name: MOUNTPOINT
-          value: /home/jovyan/dataset
+          value: /data
         - name: REPOURL
           value: "http://{{ .Values.project.name }}-minio:9000"
         - name: AWSACCESSKEYID
@@ -107,11 +107,11 @@ spec:
           value: {{ .Values.minio.secret_key }}
         volumeMounts:
         - name: dataset
-          mountPath: /home/jovyan/dataset/
-          mountPropagation: Bidirectional
+          mountPath: /data
+          #mountPropagation: Bidirectional
         - name: devfuse
           mountPath: /dev/fuse
-      securityContext: {}
+
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       volumes:
