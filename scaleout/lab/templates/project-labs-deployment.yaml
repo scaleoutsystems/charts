@@ -30,6 +30,42 @@ spec:
       #securityContext:
       #  runAsUser: 65533  # to allow read of ssh key
       containers:
+      - name: {{ .Release.Name }}-s3-sync
+        image: scaleoutsystems/s3-sync:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        resources:
+          limits:
+            cpu: 300m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        #lifecycle:
+        #  postStart:
+        #    exec:
+        #      command: ["mkdir","/home/jovyan/dataset"]
+        env:
+        - name: BUCKET
+          value: {{ .Values.minio.bucket | default "dataset" }}
+        - name: MOUNTPOINT
+          value: /data
+        - name: REPOURL
+          value: "http://{{ .Values.project.name }}-minio:9000"
+        - name: AWSACCESSKEYID
+          value: {{ .Values.minio.access_key }}
+        - name: AWSSECRETACCESSKEY
+          value: {{ .Values.minio.secret_key }}
+        volumeMounts:
+        - name: dataset
+          mountPath: /data
+          mountPropagation: Bidirectional
+        - name: devfuse
+          mountPath: /dev/fuse
       - name: {{ .Release.Name }}-labs-app
         image: {{ .Values.labs.image }}
         ports:
@@ -69,49 +105,12 @@ spec:
           mountPath: /home/jovyan/
         - name: dataset
           mountPath: /home/jovyan/dataset/
-          #mountPropagation: HostToContainer
+          mountPropagation: HostToContainer
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
         securityContext:
           allowPrivilegeEscalation: true
-      - name: {{ .Release.Name }}-s3-sync
-        image: scaleoutsystems/s3-sync:latest
-        imagePullPolicy: Always
-        securityContext:
-          privileged: true
-          capabilities:
-            add:
-              - SYS_ADMIN
-        resources:
-          limits:
-            cpu: 300m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        #lifecycle:
-        #  postStart:
-        #    exec:
-        #      command: ["mkdir","/home/jovyan/dataset"]
-        env:
-        - name: BUCKET
-          value: {{ .Values.minio.bucket | default "dataset" }}
-        - name: MOUNTPOINT
-          value: /data
-        - name: REPOURL
-          value: "http://{{ .Values.project.name }}-minio:9000"
-        - name: AWSACCESSKEYID
-          value: {{ .Values.minio.access_key }}
-        - name: AWSSECRETACCESSKEY
-          value: {{ .Values.minio.secret_key }}
-        volumeMounts:
-        - name: dataset
-          mountPath: /data
-          #mountPropagation: Bidirectional
-        - name: devfuse
-          mountPath: /dev/fuse
-
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       volumes:
