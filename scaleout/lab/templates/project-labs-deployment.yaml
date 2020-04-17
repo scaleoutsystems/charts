@@ -99,7 +99,7 @@ spec:
           value: {{ .Values.minio.bucket | default "dataset" }}
         - name: MOUNTPOINT
           value: /home/jovyan/dataset
-        - name: S3URL
+        - name: REPOURL
           value: "http://{{ .Values.project.name }}-minio:9000"
         - name: AWSACCESSKEYID
           value: {{ .Values.minio.access_key }}
