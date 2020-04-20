@@ -34,7 +34,7 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         - name: BRANCH
-          value: {{ .Values.chartcontroller.branch | default master}}
+          value: {{ .Values.chartcontroller.branch | default "master"}}
         image: {{ .Values.chartcontroller.image.repository }}
         name: {{ .Release.Name }}-chart-controller
         ports:
