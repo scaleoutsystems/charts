@@ -37,26 +37,26 @@ data:
               - key: .dockerconfigjson
                 path: config.json
       templates:
-      - name: check-input
-        container:
-          image: alpine:latest
-          command: [echo]
-          args: ["{{ "{{" }}workflow.parameters.context-bucket{{ "}}" }}",
-                 "{{ "{{" }}workflow.parameters.context-file{{ "}}" }}",
-                 "{{ "{{" }}workflow.parameters.model-bucket{{ "}}" }}",
-                 "{{ "{{" }}workflow.parameters.model-file{{ "}}" }}",
-                 "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}",
-                 "{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
-      - name: check-output
-        inputs:
-          parameters:
-          - name: build-file
-          - name: build-file-bucket
-        container:
-          image: alpine:latest
-          command: [echo]
-          args: ["{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                 "{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}"]
+    #   - name: check-input
+    #     container:
+    #       image: alpine:latest
+    #       command: [echo]
+    #       args: ["{{ "{{" }}workflow.parameters.context-bucket{{ "}}" }}",
+    #              "{{ "{{" }}workflow.parameters.context-file{{ "}}" }}",
+    #              "{{ "{{" }}workflow.parameters.model-bucket{{ "}}" }}",
+    #              "{{ "{{" }}workflow.parameters.model-file{{ "}}" }}",
+    #              "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}",
+    #              "{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+    #   - name: check-output
+    #     inputs:
+    #       parameters:
+    #       - name: build-file
+    #       - name: build-file-bucket
+    #     container:
+    #       image: alpine:latest
+    #       command: [echo]
+    #       args: ["{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
+    #              "{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}"]
       - name: package-model
         container:
           image: scaleoutsystems/package-model:latest
@@ -147,18 +147,18 @@ data:
                 image: "registry.{{ .Values.global.domain }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
       - name: deploy-wf
         steps:
-        - - name: check-input
-            template: check-input
+        # - - name: check-input
+        #     template: check-input
         - - name: package-model
             template: package-model
-        - - name: check-output
-            template: check-output
-            arguments:
-              parameters:
-              - name: build-file
-                value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file{{ "}}" }}"
-              - name: build-file-bucket
-                value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file-bucket{{ "}}" }}"
+        # - - name: check-output
+        #     template: check-output
+        #     arguments:
+        #       parameters:
+        #       - name: build-file
+        #         value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file{{ "}}" }}"
+        #       - name: build-file-bucket
+        #         value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file-bucket{{ "}}" }}"
         - - name: build-deployment
             template: build-deployment
             arguments:
