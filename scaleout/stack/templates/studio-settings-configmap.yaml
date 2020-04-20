@@ -69,8 +69,6 @@ data:
         'workflows',
         'experiments',
         'deployments',
-        'alliance_admin',
-        'platform_module',
         'bootstrap_modal_forms'
     ]
 
@@ -214,3 +212,17 @@ data:
     STORAGECLASS = {{ .Values.storageClassName | default "aws-efs" | quote }}
 
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
+
+    try:
+        from .settings_local import *
+    except ImportError as e:
+        pass
+
+    import os
+
+    try:
+        apps = [os.environ.get("APPS").split(" ")]
+        for app in apps:
+            INSTALLED_APPS += [app]
+    except Exception as e:
+        pass
