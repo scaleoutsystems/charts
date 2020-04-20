@@ -29,6 +29,6 @@ registry:
   secure: True
   host: registry-docker-registry:5000
 
-imagePullSecret: docker-reg-secret
+imagePullSecret: regcred
 #storageClassName: aws-efs
 serving_namespace: default #serving
