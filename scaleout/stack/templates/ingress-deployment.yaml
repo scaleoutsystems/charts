@@ -30,7 +30,7 @@ spec:
       - env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: {{ .Values.ingress.image.repository }} #registry.demo.scaleout.se/ingress:latest
+        image: {{ .Values.ingress.image.repository }}
         name: {{ .Release.Name }}-ingress
         ports:
         - containerPort: 80
