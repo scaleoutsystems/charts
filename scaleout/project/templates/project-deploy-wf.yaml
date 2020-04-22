@@ -36,6 +36,8 @@ data:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: workdir
+          emptyDir: {}
       templates:
     #   - name: check-input
     #     container:
@@ -60,6 +62,9 @@ data:
       - name: package-model
         container:
           image: scaleoutsystems/package-model:latest
+          volumeMounts:
+            - name: workdir
+              mountPath: /mnt/vol
           env:
             - name: S3_ACCESS_KEY_ID
               valueFrom:
@@ -87,10 +92,10 @@ data:
           parameters:
           - name: build-file
             valueFrom:
-              path: deploy_file.txt
+              path: /mnt/vol/deploy_file.txt
           - name: build-file-bucket
             valueFrom:
-              path: deploy_bucket.txt
+              path: /mnt/vol/deploy_bucket.txt
       - name: build-deployment
         inputs:
           parameters:
