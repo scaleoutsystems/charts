@@ -119,7 +119,7 @@ docker-registry:
     persistence:
       enabled: true
       accessMode: ReadWriteOnce
-      size: 10Gi
+      size: 4Gi
 
 argo:
   installCRD: false

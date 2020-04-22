@@ -26,7 +26,7 @@ service:
 # I'm not sure why... Deployment expects the registry hostname to be
 # registry.global.domain
 registry:
-  secure: True
+  secure: False
   host: registry-docker-registry:5000
 
 imagePullSecret: regcred
