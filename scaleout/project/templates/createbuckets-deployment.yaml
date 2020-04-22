@@ -1,0 +1,56 @@
+{{- if .Values.defaultBucket.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.20.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: {{ .Release.Name }}-createbuckets
+    name: {{ .Release.Name }}-createbuckets
+  name: {{ .Release.Name }}-createbuckets
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-createbuckets
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.20.0 ()
+      creationTimestamp: null
+      labels:
+        io.kompose.service: {{ .Release.Name }}-createbuckets
+        name: {{ .Release.Name }}-createbuckets
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - ' /usr/bin/mc config host add myminio http://$MINIO_ENDPOINT:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY;
+          /usr/bin/mc rm -r --force myminio/dataset;
+          /usr/bin/mc mb myminio/dataset;
+          /usr/bin/mc rm -r --force myminio/reports;
+          /usr/bin/mc mb myminio/reports;
+          /usr/bin/mc rm -r --force myminio/models;
+          /usr/bin/mc mb myminio/models;
+          /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/dataset;
+          /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/reports;
+          /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/models;
+          exit 0; '
+        image: minio/mc
+        name: {{ .Release.Name }}-createbuckets
+        resources: {}
+        env:
+          - name: MINIO_ACCESS_KEY
+            value: {{ .Values.minio.access_key }}
+          - name: MINIO_SECRET_KEY
+            value: {{ .Values.minio.secret_key }}
+          - name: MINIO_ENDPOINT
+            value: {{ .Release.Name }}-minio
+      restartPolicy: Always
+status: {}
+{{- end }}
