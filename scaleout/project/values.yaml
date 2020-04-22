@@ -27,7 +27,7 @@ service:
 # registry.global.domain
 registry:
   secure: False
-  host: registry-docker-registry:5000
+  host: stack-docker-registry:5000
 
 imagePullSecret: regcred
 #storageClassName: aws-efs
