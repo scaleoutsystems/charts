@@ -25,6 +25,7 @@ jobs:
           chmod 700 get_helm.sh
           ./get_helm.sh
           helm init --client-only
+
       - name: Add dependency chart repos
         run: |
           helm repo add stable https://kubernetes-charts.storage.googleapis.com/
