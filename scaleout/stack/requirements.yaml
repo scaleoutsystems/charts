@@ -18,4 +18,4 @@ dependencies:
   - name: docker-registry
     version: 1.9.1
     repository: "https://kubernetes-charts.storage.googleapis.com"
-    condition: registry.enabled
+    condition: docker-registry.enabled
