@@ -31,9 +31,9 @@ jobs:
           helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.0.0-alpha.2
+        uses: helm/chart-releaser-action@v1.0.0-rc.1
         with:
           charts_dir: scaleout
-          charts_repo_url: https://scaleoutsystems.github.io/charts
+          #charts_repo_url: https://scaleoutsystems.github.io/charts
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
