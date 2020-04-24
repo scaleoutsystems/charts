@@ -1,17 +1,17 @@
 # version x.x.x corresponds to "latest"
 dependencies:
   - name: openfaas
-    version: 5.5.6
+    version: 5.6.5
     repository: "https://openfaas.github.io/faas-netes/"
     condition: openfaas.enabled
 
   - name: argo-events
-    version: 0.7.0
+    version: 0.14.0
     repository: "https://argoproj.github.io/argo-helm"
     condition: argo-events.enabled
 
   - name: argo
-    version: 0.6.8
+    version: 0.7.3
     repository: "https://argoproj.github.io/argo-helm"
     condition: argo.enabled
 
