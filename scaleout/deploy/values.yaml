@@ -1,0 +1,21 @@
+global:
+  domain: stackn.akkelis.com
+
+registry:
+  secure: False
+  host: stack-docker-registry:5000
+
+imagePullSecret: regcred
+serving_namespace: default
+
+context_bucket: deploy
+context_file: tensflow.tar.gz
+model_bucket: models
+model_file: 8e67720e863011ea99bfacde48001122
+minio_host: testproj-lav-minio.stackn.akkelis.com
+minio_access: MY9GTZhuO0pxegrMHEKd
+minio_secret: xSaQWnKcl9lu40nUYPmUXmGOi8aMxOPoClTU2YbZ
+project_slug: testproj-lav
+
+model_name: testmodel1
+model_version: v2
