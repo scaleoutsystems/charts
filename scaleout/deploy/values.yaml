@@ -1,5 +1,5 @@
 global:
-  domain: stackn.akkelis.com
+  domain: global.domain
 
 registry:
   secure: False
@@ -11,11 +11,11 @@ serving_namespace: default
 context_bucket: deploy
 context_file: tensflow.tar.gz
 model_bucket: models
-model_file: 8e67720e863011ea99bfacde48001122
-minio_host: testproj-lav-minio.stackn.akkelis.com
-minio_access: MY9GTZhuO0pxegrMHEKd
-minio_secret: xSaQWnKcl9lu40nUYPmUXmGOi8aMxOPoClTU2YbZ
-project_slug: testproj-lav
+model_file: model.tar.gz
+minio_host: minio-host
+minio_access: access-key
+minio_secret: secret-key
+project_slug: project-slug
 
-model_name: testmodel1
-model_version: v3
+model_name: model-name
+model_version: model-version
