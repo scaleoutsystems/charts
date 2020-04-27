@@ -49,13 +49,13 @@ spec:
         - name: S3_ENDPOINT
           value: {{ .Values.project_slug }}-minio:9000
         - name: CONTEXT_BUCKET
-          value: "{{ "{{" }}workflow.parameters.context-bucket{{ "}}" }}"
+          value: {{ .Values.context_bucket }}
         - name: CONTEXT_FILE
-          value: "{{ "{{" }}workflow.parameters.context-file{{ "}}" }}"
+          value: {{ .Values.context_file }}
         - name: MODEL_BUCKET
-          value: "{{ "{{" }}workflow.parameters.model-bucket{{ "}}" }}"
+          value: {{ .Values.model_bucket }}
         - name: MODEL_FILE
-          value: "{{ "{{" }}workflow.parameters.model-file{{ "}}" }}"    
+          value: {{ .Values.model_file }}    
     outputs:
       parameters:
       - name: build-file
@@ -80,7 +80,7 @@ spec:
                 "{{ .Values.registry.host }}",
                 {{ end }}
                 "--context=s3://{{ "{{" }}inputs.parameters.build-file-bucket{{ "}}" }}/{{ "{{" }}inputs.parameters.build-file{{ "}}" }}",
-                "--destination={{ .Values.registry.host }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"]
+                "--destination={{ .Values.registry.host }}/{{ .Values.model_name }}-{{ .Values.model_version }}"]
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker
@@ -98,20 +98,6 @@ spec:
         resources:
           limits:
             memory: "5Gi"
-            # cpu: "2"
-  - name: deploy
-    resource:
-        action: apply
-        failureCondition: status.failed > 3
-        manifest: | 
-            apiVersion: openfaas.com/v1 
-            kind: Function
-            metadata:
-                name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                namespace: {{.Values.serving_namespace}}
-            spec:
-                name: "{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
-                image: "registry.{{ .Values.global.domain }}/{{ "{{" }}workflow.parameters.model-name{{ "}}" }}-{{ "{{" }}workflow.parameters.model-version{{ "}}" }}"
   - name: deploy-wf
     steps:
     - - name: package-model
@@ -124,5 +110,3 @@ spec:
               value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file{{ "}}" }}"
             - name: build-file-bucket
               value: "{{ "{{" }}steps.package-model.outputs.parameters.build-file-bucket{{ "}}" }}"
-    - - name: deploy
-        template: deploy

@@ -18,4 +18,4 @@ minio_secret: xSaQWnKcl9lu40nUYPmUXmGOi8aMxOPoClTU2YbZ
 project_slug: testproj-lav
 
 model_name: testmodel1
-model_version: v2
+model_version: v3

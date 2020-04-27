@@ -1,0 +1,8 @@
+apiVersion: openfaas.com/v1 
+kind: Function
+metadata:
+    name: {{ .Values.model_name }}-{{ .Values.model_version }}
+    namespace: {{.Values.serving_namespace}}
+spec:
+    name: {{ .Values.model_name }}-{{ .Values.model_version }}
+    image: "registry.{{ .Values.global.domain }}/{{ .Values.model_name }}-{{ .Values.model_version }}"
