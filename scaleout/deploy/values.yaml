@@ -8,14 +8,24 @@ registry:
 imagePullSecret: regcred
 serving_namespace: default
 
-context_bucket: deploy
-context_file: tensflow.tar.gz
-model_bucket: models
-model_file: model.tar.gz
-minio_host: minio-host
-minio_access: access-key
-minio_secret: secret-key
-project_slug: project-slug
+project:
+  slug: project-slug
 
-model_name: model-name
-model_version: model-version
+deployment:
+  version: version
+  name: deployment-name
+
+context:
+  bucket: deploy
+  file: tensflow.tar.gz
+
+model:
+  bucket: models
+  file: model.tar.gz  
+
+minio:
+  host: minio-host
+  access_key: access-key
+  secret_key: secret-key
+
+
