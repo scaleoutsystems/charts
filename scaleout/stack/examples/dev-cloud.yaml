@@ -15,7 +15,7 @@ imagePullSecrets:
 # Name: storageClassName
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 # Default: hostpath (works with docker-for-desktop)
-storageClassName: hostpath
+storageClassName: microk8s-hostpath
 namespace: default
 
 studio:
@@ -25,7 +25,7 @@ studio:
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: platform.local
+domain: 3.231.229.94.nip.io
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
@@ -33,7 +33,7 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: platform.local
+    - host: 3.231.229.94.nip.io
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
@@ -78,50 +78,50 @@ chartcontroller:
   image:
     repository: scaleoutsystems/chart-controller:master
     pullPolicy: Always
-  branch: master
 
 
 
 cluster_config: |-
     apiVersion: v1
-    kind: Config
     clusters:
-    - name: "local"
-      cluster:
-        server: "your.server.here"
-    users:
-    - name: "local"
-      user:
-        token: "your.token.here"
-
+    - cluster:
+        certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURBVENDQWVtZ0F3SUJBZ0lKQU1JUVFZRVdOeWhKTUEwR0NTcUdTSWIzRFFFQkN3VUFNQmN4RlRBVEJnTlYKQkFNTURERXdMakUxTWk0eE9ETXVNVEFlRncweU1EQTBNVGN4TVRRME1EaGFGdzB5TURBMU1UY3hNVFEwTURoYQpNQmN4RlRBVEJnTlZCQU1NRERFd0xqRTFNaTR4T0RNdU1UQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQCkFEQ0NBUW9DZ2dFQkFMUVE5eG5wOXEzYUtSam5UTVR1WFpHZjVBRDFYcHpZcCtGcUZZRm9Od2llMVBYOC9saUUKbWVDS0dnWnZRbjZ3bkZ6ajh0TDFrMk5YSUxNNXU1SFdlS3ViWDk3SHU3UUM5VGNoVElTcUQzbzd1WVcxQmF3eAovdThQVTd2RHVYTWJTVjRIcDdSRHFSY01Pa0thTVFwVC94RkFNSkZXNUx4aHh3RDB2UFVRN09vdUdnT3kzcDRaClEvdUxGcXptblNkUzdSR2dQd0FjV2tkOThWdk9NNlB3Znh6RWtWOFlhaGtxVExoelpVc3RweTNGT1hSUms1U04KZzRJc29URThCazdGVGZReXFiaXV1SkxMWTJKSmdNN2gyMThnZzBPaVZBYzc4Y2xMeTk3Z3Zic2htclhEb2tteApOSVJNOVRUMUd3SGtSc0JJRVQ5WUd5NWw2MGNyRHlWK0poRUNBd0VBQWFOUU1FNHdIUVlEVlIwT0JCWUVGSDdlClZYMHRNRzY4SmFsR0JVSm5DelNvUExBNk1COEdBMVVkSXdRWU1CYUFGSDdlVlgwdE1HNjhKYWxHQlVKbkN6U28KUExBNk1Bd0dBMVVkRXdRRk1BTUJBZjh3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUtrQitsaHdhUFNINjFuYgovTlRuejZMVVNZNC9hWUs1dExGTXFVMWdjNEdBTXd6OFFYQXFyWWRsb016UHJ2L3QvZEZvanhrdGVyNlBlcVZJCm14SUxwU2VueE5Fa0Q2bVhrU3JZSmVFbFBqQTBoSDZNY3RwUzM3T3BHL0xrNExlV3RCTDlsZEk5cDY5U0M5b0UKWUgvZEJxc0xmT2FYaFg2ZFlrZGxyZDBhVE5abFZKMVRIditsVitjbUN0TWkrWUxIcHYwRnF5ZldMdzZxdkRwUQo4UUZ1cWc4NnhkTEVISzRVSnRSUzRjeTVPejI1aUYvUmRBdTFtRGIrald3TXUvTUxQM3NpdTRSVjEzMmR0a0l5Cld1T1ZadzNTZzlRcjNVcVZLdUhuTlZuU0RwL0hHS1RUSWFNMCtSOU5LSmFKRkJ3d3A4MFFRbjBSY2VQVmYrNUwKa1pRRC9ZZz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        server: https://3.231.229.94:16443
+      name: microk8s-cluster
     contexts:
-    - name: "local"
-      context:
-        user: "local"
-        cluster: "local"
-
-    current-context: "local"
-
-fixtures: |-
-  []
+    - context:
+        cluster: microk8s-cluster
+        user: admin
+      name: microk8s
+    current-context: microk8s
+    kind: Config
+    preferences: {}
+    users:
+    - name: admin
+      user:
+        username: admin
+        password: bjdRL1I3bU5RYzRnTjlWT0JaaCtlU3djVjN4V2RSS0RaTktIRXVxdVRjTT0K
 
 docker-registry:
+    namespace: default
+    service:
+      type: ClusterIP
     enabled: true
     ingress:
         enabled: true
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
         hosts:
-            - registry.stack.your.domain.name
+            - registry.3.231.229.94.nip.io
         tls:
             - secretName: ingress-secret
               hosts:
-                  - registry.stack.your.domain.name
+                  - registry.3.231.229.94.nip.io
 
     persistence:
       enabled: true
       accessMode: ReadWriteOnce
-      size: 4Gi
+      size: 10Gi
 
 argo:
   installCRD: false
@@ -132,11 +132,11 @@ argo:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: 1000m
         hosts:
-            - workflow.stack.your.domain.name
+            - workflow.3.231.229.94.nip.io
         tls:
             - secretName: ingress-secret
               hosts:
-                  - workflow.stack.your.domain.name
+                  - workflow.3.231.229.94.nip.io
 
 argo-events:
   enabled: true
@@ -158,7 +158,7 @@ openfaas:
     ingress:
       enabled: true
       hosts:
-        - host: serve.stack.your.domain.name
+        - host: serve.3.231.229.94.nip.io
           serviceName: gateway
           servicePort: 8080
           path: /
@@ -166,4 +166,4 @@ openfaas:
       tls:
         - secretName: ingress-secret
           hosts:
-            - serve.stack.your.domain.name
+            - serve.3.231.229.94.nip.io
