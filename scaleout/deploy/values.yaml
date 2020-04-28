@@ -1,0 +1,31 @@
+global:
+  domain: global.domain
+
+registry:
+  secure: False
+  host: stack-docker-registry:5000
+
+imagePullSecret: regcred
+serving_namespace: default
+
+project:
+  slug: project-slug
+
+deployment:
+  version: version
+  name: deployment-name
+
+context:
+  bucket: deploy
+  file: tensflow.tar.gz
+
+model:
+  bucket: models
+  file: model.tar.gz  
+
+minio:
+  host: minio-host
+  access_key: access-key
+  secret_key: secret-key
+
+

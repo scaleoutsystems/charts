@@ -1,0 +1,8 @@
+apiVersion: openfaas.com/v1 
+kind: Function
+metadata:
+    name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+    namespace: {{.Values.serving_namespace}}
+spec:
+    name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+    image: "registry.{{ .Values.global.domain }}/{{ .Values.deployment.name }}-{{ .Values.deployment.version }}"

@@ -103,7 +103,7 @@ cluster_config: |-
     current-context: "local"
 
 
-docker-registry:
+registry:
     enabled: true
     ingress:
         enabled: true
