@@ -1,4 +1,4 @@
-name: Release Charts
+name: Build and create helm repo and index.yaml
 
 
 on:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Configure Git
         run: |
@@ -25,15 +25,17 @@ jobs:
           chmod 700 get_helm.sh
           ./get_helm.sh
           helm init --client-only
+
       - name: Add dependency chart repos
         run: |
           helm repo add stable https://kubernetes-charts.storage.googleapis.com/
           helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.0.0-alpha.2
+        uses: helm/chart-releaser-action@v1.0.0-rc.1
         with:
           charts_dir: scaleout
           charts_repo_url: https://scaleoutsystems.github.io/charts
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
+
