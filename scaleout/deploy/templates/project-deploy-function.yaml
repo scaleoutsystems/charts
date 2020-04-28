@@ -1,8 +1,29 @@
-apiVersion: openfaas.com/v1 
-kind: Function
+# apiVersion: openfaas.com/v1 
+# kind: Function
+# metadata:
+#     name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+#     namespace: {{.Values.serving_namespace}}
+# spec:
+#     name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+#     image: "registry.{{ .Values.global.domain }}/{{ .Values.deployment.name }}-{{ .Values.deployment.version }}"
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-    name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
-    namespace: {{.Values.serving_namespace}}
+  name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+  labels:
+    app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
 spec:
-    name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
-    image: "registry.{{ .Values.global.domain }}/{{ .Values.deployment.name }}-{{ .Values.deployment.version }}"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+    spec:
+      containers:
+      - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+        image: "registry.{{ .Values.global.domain }}/{{ .Values.deployment.name }}-{{ .Values.deployment.version }}"
+        ports:
+        - containerPort: 80
