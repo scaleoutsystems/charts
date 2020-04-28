@@ -31,11 +31,8 @@ spec:
         - /bin/sh
         - -c
         - ' /usr/bin/mc config host add myminio http://$MINIO_ENDPOINT:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY;
-          /usr/bin/mc rm -r --force myminio/dataset;
           /usr/bin/mc mb myminio/dataset;
-          /usr/bin/mc rm -r --force myminio/reports;
           /usr/bin/mc mb myminio/reports;
-          /usr/bin/mc rm -r --force myminio/models;
           /usr/bin/mc mb myminio/models;
           /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/dataset;
           /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/reports;
