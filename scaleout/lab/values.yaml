@@ -4,6 +4,9 @@ project:
 labs:
   image: pharmbio/pharmbio-notebook:tf-2.1.0-gpu
   #image: jupyter/minimal-notebook:latest
+  resources: {}
+  selectors: {}
+
   repository: "git@github.com:scaleoutsystems/digits-example-project.git"
   requests:
     memory: 256m
