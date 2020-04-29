@@ -12,7 +12,7 @@ spec:
       labels:
         app: {{ .Release.Name }}-labs-app
     spec:
-    {{ toJson .Values.labs.selectors }}
+    {{ .Values.labs.selectors }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
