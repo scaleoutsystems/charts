@@ -12,17 +12,7 @@ spec:
       labels:
         app: {{ .Release.Name }}-labs-app
     spec:
-    {{ if .Values.labs.gpu }}
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: acceleration
-                operator: In
-                values:
-                - gpu
-    {{ end }}
+    {{ toJson .Values.labs.selectors }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -77,29 +67,7 @@ spec:
           value: ""
         - name: NOTEBOOK_TOKEN
           value: ""
-
-        resources:
-            {{ if .Values.labs.requests }}
-            requests:
-                {{ if .Values.labs.requests.memory }}
-                memory: "{{ .Values.labs.requests.memory }}"
-                {{ end }}
-                {{ if .Values.labs.requests.cpu }}
-                cpu: "{{ .Values.labs.requests.cpu }}"
-                {{ end }}
-            {{ end }}
-            {{ if .Values.labs.limits}}
-            limits:
-                {{ if .Values.labs.limits.memory }}
-                memory: "{{ .Values.labs.limits.memory }}"
-                {{ end }}
-                {{ if .Values.labs.limits.cpu }}
-                cpu: "{{ .Values.labs.limits.cpu }}"
-                {{ end }}
-                {{ if .Values.labs.limits.gpu }}
-                nvidia.com/gpu: "{{ .Values.labs.limits.gpu }}"
-                {{ end }}
-            {{ end }}
+        {{ .Values.labs.resources }}
         volumeMounts:
         - name: homedir
           mountPath: /home/jovyan/
