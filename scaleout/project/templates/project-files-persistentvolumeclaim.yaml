@@ -8,7 +8,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: {{ .Values.storageClassName | default "hostpath" }}
+  storageClassName: {{ .Values.storageClassName | default "microk8s-hostpath" }}
   resources:
     requests:
       storage: 2Gi
