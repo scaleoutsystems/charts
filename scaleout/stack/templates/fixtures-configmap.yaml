@@ -1,0 +1,8 @@
+{{- if .Values.fixtures }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-fixtures-configmap
+data:
+  fixtures.json: {{ .Values.fixtures | quote }}
+{{- end }}

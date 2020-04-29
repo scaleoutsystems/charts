@@ -42,6 +42,10 @@ spec:
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
 
+          - mountPath: /app/projects/fixtures/fixtures.json
+            subPath: fixtures.json
+            name: {{ .Release.Name }}-fixtures-configmap
+
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -54,3 +58,10 @@ spec:
           items:
           - key: settings.py
             path: settings.py
+
+      - name: {{ .Release.Name }}-fixtures-configmap
+        configMap:
+          name: {{ .Release.Name }}-fixtures-configmap
+          items:
+          - key: fixtures.json
+            path: fixtures.json
