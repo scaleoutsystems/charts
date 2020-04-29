@@ -14,7 +14,7 @@ metadata:
     io.kompose.service: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-ingress
 spec:
   rules:
-    - host: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}.{{ .Values.global.domain }}
+    - host: {{ .Values.deployment.endpoint }}
       http:
         paths:
         - path: /
