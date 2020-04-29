@@ -34,9 +34,11 @@ spec:
           /usr/bin/mc mb myminio/dataset;
           /usr/bin/mc mb myminio/reports;
           /usr/bin/mc mb myminio/models;
+          /usr/bin/mc mb myminio/deploy;
           /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/dataset;
           /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/reports;
           /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/models;
+          /usr/bin/mc policy {{ .Values.defaultBucket.policy }} myminio/deploy;
           exit 0; '
         image: minio/mc
         name: {{ .Release.Name }}-createbuckets

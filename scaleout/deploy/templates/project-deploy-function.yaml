@@ -26,4 +26,4 @@ spec:
       - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
         image: "registry.{{ .Values.global.domain }}/{{ .Values.deployment.name }}-{{ .Values.deployment.version }}"
         ports:
-        - containerPort: 80
+        - containerPort: 8501
