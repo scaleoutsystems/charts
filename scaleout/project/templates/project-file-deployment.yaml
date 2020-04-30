@@ -26,6 +26,7 @@ spec:
         io.kompose.service: {{ .Release.Name }}-file-controller
         name: {{ .Release.Name }}-file-controller
     spec:
+      {{ if .Values.labs.repository }}
       initContainers:
       - name: git-sync
         image: k8s.gcr.io/git-sync:v3.1.1
@@ -51,6 +52,7 @@ spec:
         volumeMounts:
         - name: project-files
           mountPath: /tmp/git
+      {{ end }}
       containers:
       - name: {{ .Release.Name }}-file-controller
         image: scaleoutsystems/file-controller:master
