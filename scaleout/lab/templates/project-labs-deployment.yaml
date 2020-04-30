@@ -12,7 +12,10 @@ spec:
       labels:
         app: {{ .Release.Name }}-labs-app
     spec:
-    {{ .Values.labs.selectors | nindent 4 }}
+    {{ if .Values.labs.gpu.enabled }}
+      affinity:
+        {{ .Values.labs.affinity | toYaml | nindent 8 | trim }}
+    {{ end }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -67,7 +70,19 @@ spec:
           value: ""
         - name: NOTEBOOK_TOKEN
           value: ""
-        {{ .Values.labs.resources | nindent 4}}
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 200m
+            {{if .Values.labs.gpu.enabled }}
+            nvidia.com/gpu: "1"
+            {{ end }}
+          limits:
+            memory: 256Mi
+            cpu: 200m
+            {{if .Values.labs.gpu.enabled }}
+            nvidia.com/gpu: "1"
+            {{ end }}
         volumeMounts:
         - name: homedir
           mountPath: /home/jovyan/

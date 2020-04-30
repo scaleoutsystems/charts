@@ -4,18 +4,22 @@ project:
 labs:
   image: pharmbio/pharmbio-notebook:tf-2.1.0-gpu
   #image: jupyter/minimal-notebook:latest
-  resources: {}
-  selectors: {}
+
+  gpu:
+    enabled: false
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: acceleration
+            operator: In
+            values:
+            - gpu
 
   repository: "git@github.com:scaleoutsystems/digits-example-project.git"
-  requests:
-    memory: 256m
-    cpu: 200m
-  gpu: "1"
-  limits:
-    memory: 1Gi
-    cpu: 500m
-    gpu: 1
+
 
 global:
   domain: platform.local
