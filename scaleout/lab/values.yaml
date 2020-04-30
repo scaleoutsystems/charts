@@ -18,9 +18,6 @@ labs:
             values:
             - gpu
 
-  repository: "git@github.com:scaleoutsystems/digits-example-project.git"
-
-
 global:
   domain: platform.local
 
