@@ -19,6 +19,10 @@ spec:
       app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8501"
       labels:
         app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
     spec:
