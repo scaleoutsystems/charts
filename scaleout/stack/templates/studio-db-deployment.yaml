@@ -4,9 +4,9 @@ metadata:
   annotations:
   creationTimestamp: null
   labels:
-    io.kompose.service: studio-db
-    name: studio-db
-  name: studio-db
+    io.kompose.service: {{ .Release.Name }}-studio-db
+    name: {{ .Release.Name }}-studio-db
+  name: {{ .Release.Name }}-studio-db
 spec:
   replicas: 1
   strategy: {}
@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        io.kompose.service: studio-db
+        io.kompose.service: {{ .Release.Name }}-studio-db
         name: {{ .Release.Name }}-studio-db
     spec:
       containers:

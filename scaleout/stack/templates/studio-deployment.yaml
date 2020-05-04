@@ -26,6 +26,10 @@ spec:
         io.kompose.service: {{ .Release.Name }}-studio
         name: {{ .Release.Name }}-studio
     spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command: ['sh', '-c', "sleep 30 && until nslookup {{ .Release.Name }}-studio-db.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for studio-db; sleep 5; done"]
       containers:
       - args:
         - sh
