@@ -17,8 +17,7 @@ deployment:
   endpoint: deployment-endpoint
 
 context:
-  bucket: deploy
-  file: tensflow.tar.gz
+  image: context-image
 
 model:
   bucket: models
