@@ -188,6 +188,7 @@ data:
     GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
     GIT_REPOS_URL = '/repos/'
 
+    REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
     CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
     STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
 
