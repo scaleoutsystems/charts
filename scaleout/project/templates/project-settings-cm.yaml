@@ -6,4 +6,4 @@ metadata:
 data:
   # Configuration values can be set as key-value properties
   project.yaml: |-
-    {{ .Values.settings_file | nindent 2 }}
+    {{ .Values.settings_file | toYaml | nindent 2 }}
