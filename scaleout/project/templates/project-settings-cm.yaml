@@ -5,5 +5,5 @@ metadata:
   name: {{ .Release.Name }}-project-settings-configmap
 data:
   # Configuration values can be set as key-value properties
-  project.yaml: |-
-    {{ .Values.settings_file | toYaml | nindent 2 }}
+  project.yaml: |- 
+{{ .Values.settings_file | indent 4 }}
