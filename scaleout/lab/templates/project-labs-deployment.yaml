@@ -92,6 +92,8 @@ spec:
         - name: jupyterconf
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
+        - name: projconfig
+          mountPath: /home/jovyan/.scaleout/
         securityContext:
           allowPrivilegeEscalation: true
       terminationGracePeriodSeconds: 30
@@ -102,6 +104,9 @@ spec:
       - name: homedir
         persistentVolumeClaim:
           claimName: {{ .Values.project.name }}-project-files
+      - name: projconfig
+        configMap:
+          name: {{ .Values.project.name }}-project-settings-configmap
       - name: devfuse
         hostPath:
           path: /dev/fuse
