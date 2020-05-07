@@ -34,7 +34,7 @@ spec:
           - name: MODEL_FILE
             value: {{ .Values.model.file }}
         command: ["/bin/bash"]
-        args: ["-c", "./mc config host add projminio $S3_ENDPOINT $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY;./mc cp projminio/$MODEL_BUCKET/$MODEL_FILE model.tar.gz;tar xvf model.tar.gz;[[ -f requirements.txt ]] && pip3 install -r requirements.txt;uwsgi --http 0.0.0.0:8501 --wsgi-file func.py --callable app_dispatch"]
+        args: ["-c", "./mc config host add projminio $S3_ENDPOINT $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY;./mc cp projminio/$MODEL_BUCKET/$MODEL_FILE model.tar.gz;tar xvf model.tar.gz;[[ -f requirements.txt ]] && pip3 install -r requirements.txt;./deploy.sh"]
         image: {{ .Values.context.image }}
         ports:
         - containerPort: 8501
