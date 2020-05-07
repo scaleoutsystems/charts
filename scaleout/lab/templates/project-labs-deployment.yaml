@@ -93,7 +93,7 @@ spec:
           mountPath: /etc/jupyter/jupyter_notebook_config.py
           subPath: jupyter_notebook_config.py
         - name: projconfig
-          mountPath: /home/jovyan/.scaleout/project.yaml
+          mountPath: /home/jovyan/.scaleout/
         securityContext:
           allowPrivilegeEscalation: true
       terminationGracePeriodSeconds: 30
