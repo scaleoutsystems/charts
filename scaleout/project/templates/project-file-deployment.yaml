@@ -40,6 +40,8 @@ spec:
           value: master
         - name: GIT_SYNC_DEST
           value: work
+        - name: GIT_SYNC_PERMISSIONS
+          value: "0777"
         - name: GIT_SYNC_ONE_TIME
           value: "true"
         {{ if .Values.labs.secret }}
