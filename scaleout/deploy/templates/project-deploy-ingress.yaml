@@ -22,6 +22,6 @@ spec:
             serviceName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
             servicePort: 80
   tls:
-    - secretName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-ingress-secret
+    - secretName: prod-ingress
       hosts:
         - {{ .Values.deployment.name }}-{{ .Values.deployment.version }}.{{ .Values.global.domain }}
