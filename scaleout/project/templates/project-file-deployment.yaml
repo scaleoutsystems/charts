@@ -26,8 +26,8 @@ spec:
         io.kompose.service: {{ .Release.Name }}-file-controller
         name: {{ .Release.Name }}-file-controller
     spec:
-      securityContext:
-        fsGroup: 1000
+      #securityContext:
+      #  fsGroup: 1000
         #runAsNonRoot: true
       {{ if .Values.labs.repository }}
       initContainers:
@@ -55,11 +55,11 @@ spec:
         volumeMounts:
         - name: project-files
           mountPath: /tmp/git
-        securityContext:
-          allowPrivilegeEscalation: false
+        #securityContext:
+        # allowPrivilegeEscalation: false
           #readOnlyRootFilesystem: true
-          runAsUser: 1000
-          runAsGroup: 100
+        #  runAsUser: 1000
+        #  runAsGroup: 100
       {{ end }}
       containers:
       - name: {{ .Release.Name }}-file-controller

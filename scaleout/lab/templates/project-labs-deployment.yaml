@@ -27,8 +27,8 @@ spec:
         image: scaleoutsystems/s3-sync:latest
         imagePullPolicy: Always
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 100
+          #runAsUser: 1000
+          #runAsGroup: 100
           privileged: true
           capabilities:
             add:
