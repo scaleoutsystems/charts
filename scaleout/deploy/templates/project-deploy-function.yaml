@@ -17,9 +17,18 @@ spec:
         prometheus.io/port: "8501"
       labels:
         app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+        project: {{ .Values.project.slug }}
+        type: deployment
     spec:
       containers:
       - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+        resources:
+          limits:
+            cpu: 300m
+            memory: 1024Mi
+          requests:
+            cpu: 300m
+            memory: 1024Mi
         env:
           - name: S3_ACCESS_KEY_ID
             value: {{ .Values.minio.access_key }}
