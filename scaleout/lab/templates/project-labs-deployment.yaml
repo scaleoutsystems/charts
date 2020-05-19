@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-labs-app
+        project: {{ .Values.project.name }}
+        type: lab
     spec:
     {{ if .Values.labs.gpu.enabled }}
       affinity:
