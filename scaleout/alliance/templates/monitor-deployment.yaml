@@ -27,6 +27,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      initContainers:
+        - name: wait-for-delay
+          image: busybox:1.28
+          command: ['sh', '-c', "sleep 20"]
       containers:
       - args:
         - python
