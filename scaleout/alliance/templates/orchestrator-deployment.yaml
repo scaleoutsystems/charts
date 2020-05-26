@@ -41,7 +41,7 @@ spec:
       - name: {{ .Release.Name }}-orchestrator
         image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag }}"
         imagePullPolicy: Always
-        workingDir: /app
+        #workingDir: /app
         args:
         - fedn
         - run
@@ -66,7 +66,9 @@ spec:
       - name: project
         configMap:
           name: {{ .Release.Name }}-orchestrator-configmap
-
+          items:
+          - key: project.yaml
+            path: project.yaml
 
 
 status: {}
