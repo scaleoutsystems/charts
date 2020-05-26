@@ -41,7 +41,7 @@ spec:
         - name: MONITOR_HOST
           value: {{ .Release.Name }}-controller
         - name: MONITOR_PORT
-          value: {{ .Values.service.controller | quote }}
+          value: 12080
         - name: USER
           value: "{{ .Values.alliance.user }}"
         - name: PROJECT

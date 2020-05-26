@@ -19,9 +19,8 @@ data:
     Alliance:
       alliance_name: testalliance
       controller_host: {{ .Release.Name }}-controller
-      controller_port: {{ .Values.service.controller | quote }}
-      #{{ .Values.service.controller }}
-      # 12080
+      controller_port: 12080
+      #{{ .Values.service.controller | quote }}      
 
       Repository:
         minio_host: {{ .Values.alliance.project }}-minio.{{ .Values.global.domain }}
