@@ -51,6 +51,7 @@ spec:
         - name: API_URL
           value: {{ .Values.alliance.apiUrl }}
         image: "{{ .Values.monitor.image.repository }}:{{ .Values.monitor.image.tag }}"
+        imagePullPolicy: Always
         name: {{ .Release.Name }}-monitor
         #ports:
         #- containerPort: 12080

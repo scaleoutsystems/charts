@@ -36,6 +36,7 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
+        imagePullPolicy: Always
         name: {{ .Release.Name }}-controller
         ports:
         - containerPort: 12080
