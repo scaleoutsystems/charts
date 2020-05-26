@@ -46,7 +46,9 @@ data:
     # Application definition
 
     INSTALLED_APPS = [
-
+    {{ if eq .Values.fedn.enabled "true" }}
+        'alliance_admin',
+    {{ end }}
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
