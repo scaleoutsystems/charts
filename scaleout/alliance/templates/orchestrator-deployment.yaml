@@ -52,10 +52,6 @@ spec:
         env:
         - name: GET_HOSTS_FROM
           value: dns
-        #- name: MINIO_HOST
-        #  value: {{ .Release.Name }}-minio
-        #- name: CONTROLLER_HOST
-        #  value: {{ .Release.Name }}-controller
         volumeMounts:
         - name: project
           mountPath: /app/project.yaml
