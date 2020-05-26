@@ -29,8 +29,9 @@ spec:
     {{- end }}
       containers:
       - args:
-        - python
-        - server.py
+        - fedn
+        - run
+        - controller
         env:
         - name: GET_HOSTS_FROM
           value: dns

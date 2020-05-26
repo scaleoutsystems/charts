@@ -28,38 +28,41 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      securityContext:
-        runAsUser: 65533  # to allow read of ssh key
+      #securityContext:
+      #  runAsUser: 65533  # to allow read of ssh key
         #runAsUser: 1000
         #runAsGroup: 3000
         #fsGroup: 2000
+      initContainers:
+        - name: wait-for-delay
+          image: busybox:1.28
+          command: ['sh', '-c', "sleep {{ .Values.sleep }}"]
       containers:
       - name: {{ .Release.Name }}-orchestrator
         image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag }}"
+        workingDir: /app
         args:
-        - sleep
-        - {{ .Values.sleep }}
-        - &&
+        - fedn
         - run
         - fedavg
         - -s
         - {{ .Values.model }}
         - -r
-        - {{ .Values.rounds }}
+        - {{ .Values.rounds | quote }}
         env:
         - name: GET_HOSTS_FROM
           value: dns
-        - name: MINIO_HOST
-          value: {{ .Release.Name }}-minio
-        - name: CONTROLLER_HOST
-          value: {{ .Release.Name }}-controller
+        #- name: MINIO_HOST
+        #  value: {{ .Release.Name }}-minio
+        #- name: CONTROLLER_HOST
+        #  value: {{ .Release.Name }}-controller
         volumeMounts:
         - name: project
           mountPath: /app/project.yaml
           subPath: project.yaml
 
-        securityContext:
-          runAsUser: 0
+        #securityContext:
+        #  runAsUser: 0
           #allowPrivilegeEscalation: false
       restartPolicy: Always
       volumes:
