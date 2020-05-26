@@ -4,6 +4,9 @@
 
 replicaCount: 1
 
+sleep: 30
+model: init-model-id
+rounds: 10
 
 global:
   domain: alliance.scaleout.se
@@ -19,21 +22,20 @@ minio:
 
 controller:
   image:
-    repository: scaleoutsystems/controller
-    tag: latest
+    repository: scaleoutsystems/fedn-controller
+    tag: master
     pullPolicy: Always
 
 monitor:
   image:
-    repository: scaleoutsystems/monitor
-    tag: latest
+    repository: scaleoutsystems/fedn-monitor
+    tag: master
     pullPolicy: Always
 
 orchestrator:
-  repository: "git@github.com:scaleoutsystems/scaleout-alliance-orchestrator-sdk.git"
   image:
-    repository: scaleoutsystems/orchestrator
-    tag: latest
+    repository: scaleoutsystems/fedn-client
+    tag: master
     pullPolicy: Always
 
 

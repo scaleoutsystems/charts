@@ -6,20 +6,35 @@ metadata:
 data:
   # Configuration values can be set as key-value properties
   project.yaml: |-
-    Config:
-      hosts:
+    auth_url: http://{{ .Release.Name }}.{{ .Values.global.domain }}/api/api-token-auth
+    username: orchestrator
+    access_key: {{ .Values.minio.access_key }}
+    password: {{ .Values.minio.secret_key }}
+    so_domain_name: {{ .Values.global.domain }}
+
+    Project:
+      project_name: {{ .Values.alliance.project }}
+      project_id:
+
+    Alliance:
+      alliance_name: testalliance
+      controller_host: {{ .Release.Name }}-controller
+      controller_port: 12080
+
+      Repository:
         minio_host: {{ .Release.Name }}-minio
         minio_port: 9000
-        # {{ .Values.service.minio }}
-        controller_host: {{ .Release.Name}}-controller
-        controller_port: 12080
-        #{{ .Values.service.controller }}
-    Project:
-      entry_points:
-        predict:
-          command: python3 predict.py
-        train:
-          command: python3 train.py
-        validate:
-          command: python3 validate.py
-      access_key: orchestrator
+        minio_bucket: alliance
+        minio_access_key: {{ .Values.minio.access_key }}
+        minio_secret_key: {{ .Values.minio.secret_key }}
+        minio_secure_mode: False
+
+      Member:
+        name: orchestrator
+        entry_points:
+          predict:
+            command: python3 predict.py
+          train:
+            command: python3 train.py
+          validate:
+            command: python3 validate.py
