@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Name }}-orchestrator-configmap
 data:
   # Configuration values can be set as key-value properties
-  project.yaml: |
+  project.yaml: |-
     auth_url: http://{{ .Release.Name }}.{{ .Values.global.domain }}/api/api-token-auth
     username: orchestrator
     access_key: {{ .Values.minio.access_key | quote}}
@@ -20,7 +20,7 @@ data:
       alliance_name: testalliance
       controller_host: {{ .Release.Name }}-controller
       controller_port: 12080
-      #{{ .Values.service.controller | quote }}      
+      #{{ .Values.service.controller | quote }}
 
       Repository:
         minio_host: {{ .Values.alliance.project }}-minio.{{ .Values.global.domain }}
