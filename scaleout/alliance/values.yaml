@@ -4,9 +4,7 @@
 
 replicaCount: 1
 
-sleep: 30
 model: init-model-id
-rounds: 10
 
 global:
   domain: alliance.scaleout.se
