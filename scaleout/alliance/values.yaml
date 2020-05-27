@@ -36,6 +36,11 @@ orchestrator:
     tag: master
     pullPolicy: Always
 
+checkpointer:
+  image:
+    repository: scaleoutsystems/fedn-checkpointer
+    tag: master
+    pullPolicy: Always
 
 #imagePullSecrets:
 #  - name: regcred
