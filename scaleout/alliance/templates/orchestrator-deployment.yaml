@@ -61,7 +61,7 @@ spec:
         #securityContext:
         #  runAsUser: 0
           #allowPrivilegeEscalation: false
-      restartPolicy: Always
+      restartPolicy: OnFailure
       volumes:
       - name: project
         configMap:
