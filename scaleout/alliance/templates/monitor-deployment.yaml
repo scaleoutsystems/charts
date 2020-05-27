@@ -39,9 +39,9 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         - name: MONITOR_HOST
-          value: {{ .Release.Name }}-controller
+          value: "{{ .Release.Name }}-controller"
         - name: MONITOR_PORT
-          value: 12080
+          value: "12080"
         - name: USER
           value: "{{ .Values.alliance.user }}"
         - name: PROJECT
