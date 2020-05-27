@@ -33,23 +33,24 @@ spec:
         #runAsUser: 1000
         #runAsGroup: 3000
         #fsGroup: 2000
-      initContainers:
-        - name: wait-for-delay
-          image: busybox:1.28
-          command: ['sh', '-c', "sleep {{ .Values.sleep }}"]
+      #initContainers:
+      #  - name: wait-for-delay
+      #    image: busybox:1.28
+      #    command: ['sh', '-c', "sleep {{ .Values.sleep }}"]
       containers:
       - name: {{ .Release.Name }}-orchestrator
         image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag }}"
         imagePullPolicy: Always
         #workingDir: /app
-        args:
-        - fedn
-        - run
-        - fedavg
-        - -s
-        - {{ .Values.model }}
-        - -r
-        - {{ .Values.rounds | quote }}
+        command: ['sh','run.sh']
+        #args:
+        #- fedn
+        #- run
+        #- fedavg
+        #- -s
+        #- {{ .Values.model }}
+        #- -r
+        #- {{ .Values.rounds | quote }}
         env:
         - name: GET_HOSTS_FROM
           value: dns

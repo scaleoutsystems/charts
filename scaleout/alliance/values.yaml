@@ -34,7 +34,7 @@ monitor:
 
 orchestrator:
   image:
-    repository: scaleoutsystems/fedn-client
+    repository: scaleoutsystems/fedn-orchestrator
     tag: master
     pullPolicy: Always
 
