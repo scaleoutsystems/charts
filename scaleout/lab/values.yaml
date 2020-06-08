@@ -21,8 +21,9 @@ labs:
 global:
   domain: platform.local
 
-imagePullSecrets:
-  - name: regcred
+# Enable this if you intend to pull an image from a protected repository.
+#imagePullSecrets:
+#  - name: regcred
 
 minio:
   access_key: minio
