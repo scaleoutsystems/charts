@@ -167,3 +167,6 @@ openfaas:
         - secretName: ingress-secret
           hosts:
             - serve.stack.your.domain.name
+
+oidc:
+    enabled: false

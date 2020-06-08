@@ -1,21 +1,19 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-labs-ingress
-  annotations:
-    #kubernetes.io/tls-acme: 'true'
-    nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
-
+  name: {{ .Release.Name }}-ingress
+  labels:
+    io.kompose.service: {{ .Release.Name }}-ingress
 spec:
-  tls:
-  - hosts:
-    - {{ .Release.Name }}.{{ .Values.global.domain }}
-    secretName: prod-ingress
   rules:
-  - host: {{ .Release.Name }}.{{ .Values.global.domain }}
-    http:
-      paths:
+    - host: {{ .Release.Name }}.{{ .Values.global.domain }}
+      http:
+        paths:
         - path: /
           backend:
-            serviceName: {{ .Release.Name }}-labs-service
-            servicePort: 8888
+            serviceName: {{ .Release.Name }}-keycloak-proxy-svc
+            servicePort: 80
+  tls:
+    - secretName: prod-ingress
+      hosts:
+        - {{ .Release.Name }}.{{ .Values.global.domain }}

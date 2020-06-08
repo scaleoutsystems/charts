@@ -17,9 +17,25 @@ data:
     """
 
     import os
-
+    {{ if .Values.oidc.enabled }}
+    KC_USERNAME = {{ .Values.oidc.username | quote }}
+    KC_PASS = {{ .Values.oidc.password | quote }}
+    KC_REALM = {{ .Values.oidc.realm | quote }}
+    OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
+    OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
+    OIDC_OP_AUTHORIZATION_ENDPOINT = {{ .Values.oidc.auth_endpoint | quote }}
+    OIDC_OP_TOKEN_ENDPOINT = {{ .Values.oidc.token_endpoint | quote }}
+    OIDC_OP_USER_ENDPOINT = {{ .Values.oidc.user_endpoint | quote }}
+    LOGIN_REDIRECT_URL = "/projects"
+    LOGOUT_REDIRECT_URL = "/"
+    OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
+    OIDC_OP_JWKS_ENDPOINT = {{ .Values.oidc.jwks_endpoint | quote }}
+    {{ end }}
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
+        {{ if .Values.oidc.enabled }}
+        'studio.OIDCbackend.OIDCbackend'
+        {{ end }}
     ]
 
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -63,6 +79,7 @@ data:
         'projects',
         'labs',
         'models',
+        # 'monitor',
         'reports',
         'files',
         'datasets',
@@ -84,6 +101,9 @@ data:
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        {{ if .Values.oidc.enabled }}
+        'mozilla_django_oidc.middleware.SessionRefresh',
+        {{ end }}
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'corsheaders.middleware.CorsMiddleware',

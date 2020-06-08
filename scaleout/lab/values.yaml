@@ -28,3 +28,8 @@ minio:
   access_key: minio
   secret_key: minio123
   bucket: dataset
+
+gatekeeper:
+  realm: demo
+  client_secret: 15982a99-cf3b-4e65-82ab-03d7df84a25a
+  client_id: project_notebook

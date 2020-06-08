@@ -1,12 +1,13 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  name: {{ .Release.Name }}-labs-service
+  name: {{ .Release.Name }}-keycloak-proxy-svc
+  labels:
+    run: {{ .Release.Name }}-keycloak-proxy-svc
 spec:
-  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 9090
+    protocol: TCP
   selector:
     app: {{ .Release.Name }}-labs-app
-  ports:
-  - protocol: TCP
-    port: 8888
-    targetPort: 8888

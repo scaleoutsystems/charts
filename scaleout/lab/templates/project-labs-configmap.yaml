@@ -22,6 +22,9 @@ data:
     c.NotebookApp.token = ''
     c.NotebookApp.tornado_settings={'headers':{'Content-Security-Policy': 'frame-ancestors self http://{{ .Values.global.domain }}',} }
 
+    c.NotebookApp.allow_origin = '*'
+    c.NotebookApp.allow_remote_access = True
+
     # https://github.com/jupyter/notebook/issues/3130
     c.FileContentsManager.delete_to_trash = False
 
