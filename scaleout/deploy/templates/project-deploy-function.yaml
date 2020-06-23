@@ -20,10 +20,10 @@ spec:
         project: {{ .Values.project.slug }}
         type: deployment
     spec:
-      volumes:
-      - name: model-storage
-        persistentVolumeClaim:
-          claimName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-model-storage
+      # volumes:
+      # - name: model-storage
+      #   persistentVolumeClaim:
+      #     claimName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-model-storage
       # initContainers:
       # - env:
       #   - name: MODEL_FILE
