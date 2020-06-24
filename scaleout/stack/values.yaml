@@ -23,7 +23,14 @@ studio:
   image: #tell which image to deploy for studio
     repository: scaleoutsystems/studio:master # point to the latest beta image
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
-
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 4Gi
+    requests:
+      cpu: 400m
+      memory: 2Gi
+      
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 domain: platform.local
 ingress:
@@ -67,7 +74,13 @@ postgres:
     name: postgres
     user: postgres
     password: postgres
-
+  resources:
+    limits:
+      cpu: 400m
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 1Gi
 
 # default credentials for rabbitmq. override in production!
 rabbit:

@@ -30,6 +30,13 @@ spec:
         - name: wait-for-db
           image: busybox:1.28
           command: ['sh', '-c', "sleep 30 && until nslookup {{ .Release.Name }}-studio-db.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for studio-db; sleep 5; done"]
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
       containers:
       - args:
         - sh
@@ -40,7 +47,7 @@ spec:
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         name: {{ .Release.Name }}-studio
-        resources: {}
+        # resources: {}
         volumeMounts:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
@@ -49,6 +56,13 @@ spec:
           - mountPath: /app/projects/fixtures/fixtures.json
             subPath: fixtures.json
             name: {{ .Release.Name }}-fixtures-configmap
+        resources:
+          limits:
+            cpu: {{ .Values.studio.resources.limits.cpu }}
+            memory: {{ .Values.studio.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.studio.resources.requests.cpu }}
+            memory: {{ .Values.studio.resources.requests.memory }}
 
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
