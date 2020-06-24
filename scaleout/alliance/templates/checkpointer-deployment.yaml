@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.20.0 ()
   creationTimestamp: null
   labels:
-    name: {{ .Release.Name }}-monitor
-  name: {{ .Release.Name }}-monitor
+    name: {{ .Release.Name }}-checkpointer
+  name: {{ .Release.Name }}-checkpointer
 spec:
   replicas: 1
   strategy: {}
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-monitor
+      name: {{ .Release.Name }}-checkpointer
   template:
     metadata:
       annotations:
@@ -21,7 +21,7 @@ spec:
         kompose.version: 1.20.0 ()
       creationTimestamp: null
       labels:
-        name: {{ .Release.Name }}-monitor
+        name: {{ .Release.Name }}-checkpointer
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -50,9 +50,9 @@ spec:
           value: "{{ .Release.Name }}"
         - name: API_URL
           value: {{ .Values.alliance.apiUrl }}
-        image: "{{ .Values.monitor.image.repository }}:{{ .Values.monitor.image.tag }}"
+        image: "{{ .Values.checkpointer.image.repository }}:{{ .Values.checkpointer.image.tag }}"
         imagePullPolicy: Always
-        name: {{ .Release.Name }}-monitor
+        name: {{ .Release.Name }}-checkpointer
         #ports:
         #- containerPort: 12080
         #  name: grpc

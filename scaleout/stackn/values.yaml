@@ -40,7 +40,7 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: platform.local
+    - host: platform.your.domain.name
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
@@ -138,7 +138,7 @@ docker-registry:
 
 argo:
   installCRD: false
-  enabled: true
+  enabled: false
   ui:
     ingress:
         enabled: true
@@ -152,7 +152,7 @@ argo:
                   - workflow.stack.your.domain.name
 
 argo-events:
-  enabled: true
+  enabled: false
   installCRD: false
   namespace: argo-events
   singleNamespace: false
@@ -160,7 +160,7 @@ argo-events:
 
 openfaas:
     functionNamespace: stack-fn
-    exposeServices: true
+    exposeServices: false
     async: true
     rbac: false
     psp: false
@@ -169,7 +169,7 @@ openfaas:
     operator:
         create: true
     ingress:
-      enabled: true
+      enabled: false
       hosts:
         - host: serve.stack.your.domain.name
           serviceName: gateway
@@ -180,3 +180,6 @@ openfaas:
         - secretName: ingress-secret
           hosts:
             - serve.stack.your.domain.name
+
+fedn:
+  enabled: false
