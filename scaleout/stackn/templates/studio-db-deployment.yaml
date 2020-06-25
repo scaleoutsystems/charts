@@ -31,7 +31,13 @@ spec:
           value: {{ .Values.postgres.db.user }}
         image: postgres
         name: studio-db
-        resources: {}
+        resources:
+          limits:
+            cpu: {{ .Values.postgres.resources.limits.cpu }}
+            memory: {{ .Values.postgres.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.postgres.resources.requests.cpu }}
+            memory: {{ .Values.postgres.resources.requests.memory }}
         volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: db
@@ -40,4 +46,5 @@ spec:
         - name: db
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-studio-db-pvc
+      
 status: {}
