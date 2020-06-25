@@ -10,7 +10,7 @@ spec:
   tls:
   - hosts:
     - {{ .Release.Name }}.{{ .Values.global.domain }}
-    secretName: prod-ingress
+    secretName: {{ .Values.ingress.secretName }}
   rules:
   - host: {{ .Release.Name }}.{{ .Values.global.domain }}
     http:

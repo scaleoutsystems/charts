@@ -28,3 +28,6 @@ minio:
   access_key: minio
   secret_key: minio123
   bucket: dataset
+
+ingress:
+  secretName: wildcard-cert

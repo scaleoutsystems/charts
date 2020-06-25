@@ -42,6 +42,10 @@ ingress:
   hosts:
     - host: platform.your.domain.name
 
+labs:
+  ingress:
+    secretName: prod-ingress
+
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
     #- secretName: platform-tls-secret
