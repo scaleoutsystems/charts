@@ -21,6 +21,7 @@ data:
     KC_USERNAME = {{ .Values.oidc.username | quote }}
     KC_PASS = {{ .Values.oidc.password | quote }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
+    KC_ADMIN_URL = {{ .Values.oidc.admin_url | quote }}
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
     OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
     OIDC_OP_AUTHORIZATION_ENDPOINT = {{ .Values.oidc.auth_endpoint | quote }}

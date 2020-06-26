@@ -159,6 +159,7 @@ argo-events:
 
 
 openfaas:
+    enabled: false
     functionNamespace: stack-fn
     exposeServices: false
     async: true
