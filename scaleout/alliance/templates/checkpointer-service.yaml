@@ -6,14 +6,16 @@ metadata:
     kompose.version: 1.20.0 ()
   creationTimestamp: null
   labels:
-    name: {{ .Release.Name }}-orchestrator
-  name: {{ .Release.Name }}-orchestrator
+    name: {{ .Release.Name }}-checkpointer
+  name: {{ .Release.Name }}-checkpointer
 spec:
+  type: {{ .Values.service.type }}
   ports:
   - name: http
     port: 80
     targetPort: 80
+    nodePort: {{ .Values.service.minio}}
   selector:
-    name: {{ .Release.Name }}-orchestrator
+    name: {{ .Release.Name }}-checkpointer
 status:
   loadBalancer: {}

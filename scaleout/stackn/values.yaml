@@ -23,7 +23,14 @@ studio:
   image: #tell which image to deploy for studio
     repository: scaleoutsystems/studio:master # point to the latest beta image
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
-
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 4Gi
+    requests:
+      cpu: 400m
+      memory: 2Gi
+      
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 domain: platform.local
 ingress:
@@ -33,7 +40,7 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: platform.local
+    - host: platform.your.domain.name
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
@@ -67,7 +74,13 @@ postgres:
     name: postgres
     user: postgres
     password: postgres
-
+  resources:
+    limits:
+      cpu: 400m
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 1Gi
 
 # default credentials for rabbitmq. override in production!
 rabbit:
@@ -125,7 +138,7 @@ docker-registry:
 
 argo:
   installCRD: false
-  enabled: true
+  enabled: false
   ui:
     ingress:
         enabled: true
@@ -139,7 +152,7 @@ argo:
                   - workflow.stack.your.domain.name
 
 argo-events:
-  enabled: true
+  enabled: false
   installCRD: false
   namespace: argo-events
   singleNamespace: false
@@ -147,7 +160,7 @@ argo-events:
 
 openfaas:
     functionNamespace: stack-fn
-    exposeServices: true
+    exposeServices: false
     async: true
     rbac: false
     psp: false
@@ -156,7 +169,7 @@ openfaas:
     operator:
         create: true
     ingress:
-      enabled: true
+      enabled: false
       hosts:
         - host: serve.stack.your.domain.name
           serviceName: gateway
@@ -169,4 +182,8 @@ openfaas:
             - serve.stack.your.domain.name
 
 oidc:
-    enabled: false
+  enabled: false
+
+fedn:
+  enabled: false
+
