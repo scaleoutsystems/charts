@@ -30,4 +30,4 @@ minio:
   bucket: dataset
 
 ingress:
-  secretName: wildcard-cert
+  secretName: prod-ingress

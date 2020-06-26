@@ -96,6 +96,13 @@ chartcontroller:
     repository: scaleoutsystems/chart-controller:master
     pullPolicy: Always
   branch: master
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
 
 
 

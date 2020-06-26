@@ -45,6 +45,13 @@ spec:
         - name: config
           mountPath: "/root/.kube/"
           readOnly: true
+        resources:
+          limits:
+            cpu: {{ .Values.chartcontroller.resources.limits.cpu }}
+            memory: {{ .Values.chartcontroller.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.chartcontroller.resources.requests.cpu }}
+            memory: {{ .Values.chartcontroller.resources.requests.memory }}
       restartPolicy: Always
       volumes:
       - name: config
