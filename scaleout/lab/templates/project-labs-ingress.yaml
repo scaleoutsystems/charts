@@ -16,6 +16,6 @@ spec:
             serviceName: {{ .Release.Name }}-keycloak-proxy-svc
             servicePort: 80
   tls:
-    - secretName: prod-ingress
+    - secretName: {{ .Values.ingress.secretName }}
       hosts:
         - {{ .Release.Name }}.{{ .Values.global.domain }}
