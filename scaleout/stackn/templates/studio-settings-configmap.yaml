@@ -24,6 +24,7 @@ data:
     KC_ADMIN_URL = {{ .Values.oidc.admin_url | quote }}
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
     OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
+    OIDC_OP_REALM_AUTH = {{ .Values.oidc.realm_auth_endpoint | quote }}
     OIDC_OP_AUTHORIZATION_ENDPOINT = {{ .Values.oidc.auth_endpoint | quote }}
     OIDC_OP_TOKEN_ENDPOINT = {{ .Values.oidc.token_endpoint | quote }}
     OIDC_OP_USER_ENDPOINT = {{ .Values.oidc.user_endpoint | quote }}

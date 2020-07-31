@@ -10,7 +10,7 @@ data:
     - uri: /*
       roles:
       - {{ .Release.Name }}:{{ .Release.Name }}-role
-    discovery-url: https://keycloak.smart.stackn.dev/auth/realms/{{ .Values.gatekeeper.realm }}
+    discovery-url: {{ .Values.gatekeeper.auth_endpoint }}/{{ .Values.gatekeeper.realm }}
     client-id: {{ .Values.gatekeeper.client_id }}
     client-secret: {{ .Values.gatekeeper.client_secret }}
     listen: 0.0.0.0:9090

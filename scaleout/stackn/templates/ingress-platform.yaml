@@ -27,11 +27,11 @@ spec:
         paths:
         - path: /
           backend:
-            serviceName: {{ $.Release.Name }}-ingress
+            serviceName: {{ $.Release.Name }}-studio
             servicePort: 8080
         - path: /static/
           backend:
-            serviceName: {{ $.Release.Name }}-ingress
+            serviceName: {{ $.Release.Name }}-studio
             servicePort: 8080
   {{- end }}
 {{- end }}
