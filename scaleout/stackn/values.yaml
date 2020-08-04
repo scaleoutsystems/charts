@@ -170,6 +170,7 @@ argo-events:
 
 
 openfaas:
+    enabled: false
     functionNamespace: stack-fn
     exposeServices: false
     async: true
@@ -192,5 +193,58 @@ openfaas:
           hosts:
             - serve.stack.your.domain.name
 
+keycloak:
+  ingress:
+    enabled: true
+    rules:
+      - host: "keycloak.stack.your.domain.name"
+        paths: [/]
+    tls:
+      - secretName: prod-ingress
+        hosts:
+          - keycloak.stack.your.domain.name
+  persistence:
+    deployPostgres: true
+    dbVendor: postgres
+    pullPolicy: Always
+
+  extraVolumes: |
+    - name: realm-secret
+      secret:
+        secretName: realm-secret
+
+  extraVolumeMounts: |
+    - name: realm-secret
+      mountPath: "/realm/"
+      readOnly: true
+    
+  extraEnv: |
+    - name: KEYCLOAK_IMPORT
+      value: /realm/realm.json
+    - name: KEYCLOAK_USER
+      value: admin
+    - name: KEYCLOAK_PASSWORD
+      value: password
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
+
+  postgresql:
+    postgresqlUsername: keycloak
+    postgresqlPassword: db_password
+    postgresqlDatabase: keycloak
+    persistence:
+      enabled: true
+      storageClass: microk8s-hostpath
+      size: 1Gi
+
+oidc:
+  enabled: false
+  realm: STACKn
+  client_id: studio
+  client_secret: a-client-secret
+  host: https://keycloak.stack.your.domain.name
+  sign_algo: RS256
+
 fedn:
   enabled: false
+

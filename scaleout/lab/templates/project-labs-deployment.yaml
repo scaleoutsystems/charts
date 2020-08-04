@@ -25,6 +25,16 @@ spec:
       #securityContext:
       #  runAsUser: 65533  # to allow read of ssh key
       containers:
+      - name: {{ .Release.Name }}-gatekeeper
+        image: keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
+        imagePullPolicy: Always
+        args:
+          - --config=/etc/secrets/gatekeeper.yaml
+        ports:
+          - containerPort: 9090
+        volumeMounts:
+        - name: gatekeeper-config
+          mountPath: /etc/secrets/
       - name: {{ .Release.Name }}-s3-sync
         image: scaleoutsystems/s3-sync:latest
         imagePullPolicy: Always
@@ -114,6 +124,9 @@ spec:
       - name: devfuse
         hostPath:
           path: /dev/fuse
+      - name: gatekeeper-config
+        configMap:
+          name: {{ .Release.Name }}-gatekeeper-config
 
       - name: jupyterconf
         configMap:

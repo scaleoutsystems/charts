@@ -17,9 +17,25 @@ data:
     """
 
     import os
-
+    {{ if .Values.oidc.enabled }}
+    KC_REALM = {{ .Values.oidc.realm | quote }}
+    KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
+    OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
+    OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
+    OIDC_OP_REALM_AUTH = "{{ .Values.oidc.host }}/auth/realms"
+    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/auth"
+    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/token"
+    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/userinfo"
+    LOGIN_REDIRECT_URL = "/projects"
+    LOGOUT_REDIRECT_URL = "/"
+    OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
+    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/certs"
+    {{ end }}
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
+        {{ if .Values.oidc.enabled }}
+        'studio.OIDCbackend.OIDCbackend'
+        {{ end }}
     ]
 
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -65,6 +81,7 @@ data:
         'projects',
         'labs',
         'models',
+        # 'monitor',
         'reports',
         'files',
         'datasets',
@@ -86,6 +103,9 @@ data:
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        {{ if .Values.oidc.enabled }}
+        'mozilla_django_oidc.middleware.SessionRefresh',
+        {{ end }}
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'corsheaders.middleware.CorsMiddleware',

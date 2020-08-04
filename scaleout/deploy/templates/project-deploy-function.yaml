@@ -20,6 +20,30 @@ spec:
         project: {{ .Values.project.slug }}
         type: deployment
     spec:
+      # volumes:
+      # - name: model-storage
+      #   persistentVolumeClaim:
+      #     claimName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-model-storage
+      # initContainers:
+      # - env:
+      #   - name: MODEL_FILE
+      #     value: {{ .Values.model.file }}
+      #   - name: S3_ACCESS_KEY_ID
+      #     value: {{ .Values.minio.access_key }}
+      #   - name: S3_SECRET_ACCESS_KEY
+      #     value: {{ .Values.minio.secret_key }}
+      #   - name: AWS_REGION
+      #     value: us-east-1
+      #   - name: S3_ENDPOINT
+      #     value: http://{{ .Values.project.slug }}-minio:9000
+      #   - name: MODEL_BUCKET
+      #     value: {{ .Values.model.bucket }}
+      #   volumeMounts:
+      #   - mountPath: /data
+      #     name: model-storage
+      #   image: minio/mc
+      #   name: copy-model-file
+      #   command: ['/bin/sh', '-c', "mc config host add projminio $S3_ENDPOINT $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY;mc cp projminio/$MODEL_BUCKET/$MFILE model.tar.gz;tar xvf model.tar.gz;[[ -f requirements.txt ]] && pip3 install -r requirements.txt;./deploy.sh"]
       containers:
       - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
         resources:
