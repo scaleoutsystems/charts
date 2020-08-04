@@ -18,20 +18,18 @@ data:
 
     import os
     {{ if .Values.oidc.enabled }}
-    KC_USERNAME = {{ .Values.oidc.username | quote }}
-    KC_PASS = {{ .Values.oidc.password | quote }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
-    KC_ADMIN_URL = {{ .Values.oidc.admin_url | quote }}
+    KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
     OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
-    OIDC_OP_REALM_AUTH = {{ .Values.oidc.realm_auth_endpoint | quote }}
-    OIDC_OP_AUTHORIZATION_ENDPOINT = {{ .Values.oidc.auth_endpoint | quote }}
-    OIDC_OP_TOKEN_ENDPOINT = {{ .Values.oidc.token_endpoint | quote }}
-    OIDC_OP_USER_ENDPOINT = {{ .Values.oidc.user_endpoint | quote }}
+    OIDC_OP_REALM_AUTH = "{{ .Values.oidc.host }}/auth/realms"
+    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/auth"
+    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/token"
+    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/userinfo"
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
-    OIDC_OP_JWKS_ENDPOINT = {{ .Values.oidc.jwks_endpoint | quote }}
+    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/certs"
     {{ end }}
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
