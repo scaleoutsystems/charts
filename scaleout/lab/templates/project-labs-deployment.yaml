@@ -30,20 +30,6 @@ spec:
         imagePullPolicy: Always
         args:
           - --config=/etc/secrets/gatekeeper.yaml
-          # # - --enable-default-deny=true
-          # - --resources="uri=/*|groups=lab-group"
-          # # - --resources=uri=/*|white-listed=true|methods=GET,PUT
-          # # - --resources=uri=/lab/api/*|white-listed=true|methods=GET,PUT
-          # - --discovery-url=https://keycloak.smart.stackn.dev/auth/realms/{{ .Values.gatekeeper.realm }}
-          # - --client-id={{ .Values.gatekeeper.client_id }}
-          # - --client-secret={{ .Values.gatekeeper.client_secret }}
-          # - --listen=0.0.0.0:9090
-          # - --enable-session-cookies
-          # # - --enable-refresh-tokens=true
-          # # - --encryption-key=AgXa7xRcoClDEU0ZDSH4X0XhL5Qy2Z2j
-          # - --enable-logging=true
-          # - --enable-json-logging=true
-          # - --upstream-url=http://localhost:8888
         ports:
           - containerPort: 9090
         volumeMounts:
