@@ -22,6 +22,7 @@ studio:
   servicename: studio
   image: #tell which image to deploy for studio
     repository: scaleoutsystems/studio:master # point to the latest beta image
+    # studio.image.repository -- Select which version of Studio to deploy, default is master branch.
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -32,7 +33,8 @@ studio:
       memory: 2Gi
       
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: platform.local
+domain: studio.your.domain.name
+# domain -- Domain name, should match ingress.hosts.host
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
@@ -40,11 +42,13 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: platform.your.domain.name
+    - host: studio.your.domain.name
+    # ingress.hosts[0].host -- Ingress to Studio. Should match domain.
 
 labs:
   ingress:
     secretName: prod-ingress
+    # labs.ingress.secretName -- The certificate should be a wildcard cert for *.your.domain.name and *.studio.your.domain.name
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
     #tls:
@@ -94,6 +98,7 @@ rabbit:
 chartcontroller:
   image:
     repository: scaleoutsystems/chart-controller:master
+    # studio.image.repository -- Select which version of the chart controller to deploy, default is master branch.
     pullPolicy: Always
   branch: master
   resources:
@@ -125,6 +130,7 @@ cluster_config: |-
         cluster: "local"
 
     current-context: "local"
+# cluster_config -- Config file for your cluster. Should allow admin access for your namespace.
 
 fixtures: |-
   []

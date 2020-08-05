@@ -36,7 +36,7 @@ Current chart version is `0.0.1`
 | chartcontroller.resources.limits.memory | string | `"512Mi"` |  |
 | chartcontroller.resources.requests.cpu | string | `"200m"` |  |
 | chartcontroller.resources.requests.memory | string | `"512Mi"` |  |
-| cluster_config | string | `"apiVersion: v1\nkind: Config\nclusters:\n- name: \"local\"\n  cluster:\n    server: \"your.server.here\"\nusers:\n- name: \"local\"\n  user:\n    token: \"your.token.here\"\n\ncontexts:\n- name: \"local\"\n  context:\n    user: \"local\"\n    cluster: \"local\"\n\ncurrent-context: \"local\""` |  |
+| cluster_config | string | `"apiVersion: v1\nkind: Config\nclusters:\n- name: \"local\"\n  cluster:\n    server: \"your.server.here\"\nusers:\n- name: \"local\"\n  user:\n    token: \"your.token.here\"\n\ncontexts:\n- name: \"local\"\n  context:\n    user: \"local\"\n    cluster: \"local\"\n\ncurrent-context: \"local\""` | Config file for your cluster. Should allow admin access for your namespace. |
 | docker-registry.enabled | bool | `true` |  |
 | docker-registry.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"5500m"` |  |
 | docker-registry.ingress.enabled | bool | `true` |  |
@@ -46,13 +46,13 @@ Current chart version is `0.0.1`
 | docker-registry.persistence.accessMode | string | `"ReadWriteOnce"` |  |
 | docker-registry.persistence.enabled | bool | `true` |  |
 | docker-registry.persistence.size | string | `"4Gi"` |  |
-| domain | string | `"platform.local"` |  |
+| domain | string | `"studio.your.domain.name"` | Domain name, should match ingress.hosts.host |
 | fedn.enabled | bool | `false` |  |
 | fixtures | string | `"[]"` |  |
 | imagePullSecrets[0].name | string | `"regcred"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `true` |  |
-| ingress.hosts[0].host | string | `"platform.your.domain.name"` |  |
+| ingress.hosts[0].host | string | `"studio.your.domain.name"` | Ingress to Studio. Should match domain. |
 | ingress.image.pullPolicy | string | `"Always"` |  |
 | ingress.image.repository | string | `"scaleoutsystems/ingress:master"` |  |
 | keycloak.extraEnv | string | `"- name: KEYCLOAK_IMPORT\n  value: /realm/realm.json\n- name: KEYCLOAK_USER\n  value: admin\n- name: KEYCLOAK_PASSWORD\n  value: password\n- name: PROXY_ADDRESS_FORWARDING\n  value: \"true\"\n"` |  |
@@ -72,7 +72,7 @@ Current chart version is `0.0.1`
 | keycloak.postgresql.postgresqlDatabase | string | `"keycloak"` |  |
 | keycloak.postgresql.postgresqlPassword | string | `"db_password"` |  |
 | keycloak.postgresql.postgresqlUsername | string | `"keycloak"` |  |
-| labs.ingress.secretName | string | `"prod-ingress"` |  |
+| labs.ingress.secretName | string | `"prod-ingress"` | The certificate should be a wildcard cert for *.your.domain.name and *.studio.your.domain.name |
 | namespace | string | `"default"` |  |
 | nodeSelector | object | `{}` |  |
 | oidc.client_id | string | `"studio"` |  |
@@ -111,7 +111,7 @@ Current chart version is `0.0.1`
 | service.type | string | `"ClusterIP"` |  |
 | storageClassName | string | `"hostpath"` |  |
 | studio.image.pullPolicy | string | `"Always"` |  |
-| studio.image.repository | string | `"scaleoutsystems/studio:master"` |  |
+| studio.image.repository | string | `"scaleoutsystems/studio:master"` | Select which version of the chart controller to deploy, default is master branch. |
 | studio.resources.limits.cpu | string | `"1000m"` |  |
 | studio.resources.limits.memory | string | `"4Gi"` |  |
 | studio.resources.requests.cpu | string | `"400m"` |  |
