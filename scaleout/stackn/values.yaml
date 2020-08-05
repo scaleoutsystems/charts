@@ -51,6 +51,9 @@ ingress:
       hosts:
         - studio.your-domain.com
 
+labs:
+  ingress:
+    secretName: prod-ingress
 
 service:
   type: ClusterIP #override if you want to use NodePort instead to access cluster services
