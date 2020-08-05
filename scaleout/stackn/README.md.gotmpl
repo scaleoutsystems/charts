@@ -1,0 +1,37 @@
+{{ template "chart.header" . }}
+
+## Description
+
+{{ template "chart.description" . }}
+
+Current chart version is {{ template "chart.version" . }}
+
+## Chart Requirements
+
+{{ template "chart.requirementsTable" . }}
+
+## Configuration
+
+You will need to change some of the default values:
+
+`your-domain.com` should be replaced with your actual domain name everywhere.
+
+<!-- `domain`, `ingress.hosts[0].host`, and `ingress.tls[0].hosts` should point to Studio and should be the same (e.g. studio.your-domain.com)
+
+`keycloak.ingress.rules[0].host` needs to be updated with your domain, e.g. keycloak.your-domain.com. It should have the same value as `oidc.host`. -->
+
+`cluster_config` should be updated with the config file for your cluster. You need to have admin access to the namespace in which STACKn is to be deployed.
+
+You might have to update `storageClassName`, `storageClass`, and `namespace`, depending on your cluster setup.
+
+## Deploy an SSL certificate
+
+You need a domain name with a wildcard SSL certificate. If your domain is your-domain.com, you will need a certificate for *.your-domain.com and *.studio.your-domain.com. Assuming that your certificate is fullchain.pem and your private key privkey.pem, you can create a secret `prod-ingress` containing the certificate with the command:
+```
+kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
+```
+An alternative is to deploy STACKn without a certificate, but you will then receive warnings from your browser, and the command-line tool will not work properly. To deploy without SSL, simply comment out the corresponding lines in your `values.yaml`.
+
+{{ template "chart.valuesHeader" . }}
+
+{{ template "chart.valuesTable" . }}
