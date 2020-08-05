@@ -98,6 +98,7 @@ An alternative is to deploy STACKn without a certificate, but you will then rece
 | keycloak.postgresql.postgresqlDatabase | string | `"keycloak"` |  |
 | keycloak.postgresql.postgresqlPassword | string | `"db_password"` |  |
 | keycloak.postgresql.postgresqlUsername | string | `"keycloak"` |  |
+| labs.ingress.secretName | string | `"prod-ingress"` |  |
 | namespace | string | `"default"` |  |
 | nodeSelector | object | `{}` |  |
 | oidc.client_id | string | `"studio"` |  |
