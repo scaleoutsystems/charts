@@ -15,7 +15,7 @@ imagePullSecrets:
 # Name: storageClassName
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 # Default: hostpath (works with docker-for-desktop)
-storageClassName: hostpath
+storageClassName: microk8s-hostpath
 namespace: default
 
 studio:
@@ -33,7 +33,7 @@ studio:
       memory: 2Gi
       
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio.your.domain.name
+domain: studio.your-domain.com
 # domain -- Domain name, should match ingress.hosts.host
 ingress:
   enabled: true
@@ -42,19 +42,14 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: studio.your.domain.name
+    - host: studio.your-domain.com
     # ingress.hosts[0].host -- Ingress to Studio. Should match domain.
-
-labs:
-  ingress:
-    secretName: prod-ingress
-    # labs.ingress.secretName -- The certificate should be a wildcard cert for *.your.domain.name and *.studio.your.domain.name
-
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
-    #tls:
-    #- secretName: platform-tls-secret
-    #  hosts:
-    #    - platform.local
+  tls:
+    - secretName: prod-ingress
+    # ingress.tls[0].secretName -- The certificate should be a wildcard cert for *.your-domain.com and *.studio.your-domain.com
+      hosts:
+        - studio.your-domain.com
 
 
 service:
@@ -142,16 +137,17 @@ docker-registry:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
         hosts:
-            - registry.stack.your.domain.name
+            - registry.your-domain.com
         tls:
             - secretName: prod-ingress
               hosts:
-                  - registry.stack.your.domain.name
+                  - registry.your-domain.com
 
     persistence:
       enabled: true
       accessMode: ReadWriteOnce
       size: 4Gi
+      storageClass: microk8s-hostpath
 
 argo:
   installCRD: false
@@ -162,11 +158,11 @@ argo:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: 1000m
         hosts:
-            - workflow.stack.your.domain.name
+            - workflow.your-domain.com
         tls:
             - secretName: prod-ingress
               hosts:
-                  - workflow.stack.your.domain.name
+                  - workflow.your-domain.com
 
 argo-events:
   enabled: false
@@ -189,26 +185,26 @@ openfaas:
     ingress:
       enabled: false
       hosts:
-        - host: serve.stack.your.domain.name
+        - host: serve.your-domain.com
           serviceName: gateway
           servicePort: 8080
           path: /
       #annotations: {}
       tls:
-        - secretName: ingress-secret
+        - secretName: prod-ingress
           hosts:
-            - serve.stack.your.domain.name
+            - serve.your-domain.com
 
 keycloak:
   ingress:
     enabled: true
     rules:
-      - host: "keycloak.stack.your.domain.name"
+      - host: "keycloak.your-domain.com"
         paths: [/]
     tls:
       - secretName: prod-ingress
         hosts:
-          - keycloak.stack.your.domain.name
+          - keycloak.your-domain.com
   persistence:
     deployPostgres: true
     dbVendor: postgres
@@ -248,7 +244,7 @@ oidc:
   realm: STACKn
   client_id: studio
   client_secret: a-client-secret
-  host: https://keycloak.stack.your.domain.name
+  host: https://keycloak.your-domain.com
   sign_algo: RS256
 
 fedn:
