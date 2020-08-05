@@ -1,5 +1,12 @@
 apiVersion: v1
-appVersion: "0.1"
+appVersion: "0.0.1"
 description: A Helm chart for deploying STACKn by Scaleout
 name: stackn
 version: 0.0.1
+maintainers:
+  - email: morgan@scaleoutsystems.com
+    name: Morgan Ekmefjord
+  - email: stefan@scaleoutsystems.com
+    name: Stefan Hellander
+  - email: desislava@scaleoutsystems.com
+    name: Desislava Stoyanova

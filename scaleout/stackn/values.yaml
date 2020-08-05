@@ -138,13 +138,13 @@ fixtures: |-
 docker-registry:
     enabled: true
     ingress:
-        enabled: true
+        enabled: false
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
         hosts:
             - registry.stack.your.domain.name
         tls:
-            - secretName: ingress-secret
+            - secretName: prod-ingress
               hosts:
                   - registry.stack.your.domain.name
 
@@ -164,7 +164,7 @@ argo:
         hosts:
             - workflow.stack.your.domain.name
         tls:
-            - secretName: ingress-secret
+            - secretName: prod-ingress
               hosts:
                   - workflow.stack.your.domain.name
 
@@ -244,7 +244,7 @@ keycloak:
       size: 1Gi
 
 oidc:
-  enabled: false
+  enabled: true
   realm: STACKn
   client_id: studio
   client_secret: a-client-secret

@@ -1,10 +1,11 @@
 stackn
 ======
+
+## Description
+
 A Helm chart for deploying STACKn by Scaleout
 
-Current chart version is `0.0.1`
-
-
+Current chart version is 0.0.1
 
 ## Chart Requirements
 
@@ -12,6 +13,17 @@ Current chart version is `0.0.1`
 |------------|------|---------|
 | https://codecentric.github.io/helm-charts | keycloak | 9.0.1 |
 | https://kubernetes-charts.storage.googleapis.com | docker-registry | 1.9.1 |
+
+## Configuration
+
+You will need to change some of the default values:
+
+`domain` and `ingress.hosts[0].host` should point to Studio and should be the same (e.g. studio.your-domain.com)
+
+`keycloak.ingress.rules[0].host` needs to be updated with your domain, e.g. keycloak.your-domain.com. It should have the same value as `oidc.host`.
+
+`cluster_config` should be updated with the config file for your cluster. You need to have admin access to the namespace in which STACKn is to be deployed.
+
 
 ## Chart Values
 
@@ -28,7 +40,7 @@ Current chart version is `0.0.1`
 | argo.ui.ingress.enabled | bool | `true` |  |
 | argo.ui.ingress.hosts[0] | string | `"workflow.stack.your.domain.name"` |  |
 | argo.ui.ingress.tls[0].hosts[0] | string | `"workflow.stack.your.domain.name"` |  |
-| argo.ui.ingress.tls[0].secretName | string | `"ingress-secret"` |  |
+| argo.ui.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
 | chartcontroller.branch | string | `"master"` |  |
 | chartcontroller.image.pullPolicy | string | `"Always"` |  |
 | chartcontroller.image.repository | string | `"scaleoutsystems/chart-controller:master"` |  |
@@ -39,10 +51,10 @@ Current chart version is `0.0.1`
 | cluster_config | string | `"apiVersion: v1\nkind: Config\nclusters:\n- name: \"local\"\n  cluster:\n    server: \"your.server.here\"\nusers:\n- name: \"local\"\n  user:\n    token: \"your.token.here\"\n\ncontexts:\n- name: \"local\"\n  context:\n    user: \"local\"\n    cluster: \"local\"\n\ncurrent-context: \"local\""` | Config file for your cluster. Should allow admin access for your namespace. |
 | docker-registry.enabled | bool | `true` |  |
 | docker-registry.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"5500m"` |  |
-| docker-registry.ingress.enabled | bool | `true` |  |
+| docker-registry.ingress.enabled | bool | `false` |  |
 | docker-registry.ingress.hosts[0] | string | `"registry.stack.your.domain.name"` |  |
 | docker-registry.ingress.tls[0].hosts[0] | string | `"registry.stack.your.domain.name"` |  |
-| docker-registry.ingress.tls[0].secretName | string | `"ingress-secret"` |  |
+| docker-registry.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
 | docker-registry.persistence.accessMode | string | `"ReadWriteOnce"` |  |
 | docker-registry.persistence.enabled | bool | `true` |  |
 | docker-registry.persistence.size | string | `"4Gi"` |  |
@@ -77,7 +89,7 @@ Current chart version is `0.0.1`
 | nodeSelector | object | `{}` |  |
 | oidc.client_id | string | `"studio"` |  |
 | oidc.client_secret | string | `"a-client-secret"` |  |
-| oidc.enabled | bool | `false` |  |
+| oidc.enabled | bool | `true` |  |
 | oidc.host | string | `"https://keycloak.stack.your.domain.name"` |  |
 | oidc.realm | string | `"STACKn"` |  |
 | oidc.sign_algo | string | `"RS256"` |  |
