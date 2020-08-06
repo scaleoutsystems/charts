@@ -21,4 +21,4 @@ spec:
   tls:
     - secretName: prod-ingress
       hosts:
-        - {{ .Values.deployment.name }}-{{ .Values.deployment.version }}.{{ .Values.global.domain }}
+        - {{ .Values.deployment.endpoint }}
