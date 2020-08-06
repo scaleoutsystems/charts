@@ -5,10 +5,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: https://{{ .Values.global.domain }}/api/deploymentInstances/auth/
     nginx.ingress.kubernetes.io/auth-method: POST
     nginx.ingress.kubernetes.io/auth-response-headers: UserID
-    #kubernetes.io/ingress.class: "nginx"
-    #nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    #kubernetes.io/tls-acme: 'true'
-    # nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
   name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-ingress
   labels:
     io.kompose.service: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-ingress
@@ -17,7 +14,7 @@ spec:
     - host: {{ .Values.deployment.endpoint }}
       http:
         paths:
-        - path: /
+        - path: {{ .Values.deployment.path }}(/|$)(.*)
           backend:
             serviceName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
             servicePort: 80
