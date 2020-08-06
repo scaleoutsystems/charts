@@ -201,6 +201,8 @@ openfaas:
 keycloak:
   ingress:
     enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
     rules:
       - host: "keycloak.your-domain.com"
         paths: [/]
