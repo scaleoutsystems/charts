@@ -15,6 +15,7 @@ deployment:
   version: version
   name: deployment-name
   endpoint: deployment-endpoint
+  path: deployment-path
 
 context:
   image: context-image
