@@ -27,13 +27,13 @@ spec:
           optional: true
       containers:
       - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
-        # resources:
-        #   limits:
-        #     cpu: 300m
-        #     memory: 1024Mi
-        #   requests:
-        #     cpu: 300m
-        #     memory: 1024Mi
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2048Mi
+          requests:
+            cpu: 300m
+            memory: 1024Mi
         volumeMounts:
         - name: secret-vol
           mountPath: license
