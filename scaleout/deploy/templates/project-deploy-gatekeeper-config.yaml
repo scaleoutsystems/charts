@@ -9,7 +9,7 @@ data:
     resources:
     - uri: /*
       roles:
-      - {{ .Release.Name }}:{{ .Release.Name }}-role
+      - {{ .Values.gatekeeper.client_id }}:{{ .Values.gatekeeper.client_id }}-role
     discovery-url: {{ .Values.gatekeeper.auth_endpoint }}/{{ .Values.gatekeeper.realm }}
     client-id: {{ .Values.gatekeeper.client_id }}
     client-secret: {{ .Values.gatekeeper.client_secret }}
