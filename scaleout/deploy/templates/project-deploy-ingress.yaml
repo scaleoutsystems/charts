@@ -2,9 +2,9 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    nginx.ingress.kubernetes.io/auth-url: https://{{ .Values.global.domain }}/api/deploymentInstances/auth/
-    nginx.ingress.kubernetes.io/auth-method: POST
-    nginx.ingress.kubernetes.io/auth-response-headers: UserID
+    # nginx.ingress.kubernetes.io/auth-url: https://{{ .Values.global.domain }}/api/deploymentInstances/auth/
+    # nginx.ingress.kubernetes.io/auth-method: POST
+    # nginx.ingress.kubernetes.io/auth-response-headers: UserID
     nginx.ingress.kubernetes.io/rewrite-target: /$1
   name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}-ingress
   labels:

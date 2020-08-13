@@ -244,6 +244,9 @@ keycloak:
       storageClass: microk8s-hostpath
       size: 1Gi
 
+  args:
+    - "-Dkeycloak.profile.feature.token_exchange=enabled"
+
 oidc:
   enabled: true
   realm: STACKn

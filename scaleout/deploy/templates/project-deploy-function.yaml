@@ -25,7 +25,20 @@ spec:
         secret:
           secretName: serve-secret
           optional: true
+      - name: gatekeeper-config
+        configMap:
+          name: {{ .Release.Name }}-gatekeeper-config
       containers:
+      - name: {{ .Release.Name }}-gatekeeper
+        image: keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
+        imagePullPolicy: Always
+        args:
+          - --config=/etc/secrets/gatekeeper.yaml
+        ports:
+          - containerPort: 9090
+        volumeMounts:
+        - name: gatekeeper-config
+          mountPath: /etc/secrets/
       - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
         resources:
           limits:
