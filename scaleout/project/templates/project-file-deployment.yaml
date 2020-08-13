@@ -66,6 +66,7 @@ spec:
       containers:
       - name: {{ .Release.Name }}-file-controller
         image: scaleoutsystems/file-controller:master
+        imagePullPolicy: Always
         env:
         - name: PROJECT_DIR
           value: /app/work
