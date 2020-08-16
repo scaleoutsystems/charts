@@ -17,6 +17,9 @@ data:
     """
 
     import os
+
+    VERSION_BACKEND = 'studio.version.Version'
+
     {{ if .Values.oidc.enabled }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
     KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
