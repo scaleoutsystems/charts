@@ -247,6 +247,10 @@ keycloak:
   args:
     - "-Dkeycloak.profile.feature.token_exchange=enabled"
 
+prometheus:
+  enabled: true
+
+
 oidc:
   enabled: true
   realm: STACKn
