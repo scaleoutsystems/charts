@@ -1,4 +1,5 @@
 replicas: 1
+appname: app-name
 
 global:
   domain: global.domain

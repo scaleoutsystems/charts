@@ -16,7 +16,7 @@ spec:
         paths:
         - path: {{ .Values.deployment.path }}(.*)
           backend:
-            serviceName: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+            serviceName: {{ .Values.appname }}
             servicePort: 80
   tls:
     - secretName: prod-ingress
