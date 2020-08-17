@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+  name: {{ .Values.appname }}
   labels:
-    app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+    app: {{ .Values.appname }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+      app: {{ .Values.appname }}
   template:
     metadata:
       annotations:
@@ -16,7 +16,7 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "8501"
       labels:
-        app: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+        app: {{ .Values.appname }}
         project: {{ .Values.project.slug }}
         type: deployment
     spec:
@@ -29,7 +29,7 @@ spec:
         configMap:
           name: {{ .Release.Name }}-gatekeeper-config
       containers:
-      - name: {{ .Release.Name }}-gatekeeper
+      - name: gatekeeper
         image: keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
         imagePullPolicy: Always
         args:
@@ -39,7 +39,7 @@ spec:
         volumeMounts:
         - name: gatekeeper-config
           mountPath: /etc/secrets/
-      - name: {{ .Values.deployment.name }}-{{ .Values.deployment.version }}
+      - name: serve
         resources:
           limits:
             cpu: 1000m
