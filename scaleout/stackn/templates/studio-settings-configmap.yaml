@@ -17,8 +17,11 @@ data:
     """
 
     import os
+    import logging
 
     VERSION_BACKEND = 'studio.version.Version'
+    LOGGING_LEVEL = logging.DEBUG
+
 
     {{ if .Values.oidc.enabled }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
@@ -68,8 +71,8 @@ data:
     {{ if .Values.fedn.enabled }}
         'alliance_admin',
     {{ end }}
-        'django.contrib.admin',
         'django.contrib.auth',
+        'django.contrib.admin',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
@@ -84,7 +87,7 @@ data:
         'projects',
         'labs',
         'models',
-        # 'monitor',
+        'monitor',
         'reports',
         'files',
         'datasets',
@@ -221,7 +224,7 @@ data:
     GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
     GIT_REPOS_URL = '/repos/'
 
-    PROMETHEUS_SVC = 'http://{{ .Release.name }}-prometheus-server'
+    PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
     REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
     CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
     STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'

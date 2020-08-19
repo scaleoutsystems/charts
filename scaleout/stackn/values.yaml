@@ -249,7 +249,42 @@ keycloak:
 
 prometheus:
   enabled: true
+  server:
+    ingress:
+      enabled: true
+      hosts:
+        - prometheus.your-domain.com
+      tls:
+        - secretName: prod-ingress
+          hosts:
+            - prometheus.your-domain.com
 
+loki-stack:
+  enabled: true
+
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      domain: grafana.your-domain.com
+      root_url: "%(protocol)s://%(domain)s/"
+      serve_from_sub_path: true
+  ingress:
+    enabled: true
+    hosts:
+      - "grafana.your-domain.com"
+    path: "/"
+
+    tls:
+        - secretName: prod-ingress
+          hosts:
+            - grafana.your-domain.com
+
+  persistence:
+    enabled: true
+    type: pvc
+    size: 4Gi
+    storageClassName: microk8s-hostpath
 
 oidc:
   enabled: true
