@@ -35,4 +35,4 @@ registry:
 imagePullSecret: regcred
 #storageClassName: aws-efs
 serving_namespace: default #serving
-settings_file: projectSettings
+settings_file: stackn-settings

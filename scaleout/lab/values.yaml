@@ -1,6 +1,10 @@
 
+settings_file: project-settings
+user_settings_file: user-settings
+
 project:
   name: test
+  slug: slug
 labs:
   image: pharmbio/pharmbio-notebook:tf-2.1.0-gpu
   #image: jupyter/minimal-notebook:latest
