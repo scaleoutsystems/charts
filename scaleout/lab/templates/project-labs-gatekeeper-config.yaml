@@ -17,6 +17,6 @@ data:
     enable-session-cookies: true
     enable-logging: true
     enable-json-logging: true
-    encryption-key: {{ randAscii 32 }}
+    encryption-key: {{ randAlphaNum 32 }}
     enable-refresh-tokens: true
     upstream-url: http://localhost:8888
