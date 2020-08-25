@@ -1,0 +1,42 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    project: {{ .Values.project.slug }}
+    type: cronjob
+spec:
+  schedule: "{{ .Values.cronjob.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ .Release.Name }}
+            project: {{ .Values.project.slug }}
+            type: cronjob
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: cronjob
+            image: {{ .Values.image }}
+            # workingDir: /home/app
+            command: {{ .Values.command }}
+            volumeMounts:
+            - name: jobstorage
+              mountPath: /home/app/
+            imagePullPolicy: Always  
+            resources:
+              limits:
+                cpu: {{ .Values.cronjob.resources.limits.cpu }}
+                memory: {{ .Values.cronjob.resources.limits.memory }}
+              requests:
+                cpu: {{ .Values.cronjob.resources.requests.cpu }}
+                memory: {{ .Values.cronjob.resources.requests.memory }}
+          volumes:
+          - name: jobstorage
+            persistentVolumeClaim:
+              claimName: {{ .Values.project.slug }}-project-files
+
+        

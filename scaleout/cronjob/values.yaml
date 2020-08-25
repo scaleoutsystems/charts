@@ -1,0 +1,17 @@
+project:
+  slug: aml-itt
+
+cronjob:
+  schedule: "* * * * *"
+  port: 8786
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+command: command
+image: python
+             
