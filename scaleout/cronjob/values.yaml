@@ -3,7 +3,6 @@ project:
 
 cronjob:
   schedule: "* * * * *"
-  port: 8786
   resources:
     limits:
       cpu: 500m
