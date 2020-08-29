@@ -1,5 +1,6 @@
 replicas: 1
 appname: app-name
+namespace: default
 
 global:
   domain: global.domain
@@ -9,7 +10,6 @@ registry:
   host: stack-docker-registry:5000
 
 imagePullSecret: regcred
-serving_namespace: default
 
 project:
   slug: project-slug
