@@ -1,0 +1,17 @@
+project:
+  slug: aml-itt
+
+cronjob:
+  schedule: "* * * * *"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+command: command
+image: python
+iscron: 1
+             

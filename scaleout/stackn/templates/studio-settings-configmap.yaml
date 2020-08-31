@@ -227,6 +227,7 @@ data:
     GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
     GIT_REPOS_URL = '/repos/'
 
+    LOKI_SVC = 'http://{{ .Release.Name }}-loki:3100'
     PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
     REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
     CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
