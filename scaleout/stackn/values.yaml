@@ -296,6 +296,7 @@ oidc:
   client_secret: a-client-secret
   host: https://keycloak.your-domain.com
   sign_algo: RS256
+  id_token_expiry_seconds: 180
 
 fedn:
   enabled: false

@@ -35,6 +35,7 @@ data:
     OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/userinfo"
     OIDC_STORE_ACCESS_TOKEN = True
     OIDC_STORE_ID_TOKEN = True
+    OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = {{ .Values.oidc.id_token_expiry_seconds | default "180" }}
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
