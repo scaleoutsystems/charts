@@ -2,7 +2,7 @@
 settings_file: project-settings
 user_settings_file: user-settings
 namespace: default
-
+appname: app-name
 project:
   name: test
   slug: slug

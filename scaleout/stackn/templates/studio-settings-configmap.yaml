@@ -24,6 +24,23 @@ data:
 
     PROJECT_ROLES = ['guest', 'member', 'admin']
 
+    # Permissions
+
+    # Project settings
+    PROJECT_SETTINGS_PERM = {
+      'view': ['member', 'admin'],
+      'view_credentials': ['member', 'admin'],
+      'env_settings': ['member', 'admin'],
+      'collab_settings': ['member', 'admin'],
+      'add_member': ['admin'],
+      'publish_github': ['member', 'admin'],
+      'danger_zone': ['admin']
+    }
+
+    MONITOR_PERM = {
+      'view': ['admin']
+    }
+
     {{ if .Values.oidc.enabled }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
     KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"

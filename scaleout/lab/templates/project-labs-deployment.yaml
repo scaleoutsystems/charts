@@ -7,11 +7,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-labs-app
+      app: {{ .Values.appname }}
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        # prometheus.io/port: "8501"
       labels:
-        app: {{ .Release.Name }}-labs-app
+        app: {{ .Values.appname }}
         project: {{ .Values.project.name }}
         type: lab
     spec:
