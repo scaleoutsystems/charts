@@ -33,6 +33,13 @@ spec:
             volumeMounts:
             - name: jobstorage
               mountPath: /home/app/
+            - name: stacknconfig
+              mountPath: /home/jovyan/.scaleout/
+            - name: projectconfig
+              mountPath: /home/jovyan/.scaleout/stackn/projects/
+            - name: userconfig
+              mountPath: /home/jovyan/.scaleout/stackn/
+              readOnly: true
             imagePullPolicy: Always  
             resources:
               limits:
@@ -45,3 +52,12 @@ spec:
           - name: jobstorage
             persistentVolumeClaim:
               claimName: {{ .Values.project.slug }}-project-files
+          - name: stacknconfig
+            configMap:
+              name: {{ .Values.project.slug }}-project-settings-configmap
+          - name: projectconfig
+            configMap:
+              name: {{ .Release.Name }}-project-stackn-settings
+          - name: userconfig
+            secret:
+              secretName: {{ .Release.Name }}-project-user-settings
