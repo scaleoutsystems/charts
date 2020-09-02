@@ -11,4 +11,4 @@ spec:
     targetPort: 9090
     protocol: TCP
   selector:
-    app: {{ .Release.Name }}-labs-app
+    app: {{ .Values.appname }}
