@@ -43,11 +43,11 @@ spec:
       - name: serve
         resources:
           limits:
-            cpu: 1000m
-            memory: 2048Mi
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
           requests:
-            cpu: 300m
-            memory: 1024Mi
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
         volumeMounts:
         - name: secret-vol
           mountPath: license

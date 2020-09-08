@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-labs-app
+  name: {{ .Values.appname }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
