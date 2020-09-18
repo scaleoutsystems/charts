@@ -1,6 +1,7 @@
 replicas: 1
 appname: app-name
 namespace: default
+visibility: private
 
 resources:
   limits:
