@@ -19,3 +19,6 @@ data:
     enable-logging: true
     enable-json-logging: true
     upstream-url: http://localhost:8501
+    {{ if .Values.gatekeeper.skip_tls }}
+    skip-openid-provider-tls-verify: true
+    {{ end }}
