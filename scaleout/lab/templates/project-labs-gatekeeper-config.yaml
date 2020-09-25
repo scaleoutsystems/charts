@@ -21,3 +21,6 @@ data:
     encryption-key: {{ randAlphaNum 32 }}
     enable-refresh-tokens: true
     upstream-url: http://localhost:8888
+    {{ if .Values.gatekeeper.skip_tls }}
+    skip-openid-provider-tls-verify: true
+    {{ end }}
