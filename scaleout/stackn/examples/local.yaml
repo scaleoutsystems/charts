@@ -14,32 +14,35 @@ imagePullSecrets:
 # REQUIREMENT: set a storage class with ability to serve ReadWriteMany
 # Name: storageClassName
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
-# Default: hostpath (works with docker-for-desktop)
-storageClassName: hostpath
+# Default: microk8s-hostpath (works with docker-for-desktop)
+storageClassName: microk8s-hostpath
 namespace: default
 
 studio:
   servicename: studio
   image: #tell which image to deploy for studio
-    repository: registry.demo.scaleout.se/studio:latest # point to the latest beta image
+    repository: scaleoutsystems/studio:develop # point to the latest beta image
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
+  storage:
+    StorageClassName: microk8s-hostpath
+    size: 2Gi
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: 192.168.32.161.nip.io
+domain: studio.127.0.0.1.nip.io
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
-    repository: registry.demo.scaleout.se/ingress:latest
+    repository: scaleoutsystems/ingress:master
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: 192.168.32.161.nip.io
+    - host: studio.127.0.0.1.nip.io
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
-    #tls:
-    #- secretName: platform-tls-secret
-    #  hosts:
-    #    - platform.local
+  tls:
+    - secretName: prod-ingress
+      hosts:
+        - studio.127.0.0.1.nip.io
 
 
 service:
@@ -63,6 +66,7 @@ affinity: {}
 
 # Postgres default credentials for backend DB. Override for security!
 postgres:
+  enabled: false
   db:
     name: postgres
     user: postgres
@@ -75,32 +79,33 @@ rabbit:
   password: LJqEG9RE4FdZbVWoJzZIOQEI
 
 chartcontroller:
+  enabled: false
   image:
-    repository: registry.demo.scaleout.se/chart-controller:latest
+    repository: scaleoutsystems/chart-controller:develop
     pullPolicy: Always
+  branch: develop
 
 
 
 cluster_config: |-
-    apiVersion: v1
-    kind: Config
-    clusters:
-    - name: "local"
-      cluster:
-        server: "your.server.here"
-    users:
-    - name: "local"
-      user:
-        token: "your.token.here"
-
-    contexts:
-    - name: "local"
-      context:
-        user: "local"
-        cluster: "local"
-
-    current-context: "local"
-
+  apiVersion: v1
+  clusters:
+  - cluster:
+      certificate-authority-data: cert-auth-data=
+      server: https://127.0.0.1:16443
+    name: local
+  contexts:
+  - context:
+      cluster: local
+      user: admin
+    name: local
+  current-context: local
+  kind: Config
+  preferences: {}
+  users:
+  - name: admin
+    user:
+      token: your-token
 
 docker-registry:
     enabled: true
@@ -109,58 +114,121 @@ docker-registry:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
         hosts:
-            - registry.192.168.32.161.nip.io
+            - registry.127.0.0.1.nip.io
         tls:
-            - secretName: ingress-secret
+            - secretName: prod-ingress
               hosts:
-                  - registry.192.168.32.161.nip.io
+                  - registry.127.0.0.1.nip.io
 
     persistence:
       enabled: true
       accessMode: ReadWriteOnce
-      size: 10Gi
+      size: 2Gi
+      storageClass: microk8s-hostpath
 
 argo:
-  installCRD: false
-  enabled: true
-  ui:
-    ingress:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/proxy-body-size: 1000m
-        hosts:
-            - workflow.192.168.32.161.nip.io
-        tls:
-            - secretName: ingress-secret
-              hosts:
-                  - workflow.192.168.32.161.nip.io
+  enabled: false
 
 argo-events:
-  enabled: true
-  installCRD: false
-  namespace: argo-events
-  singleNamespace: false
+  enabled: false
 
 
 openfaas:
-    functionNamespace: stack-fn
-    exposeServices: true
-    async: true
-    rbac: false
-    psp: false
-    securityContext: true
-    basic_auth: false
-    operator:
-        create: true
+    enabled: false
+
+
+keycloak:
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    rules:
+      - host: "keycloak.127.0.0.1.nip.io"
+        paths: 
+          - /
+    tls:
+      - secretName: prod-ingress
+        hosts:
+          - keycloak.127.0.0.1.nip.io
+  persistence:
+    deployPostgres: true
+    dbVendor: postgres
+    pullPolicy: Always
+
+  extraVolumes: |
+    - name: realm-secret
+      secret:
+        secretName: realm-secret
+
+  extraVolumeMounts: |
+    - name: realm-secret
+      mountPath: "/realm/"
+      readOnly: true
+
+  extraEnv: |
+    - name: KEYCLOAK_IMPORT
+      value: /realm/realm.json
+    - name: KEYCLOAK_USER
+      value: keycloak_admin
+    - name: KEYCLOAK_PASSWORD
+      value: aFGMSDLKmfdskHJASd
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
+
+  postgresql:
+    postgresqlUsername: keycloak
+    postgresqlPassword: usOcCo+lh\TuIO:(p:Om9'
+    postgresqlDatabase: keycloak
+    persistence:
+      enabled: true
+      storageClass: microk8s-hostpath
+      size: 2Gi
+  
+  args:
+    - "-Dkeycloak.profile.feature.token_exchange=enabled"
+
+oidc:
+    enabled: true
+    realm: STACKn
+    client_id: studio
+    client_secret: Q#cdsIA(2MDAKLS00caradsf<OLAL:KSDn(kvd 
+    host: http://keycloak.127.0.0.1.nip.io
+    sign_algo: RS256
+    verify_ssl: false
+
+prometheus:
+  server:
     ingress:
       enabled: true
       hosts:
-        - host: serve.192.168.32.161.nip.io
-          serviceName: gateway
-          servicePort: 8080
-          path: /
-      #annotations: {}
+        - prometheus.127.0.0.1.nip.io
       tls:
-        - secretName: ingress-secret
+        - secretName: prod-ingress
           hosts:
-            - serve.192.168.32.161.nip.io
+            - prometheus.127.0.0.1.nip.io
+    persistentVolume:
+      storageClass: microk8s-hostpath
+      size: 2Gi
+
+grafana:
+  grafana.ini:
+    server:
+      domain: grafana.127.0.0.1.nip.io
+      root_url: "%(protocol)s://%(domain)s/"
+      serve_from_sub_path: true
+  ingress:
+    enabled: true
+    hosts:
+      - "grafana.127.0.0.1.nip.io"
+    path: "/"
+
+    tls:
+        - secretName: prod-ingress
+          hosts:
+            - grafana.127.0.0.1.nip.io
+
+  persistence:
+    enabled: true
+    type: pvc
+    size: 2Gi
+    storageClassName: microk8s-hostpath
