@@ -79,6 +79,7 @@ affinity: {}
 
 # Postgres default credentials for backend DB. Override for security!
 postgres:
+  image: postgres
   db:
     name: postgres
     user: postgres

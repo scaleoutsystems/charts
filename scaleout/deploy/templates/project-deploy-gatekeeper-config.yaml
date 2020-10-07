@@ -19,6 +19,8 @@ data:
     enable-logging: true
     enable-json-logging: true
     upstream-url: http://localhost:8501
+    server-write-timeout: 200s
+    upstream-response-header-timeout: 200s
     {{ if .Values.gatekeeper.skip_tls }}
     skip-openid-provider-tls-verify: true
     {{ end }}

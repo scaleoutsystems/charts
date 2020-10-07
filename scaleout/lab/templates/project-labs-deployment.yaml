@@ -31,7 +31,7 @@ spec:
       #  runAsUser: 65533  # to allow read of ssh key
       containers:
       - name: {{ .Release.Name }}-gatekeeper
-        image: keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
+        image: quay.io/louketo/louketo-proxy:latest #keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
         imagePullPolicy: Always
         args:
           - --config=/etc/secrets/gatekeeper.yaml
