@@ -5,11 +5,11 @@ visibility: private
 
 resources:
   limits:
-    cpu: 1000m
-    memory: 2048Mi
+    cpu: 1000
+    memory: 4096
   requests:
-    cpu: 700m
-    memory: 1024Mi
+    cpu: 700
+    memory: 2048
 
 global:
   domain: global.domain
