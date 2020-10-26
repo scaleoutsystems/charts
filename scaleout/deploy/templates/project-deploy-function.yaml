@@ -31,7 +31,7 @@ spec:
           name: {{ .Release.Name }}-gatekeeper-config
       containers:
       - name: gatekeeper
-        image: keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
+        image: keycloak/keycloak-gatekeeper:latest #quay.io/louketo/louketo-proxy:latest
         imagePullPolicy: Always
         args:
           - --config=/etc/secrets/gatekeeper.yaml
