@@ -1,0 +1,21 @@
+settings_file: project-settings
+user_settings_file: user-settings
+namespace: default
+
+project:
+  slug: aml-itt
+
+cronjob:
+  schedule: "* * * * *"
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 256Mi
+
+command: command
+image: python
+iscron: 1
+             

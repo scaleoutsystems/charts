@@ -29,7 +29,7 @@ spec:
           value: {{ .Values.postgres.db.password }}
         - name: POSTGRES_USER
           value: {{ .Values.postgres.db.user }}
-        image: postgres
+        image: {{ .Values.postgres.image }}
         name: studio-db
         resources:
           limits:

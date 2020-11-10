@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.appname }}
+  namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.appname }}
 spec:
@@ -30,7 +31,7 @@ spec:
           name: {{ .Release.Name }}-gatekeeper-config
       containers:
       - name: gatekeeper
-        image: keycloak/keycloak-gatekeeper:latest #quay.io/gambol99/keycloak-proxy:latest
+        image: keycloak/keycloak-gatekeeper:latest #quay.io/louketo/louketo-proxy:latest
         imagePullPolicy: Always
         args:
           - --config=/etc/secrets/gatekeeper.yaml
@@ -42,11 +43,11 @@ spec:
       - name: serve
         resources:
           limits:
-            cpu: 1000m
-            memory: 2048Mi
+            cpu: {{ .Values.resources.limits.cpu }}m
+            memory: {{ .Values.resources.limits.memory }}Mi
           requests:
-            cpu: 300m
-            memory: 1024Mi
+            cpu: {{ .Values.resources.requests.cpu }}m
+            memory: {{ .Values.resources.requests.memory }}Mi
         volumeMounts:
         - name: secret-vol
           mountPath: license

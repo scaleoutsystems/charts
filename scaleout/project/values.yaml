@@ -1,6 +1,7 @@
 
 
-
+volume:
+  size: 2Gi
 
 labs:
   image: jupyter/minimal-notebook:latest
@@ -13,6 +14,8 @@ global:
 minio:
   access_key: minio
   secret_key: minio123
+  volume:
+    size: 2Gi
 
 defaultBucket:
   enabled: True

@@ -22,6 +22,24 @@ data:
     VERSION_BACKEND = 'studio.version.Version'
     LOGGING_LEVEL = logging.DEBUG
 
+    PROJECT_ROLES = ['guest', 'member', 'admin']
+
+    # Permissions
+
+    # Project settings
+    PROJECT_SETTINGS_PERM = {
+      'view': ['member', 'admin'],
+      'view_credentials': ['member', 'admin'],
+      'env_settings': ['member', 'admin'],
+      'collab_settings': ['member', 'admin'],
+      'add_member': ['admin'],
+      'publish_github': ['member', 'admin'],
+      'danger_zone': ['admin']
+    }
+
+    MONITOR_PERM = {
+      'view': ['admin']
+    }
 
     {{ if .Values.oidc.enabled }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
@@ -32,6 +50,15 @@ data:
     OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/auth"
     OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/token"
     OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/userinfo"
+    OIDC_STORE_ACCESS_TOKEN = True
+    OIDC_STORE_ID_TOKEN = True
+    {{ if eq .Values.oidc.verify_ssl false }}
+    print("WARNING: Skipping SSL verification.")
+    OIDC_VERIFY_SSL = False
+    {{ else }}
+    OIDC_VERIFY_SSL = True
+    {{ end }}
+    OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = {{ .Values.oidc.id_token_expiry_seconds | default "180" }}
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
@@ -224,6 +251,7 @@ data:
     GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
     GIT_REPOS_URL = '/repos/'
 
+    LOKI_SVC = 'http://{{ .Release.Name }}-loki:3100'
     PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
     REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
     CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
@@ -236,7 +264,7 @@ data:
 
     REDIS_PORT = 6379
     REDIS_DB = 0
-    REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', 'redis')
+    REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis')
 
     CELERY_BROKER_URL = 'amqp://{{ .Values.rabbit.username }}:{{ .Values.rabbit.password }}@{{ .Release.Name }}-rabbit:5672//'
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)

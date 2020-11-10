@@ -8,8 +8,8 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: {{ .Values.storageClassName | default "hostpath" }}
+  storageClassName: {{ .Values.studio.storage.StorageClassName | default "hostpath" }}
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ .Values.studio.storage.size | default "5Gi" }}
 status: {}
