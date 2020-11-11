@@ -38,6 +38,7 @@ model:
   file: model.tar.gz  
 
 minio:
+  mount: false
   host: minio-host
   access_key: access-key
   secret_key: secret-key

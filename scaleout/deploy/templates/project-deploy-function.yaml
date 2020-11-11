@@ -22,11 +22,13 @@ spec:
         type: deployment
     spec:
       volumes:
+      {{ if .Values.minio.mount }}
       - name: devfuse
         hostPath:
           path: /dev/fuse
       - name: dataset
         emptyDir: {}
+      {{ end }}
       - name: secret-vol
         secret:
           secretName: serve-secret
@@ -38,6 +40,7 @@ spec:
       {{- tpl . $ | nindent 6 }}
       {{- end }}
       containers:
+      {{ if .Values.minio.mount }}
       - name: {{ .Release.Name }}-s3-sync
         image: scaleoutsystems/s3-sync:latest
         imagePullPolicy: Always
@@ -70,6 +73,7 @@ spec:
           mountPropagation: Bidirectional
         - name: devfuse
           mountPath: /dev/fuse
+      {{ end }}
       - name: gatekeeper
         image: keycloak/keycloak-gatekeeper:latest #quay.io/louketo/louketo-proxy:latest
         imagePullPolicy: Always
@@ -89,9 +93,11 @@ spec:
             cpu: {{ .Values.resources.requests.cpu }}m
             memory: {{ .Values.resources.requests.memory }}Mi
         volumeMounts:
+        {{ if .Values.minio.mount }}
         - name: dataset
-          mountPath: /dataset/
+          mountPath: /{{ .Values.minio.bucket }}/
           mountPropagation: HostToContainer
+        {{ end }}
         - name: secret-vol
           mountPath: license
           readOnly: true
