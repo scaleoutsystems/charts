@@ -59,6 +59,7 @@ data:
     OIDC_VERIFY_SSL = True
     {{ end }}
     OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = {{ .Values.oidc.id_token_expiry_seconds | default "180" }}
+    LOGIN_URL = "/projects"
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
@@ -239,8 +240,6 @@ data:
 
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(REPO_DIR, 'media/')
-
-    LOGIN_REDIRECT_URL = '/'
 
     import socket
 
