@@ -105,7 +105,7 @@ spec:
             {{ end }}
         volumeMounts:
         - name: homedir
-          mountPath: /home/jovyan/
+          mountPath: /home/jovyan/common
         - name: dataset
           mountPath: /home/jovyan/dataset/
           mountPropagation: HostToContainer
@@ -121,6 +121,9 @@ spec:
           readOnly: true
         - name: cli-working-dir
           mountPath: /home/.scaleout/
+        {{- with .Values.extraVolumeMounts }}
+        {{- tpl . $ | nindent 8 }}
+        {{- end }}
         securityContext:
           allowPrivilegeEscalation: true
       terminationGracePeriodSeconds: 30
@@ -148,7 +151,9 @@ spec:
       - name: gatekeeper-config
         configMap:
           name: {{ .Release.Name }}-gatekeeper-config
-
       - name: jupyterconf
         configMap:
           name: {{ .Release.Name }}-jupyter-configmap
+      {{- with .Values.extraVolumes }}
+      {{- tpl . $ | nindent 6 }}
+      {{- end }}
