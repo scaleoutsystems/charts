@@ -78,6 +78,7 @@ data:
     REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     DOMAIN = {{ .Values.domain | quote }}
+    STUDIO_HOST = "https://{{ .Values.domain | quote }}"
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
