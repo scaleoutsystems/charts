@@ -25,6 +25,10 @@ spec:
             project: {{ .Values.project.slug }}
             type: cronjob
         spec:
+          {{ if .Values.resources.gpu.enabled }}
+          affinity:
+            {{ .Values.affinity | toYaml | nindent 12 | trim }}
+          {{ end }}
           restartPolicy: OnFailure
           containers:
           - name: cronjob
@@ -43,11 +47,17 @@ spec:
             imagePullPolicy: Always  
             resources:
               limits:
-                cpu: {{ .Values.cronjob.resources.limits.cpu }}
-                memory: {{ .Values.cronjob.resources.limits.memory }}
+                cpu: {{ .Values.resources.limits.cpu }}
+                memory: {{ .Values.resources.limits.memory }}
+                {{if .Values.resources.gpu.enabled }}
+                nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
+                {{ end }}
               requests:
-                cpu: {{ .Values.cronjob.resources.requests.cpu }}
-                memory: {{ .Values.cronjob.resources.requests.memory }}
+                cpu: {{ .Values.resources.requests.cpu }}
+                memory: {{ .Values.resources.requests.memory }}
+                {{if .Values.resources.gpu.enabled }}
+                nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
+                {{ end }}
           volumes:
           - name: jobstorage
             persistentVolumeClaim:
