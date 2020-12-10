@@ -29,6 +29,8 @@ spec:
           value: {{ .Values.postgres.db.password }}
         - name: POSTGRES_USER
           value: {{ .Values.postgres.db.user }}
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         image: {{ .Values.postgres.image }}
         name: studio-db
         resources:
