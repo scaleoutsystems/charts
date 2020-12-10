@@ -104,8 +104,8 @@ spec:
             nvidia.com/gpu: "1"
             {{ end }}
         volumeMounts:
-        - name: homedir
-          mountPath: /home/jovyan/
+        # - name: homedir
+        #   mountPath: /home/jovyan/
         - name: dataset
           mountPath: /home/jovyan/dataset/
           mountPropagation: HostToContainer
@@ -128,9 +128,9 @@ spec:
       volumes:
       - name: dataset
         emptyDir: {}
-      - name: homedir
-        persistentVolumeClaim:
-          claimName: {{ .Values.project.name }}-project-files
+      # - name: homedir
+      #   persistentVolumeClaim:
+      #     claimName: {{ .Values.project.name }}-project-files
       - name: stacknconfig
         configMap:
           name: {{ .Values.project.name }}-project-settings-configmap
