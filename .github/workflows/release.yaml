@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "GITHUB_ACTOR: $GITHUB_ACTOR"
           git config --global user.name "$GITHUB_ACTOR"
-          git config --global user.email "desislava@scaleoutsystems.com"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
           
       - name: Install Helm
         run: |
@@ -32,9 +32,8 @@ jobs:
           
       - name: Update gh-pages repo
         run: |
-          git clone git@github.com:scaleoutsystems/charts.git -b gh-pages
-          cd charts
+          git checkout gh-pages
           helm repo index scaleout/stackn/
-          git add .
-          git commit -m "Updated scaleout/stackn/index.yml"
-          git push
+          git add scaleout/stackn/index.yaml
+          git commit -m "Updated scaleout/stackn/index.yaml"
+          git push origin gh-pages
