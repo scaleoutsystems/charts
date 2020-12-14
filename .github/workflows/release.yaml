@@ -35,4 +35,4 @@ jobs:
           helm repo index scaleout/stackn/
           git add scaleout/stackn/index.yaml
           git commit -m "Updated scaleout/stackn/index.yaml"
-          git push origin master
+          git push
