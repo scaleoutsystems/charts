@@ -6,11 +6,27 @@ on:
       - master
 
 jobs:
+  sync-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Merge master -> gh-pages
+        uses: devmasx/merge-branch@v1.3.1
+        with:
+          type: now
+          from_branch: master
+          target_branch: gh-pages
+          github_token: ${{ secrets.CR_TOKEN }}
+  
   chart-releaser:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: gh-pages
 
       - name: Configure Git
         run: |
@@ -41,18 +57,4 @@ jobs:
           helm repo index scaleout/stackn/
           git add scaleout/stackn/index.yaml
           git commit -m "Updated scaleout/stackn/index.yaml"
-          git push
-          
-  sync-branch:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Merge master -> gh-pages
-        uses: devmasx/merge-branch@v1.3.1
-        with:
-          type: now
-          from_branch: master
-          target_branch: gh-pages
-          github_token: ${{ secrets.CR_TOKEN }}
+          git push origin gh-pages
