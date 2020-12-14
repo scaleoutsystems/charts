@@ -1,0 +1,44 @@
+name: Release Helm charts
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  chart-releaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure Git
+        run: |
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          
+      - name: Install Helm
+        run: |
+          curl -sSLo get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+          helm init --client-only
+
+      - name: Add chart dependencies
+        run: |
+          helm repo add stable https://charts.helm.sh/stable
+      
+      - name: Remove existing index.yaml
+        run: |
+          FILE=scaleout/stackn/index.yaml
+          if [ -f "$FILE" ]; then
+              rm scaleout/stackn/index.yaml
+          fi
+          
+      - name: Update index.yaml
+        run: |
+          helm repo index scaleout/stackn/
+          git add scaleout/stackn/index.yaml
+          git commit -m "Updated scaleout/stackn/index.yaml"
+          git push
