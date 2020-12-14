@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - fix/*
 
 jobs:
   chart-releaser:
@@ -28,7 +29,12 @@ jobs:
       - name: Add chart dependencies
         run: |
           helm repo add stable https://charts.helm.sh/stable
-
-      - name: Generate index.yaml files
+          
+      - name: Update gh-pages repo
         run: |
+          git clone https://github.com/scaleoutsystems/charts.git -b gh-pages
+          cd gh-pages
           helm repo index scaleout/stackn/
+          git add scaleout/stackn/index.yml
+          git commit -m "Updated scaleout/stackn/index.yml"
+          git push origin gh-pages
