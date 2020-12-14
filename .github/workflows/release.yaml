@@ -30,10 +30,9 @@ jobs:
         run: |
           helm repo add stable https://charts.helm.sh/stable
           
-      - name: Update gh-pages repo
+      - name: Update index.yaml
         run: |
-          git checkout gh-pages
           helm repo index scaleout/stackn/
           git add scaleout/stackn/index.yaml
           git commit -m "Updated scaleout/stackn/index.yaml"
-          git push origin gh-pages
+          git push origin master
