@@ -30,6 +30,11 @@ jobs:
         run: |
           helm repo add stable https://charts.helm.sh/stable
           
+      - name: Add git credentials
+        run: |
+          git config user.email "desislava@scaleoutsystems.com"
+          git config user.name "Desislava Stoyanova"
+          
       - name: Update gh-pages repo
         run: |
           git clone https://github.com/scaleoutsystems/charts.git -b gh-pages
