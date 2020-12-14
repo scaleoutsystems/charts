@@ -35,6 +35,6 @@ jobs:
           git clone https://github.com/scaleoutsystems/charts.git -b gh-pages
           cd charts
           helm repo index scaleout/stackn/
-          git add scaleout/stackn/index.yml
+          git add .
           git commit -m "Updated scaleout/stackn/index.yml"
-          git push origin gh-pages
+          git push
