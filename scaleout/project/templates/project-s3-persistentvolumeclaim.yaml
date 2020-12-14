@@ -8,6 +8,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: {{ .Values.storageClassName | default "hostpath" }}
   resources:
     requests:
       storage: {{ .Values.minio.volume.size }}
