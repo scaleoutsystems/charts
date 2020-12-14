@@ -58,4 +58,4 @@ jobs:
           type: now
           from_branch: master
           target_branch: gh-pages
-          github_token: ${{ CR_TOKEN }}
+          github_token: ${{ secrets.CR_TOKEN }}
