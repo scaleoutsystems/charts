@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - fix/*
 
 jobs:
   chart-releaser:
@@ -21,7 +20,6 @@ jobs:
           
       - name: Install Helm
         run: |
-          echo "helm init ..."
           curl -sSLo get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get
           chmod 700 get_helm.sh
           ./get_helm.sh
@@ -29,7 +27,6 @@ jobs:
 
       - name: Add chart dependencies
         run: |
-          echo "helm repo add stable ..."
           helm repo add stable https://charts.helm.sh/stable
 
       - name: Generate index.yaml files
