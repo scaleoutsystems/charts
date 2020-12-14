@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - fix/* 
 
 jobs:
   chart-releaser:
@@ -49,13 +48,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          ref: master
 
-      - name: Merge develop -> gh-pages
+      - name: Merge master -> gh-pages
         uses: devmasx/merge-branch@v1.3.1
         with:
           type: now
-          from_branch: develop
+          from_branch: master
           target_branch: gh-pages
           github_token: ${{ secrets.CR_TOKEN }}
