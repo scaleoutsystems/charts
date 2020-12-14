@@ -3,7 +3,7 @@ entries:
   docker-registry:
   - apiVersion: v1
     appVersion: 2.7.1
-    created: "2020-12-14T15:01:04.263815026Z"
+    created: "2020-12-14T15:03:23.124129518Z"
     description: A Helm chart for Docker Registry
     digest: 28518cc07f5217912aecd7939118c6c295e7660ac9cf8ebbaed681ff7f2f4088
     home: https://hub.docker.com/_/registry/
@@ -22,7 +22,7 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 7.1.1
-    created: "2020-12-14T15:01:04.264979629Z"
+    created: "2020-12-14T15:03:23.125459303Z"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 15058e59b6176268d47f7ca0824121403480f57a07ec90ca733a3a13f0e43bbd
     engine: gotpl
@@ -46,7 +46,7 @@ entries:
   keycloak:
   - apiVersion: v1
     appVersion: 11.0.0
-    created: "2020-12-14T15:01:04.269121642Z"
+    created: "2020-12-14T15:03:23.130579144Z"
     description: Open Source Identity and Access Management For Modern Applications
       and Services
     digest: fb2d881ae56abb06f4781088547f63323621cc1d9399824c48fb78d9d86eda90
@@ -75,7 +75,7 @@ entries:
   loki-stack:
   - apiVersion: v1
     appVersion: v1.6.0
-    created: "2020-12-14T15:01:04.275595761Z"
+    created: "2020-12-14T15:03:23.136454177Z"
     description: 'Loki: like Prometheus, but for logs.'
     digest: b3e41f3b7d390ef6eda908bf1c721be3ab3161c82366ff5015f92de23d723869
     engine: gotpl
@@ -94,7 +94,7 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.19.0
-    created: "2020-12-14T15:01:04.277667068Z"
+    created: "2020-12-14T15:03:23.138918849Z"
     description: Prometheus is a monitoring system and time series database.
     digest: eda86f74b379483e798a736ace41c3484384b8190e569c4d9e1d7b072d7fd886
     engine: gotpl
@@ -118,4 +118,4 @@ entries:
     urls:
     - charts/prometheus-11.11.1.tgz
     version: 11.11.1
-generated: "2020-12-14T15:01:04.263149024Z"
+generated: "2020-12-14T15:03:23.123384526Z"
