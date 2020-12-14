@@ -33,7 +33,7 @@ jobs:
       - name: Update gh-pages repo
         run: |
           git clone https://github.com/scaleoutsystems/charts.git -b gh-pages
-          cd gh-pages
+          cd charts
           helm repo index scaleout/stackn/
           git add scaleout/stackn/index.yml
           git commit -m "Updated scaleout/stackn/index.yml"
