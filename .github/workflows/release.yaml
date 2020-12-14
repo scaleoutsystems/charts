@@ -31,10 +31,4 @@ jobs:
 
       - name: Generate index.yaml files
         run: |
-          echo "helm repo index ..."
-          helm repo index scaleout/cronjob/
-          helm repo index scaleout/deploy/
-          helm repo index scaleout/lab/
-          helm repo index scaleout/project/
           helm repo index scaleout/stackn/
-          helm repo index scaleout/volume/
