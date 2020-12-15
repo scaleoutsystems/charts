@@ -23,11 +23,13 @@ spec:
     spec:
       volumes:
       {{ if .Values.minio.mount }}
-      - name: devfuse
-        hostPath:
-          path: /dev/fuse
-      - name: dataset
+      # - name: devfuse
+      #   hostPath:
+      #     path: /dev/fuse
+      {{- range $bucket := .Values.minio.buckets }}
+      - name: {{ $bucket }}
         emptyDir: {}
+      {{- end }}
       {{ end }}
       - name: secret-vol
         secret:
@@ -41,7 +43,11 @@ spec:
       {{- end }}
       containers:
       {{ if .Values.minio.mount }}
-      - name: {{ .Release.Name }}-s3-sync
+      {{- $miniohost := .Values.minio.host -}}
+      {{- $accesskey := .Values.minio.access_key -}}
+      {{- $secretkey := .Values.minio.secret_key -}}
+      {{- range $bucket := .Values.minio.buckets }}
+      - name: {{ $bucket }}-s3-sync
         image: scaleoutsystems/s3-sync:latest
         imagePullPolicy: Always
         securityContext:
@@ -58,21 +64,22 @@ spec:
             memory: 128Mi
         env:
         - name: BUCKET
-          value: {{ .Values.minio.bucket | default "dataset" }}
+          value: {{ $bucket }}
         - name: MOUNTPOINT
           value: /data
         - name: REPOURL
-          value: "http://{{ .Values.minio.host }}"
+          value: "http://{{ $miniohost }}"
         - name: AWSACCESSKEYID
-          value: {{ .Values.minio.access_key }}
+          value: {{ $accesskey }}
         - name: AWSSECRETACCESSKEY
-          value: {{ .Values.minio.secret_key }}
+          value: {{ $secretkey }}
         volumeMounts:
-        - name: dataset
+        - name: {{ $bucket }}
           mountPath: /data
           mountPropagation: Bidirectional
-        - name: devfuse
-          mountPath: /dev/fuse
+        # - name: devfuse
+        #   mountPath: /dev/fuse
+      {{- end }}
       {{ end }}
       - name: gatekeeper
         image: keycloak/keycloak-gatekeeper:latest #quay.io/louketo/louketo-proxy:latest
@@ -94,9 +101,11 @@ spec:
             memory: {{ .Values.resources.requests.memory }}Mi
         volumeMounts:
         {{ if .Values.minio.mount }}
-        - name: dataset
-          mountPath: /{{ .Values.minio.bucket }}/
+        {{- range $bucket := .Values.minio.buckets }}
+        - name: {{ $bucket }}
+          mountPath: /{{ $bucket }}/
           mountPropagation: HostToContainer
+          {{- end }}
         {{ end }}
         - name: secret-vol
           mountPath: license
