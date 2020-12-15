@@ -42,7 +42,9 @@ minio:
   host: minio-host
   access_key: access-key
   secret_key: secret-key
-  bucket: dataset
+  buckets:
+    - dataset
+    - models
 
 
 gatekeeper:

@@ -43,6 +43,7 @@ data:
 
     {{ if .Values.oidc.enabled }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
+    KC_URL = "{{ .Values.oidc.host }}"
     KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
     OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
@@ -77,6 +78,7 @@ data:
     REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     DOMAIN = {{ .Values.domain | quote }}
+    STUDIO_HOST = "https://{{ .Values.domain | quote }}"
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
