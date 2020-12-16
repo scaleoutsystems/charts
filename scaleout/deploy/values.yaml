@@ -28,6 +28,7 @@ deployment:
   name: deployment-name
   endpoint: deployment-endpoint
   path: deployment-path
+  port: 8501
 
 context:
   image: context-image
@@ -37,9 +38,13 @@ model:
   file: model.tar.gz  
 
 minio:
+  mount: false
   host: minio-host
   access_key: access-key
   secret_key: secret-key
+  buckets:
+    - dataset
+    - models
 
 
 gatekeeper:
@@ -50,3 +55,6 @@ gatekeeper:
   skip_tls: 0
   rules: "default"
 
+extraEnv: |
+  - name: LICENSE_FILE
+    value: SOMESTRING
