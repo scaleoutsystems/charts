@@ -7,7 +7,7 @@ metadata:
   name: {{ .Release.Name }}-studio-db-pvc
 spec:
   accessModes:
-  - {{ .Values.studio.storage.accessModes }}
+  - {{ .Values.studio.storage.accessModes  | default "ReadWriteMany"}}
   storageClassName: {{ .Values.studio.storage.StorageClassName | default "hostpath" }}
   resources:
     requests:
