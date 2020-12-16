@@ -43,6 +43,7 @@ data:
 
     {{ if .Values.oidc.enabled }}
     KC_REALM = {{ .Values.oidc.realm | quote }}
+    KC_URL = "{{ .Values.oidc.host }}"
     KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
     OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
@@ -59,6 +60,7 @@ data:
     OIDC_VERIFY_SSL = True
     {{ end }}
     OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = {{ .Values.oidc.id_token_expiry_seconds | default "180" }}
+    LOGIN_URL = "/projects"
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
@@ -76,6 +78,7 @@ data:
     REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     DOMAIN = {{ .Values.domain | quote }}
+    STUDIO_HOST = "https://{{ .Values.domain }}"
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -239,8 +242,6 @@ data:
 
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(REPO_DIR, 'media/')
-
-    LOGIN_REDIRECT_URL = '/'
 
     import socket
 

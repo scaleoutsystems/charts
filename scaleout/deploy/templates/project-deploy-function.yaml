@@ -22,6 +22,15 @@ spec:
         type: deployment
     spec:
       volumes:
+      {{ if .Values.minio.mount }}
+      # - name: devfuse
+      #   hostPath:
+      #     path: /dev/fuse
+      {{- range $bucket := .Values.minio.buckets }}
+      - name: {{ $bucket }}
+        emptyDir: {}
+      {{- end }}
+      {{ end }}
       - name: secret-vol
         secret:
           secretName: serve-secret
@@ -29,7 +38,49 @@ spec:
       - name: gatekeeper-config
         configMap:
           name: {{ .Release.Name }}-gatekeeper-config
+      {{- with .Values.extraVolumes }}
+      {{- tpl . $ | nindent 6 }}
+      {{- end }}
       containers:
+      {{ if .Values.minio.mount }}
+      {{- $miniohost := .Values.minio.host -}}
+      {{- $accesskey := .Values.minio.access_key -}}
+      {{- $secretkey := .Values.minio.secret_key -}}
+      {{- range $bucket := .Values.minio.buckets }}
+      - name: {{ $bucket }}-s3-sync
+        image: scaleoutsystems/s3-sync:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        resources:
+          limits:
+            cpu: 300m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: BUCKET
+          value: {{ $bucket }}
+        - name: MOUNTPOINT
+          value: /data
+        - name: REPOURL
+          value: "http://{{ $miniohost }}"
+        - name: AWSACCESSKEYID
+          value: {{ $accesskey }}
+        - name: AWSSECRETACCESSKEY
+          value: {{ $secretkey }}
+        volumeMounts:
+        - name: {{ $bucket }}
+          mountPath: /data
+          mountPropagation: Bidirectional
+        # - name: devfuse
+        #   mountPath: /dev/fuse
+      {{- end }}
+      {{ end }}
       - name: gatekeeper
         image: keycloak/keycloak-gatekeeper:latest #quay.io/louketo/louketo-proxy:latest
         imagePullPolicy: Always
@@ -49,9 +100,19 @@ spec:
             cpu: {{ .Values.resources.requests.cpu }}m
             memory: {{ .Values.resources.requests.memory }}Mi
         volumeMounts:
+        {{ if .Values.minio.mount }}
+        {{- range $bucket := .Values.minio.buckets }}
+        - name: {{ $bucket }}
+          mountPath: /{{ $bucket }}/
+          mountPropagation: HostToContainer
+          {{- end }}
+        {{ end }}
         - name: secret-vol
           mountPath: license
           readOnly: true
+        {{- with .Values.extraVolumeMounts }}
+        {{- tpl . $ | nindent 8 }}
+        {{- end }}
         env:
           - name: S3_ACCESS_KEY_ID
             value: {{ .Values.minio.access_key }}
@@ -61,12 +122,16 @@ spec:
             value: us-east-1
           - name: S3_ENDPOINT
             value: http://{{ .Values.project.slug }}-minio:9000
-          - name: MODEL_BUCKET
+          - name: STACKN_MODEL_BUCKET
             value: {{ .Values.model.bucket }}
-          - name: MODEL_FILE
+          - name: STACKN_MODEL_FILE
             value: {{ .Values.model.file }}
+          {{- with .Values.extraEnv }}
+          {{- tpl . $ | nindent 10 }}
+          {{- end }}
         command: ["/bin/bash"]
-        args: ["-c", "./mc config host add projminio $S3_ENDPOINT $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY;./mc cp projminio/$MODEL_BUCKET/$MODEL_FILE model.tar.gz;tar xvf model.tar.gz;[[ -f requirements.txt ]] && pip3 install -r requirements.txt;./deploy.sh"]
+        args: ["-c", "./mc config host add projminio $S3_ENDPOINT $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY;./mc cp projminio/$STACKN_MODEL_BUCKET/$STACKN_MODEL_FILE model.tar.gz;tar xvf model.tar.gz;[[ -f requirements.txt ]] && pip3 install -r requirements.txt;./deploy.sh"]
         image: {{ .Values.context.image }}
+        imagePullPolicy: Always
         ports:
-        - containerPort: 8501
+        - containerPort: {{ .Values.deployment.port }}
