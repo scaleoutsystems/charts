@@ -6,12 +6,12 @@ This repository contains Helm charts maintained by Scaleout Systems AB. The repo
 To be able to deploy Helm chrats from this repository you first need to add this repository as a source of charts.
 
 ```bash
-$ helm repo add stackn https://scaleoutsystems.github.io/charts/scaleout/stackn
+$ helm repo add scaleout https://scaleoutsystems.github.io/charts/scaleout/stackn
 ```
 
 Deploy a chart
 ```bash
-$ helm install --name stackn --namespace <your-namespace> --set domain=<your.domain.name> stackn
+$ helm install stackn scaleout/stackn -f <path_to_values.yaml>
 ```
 
 ### Local configs

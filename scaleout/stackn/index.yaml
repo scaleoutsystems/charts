@@ -3,7 +3,7 @@ entries:
   docker-registry:
   - apiVersion: v1
     appVersion: 2.7.1
-    created: "2021-02-04T18:02:07.2210799+01:00"
+    created: "2021-02-04T18:35:19.5070646+01:00"
     description: A Helm chart for Docker Registry
     digest: 28518cc07f5217912aecd7939118c6c295e7660ac9cf8ebbaed681ff7f2f4088
     home: https://hub.docker.com/_/registry/
@@ -22,7 +22,7 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 7.1.1
-    created: "2021-02-04T18:02:07.22308+01:00"
+    created: "2021-02-04T18:35:19.5090663+01:00"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 15058e59b6176268d47f7ca0824121403480f57a07ec90ca733a3a13f0e43bbd
     home: https://grafana.net
@@ -44,7 +44,7 @@ entries:
   keycloak:
   - apiVersion: v1
     appVersion: 11.0.0
-    created: "2021-02-04T18:02:07.2260804+01:00"
+    created: "2021-02-04T18:35:19.5130661+01:00"
     dependencies:
     - condition: postgresql.enabled
       name: postgresql
@@ -78,7 +78,7 @@ entries:
   loki-stack:
   - apiVersion: v1
     appVersion: v1.6.0
-    created: "2021-02-04T18:02:07.2330803+01:00"
+    created: "2021-02-04T18:35:19.5210673+01:00"
     dependencies:
     - condition: loki.enabled
       name: loki
@@ -125,7 +125,7 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.19.0
-    created: "2021-02-04T18:02:07.2380806+01:00"
+    created: "2021-02-04T18:35:19.5250685+01:00"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -154,7 +154,8 @@ entries:
     version: 11.11.1
   stackn:
   - apiVersion: v1
-    created: "2021-02-04T18:02:07.22008+01:00"
+    appVersion: 0.4.0
+    created: "2021-02-04T18:35:19.5070646+01:00"
     dependencies:
     - condition: docker-registry.enabled
       name: docker-registry
@@ -173,7 +174,7 @@ entries:
       repository: https://kubernetes-charts.storage.googleapis.com
       version: 5.5.5
     description: A Helm chart for deploying STACKn by Scaleout
-    digest: 9f2a7007d622cf4922b72632e1104048b0f45e71d5297a4663c753dcbbb197ad
+    digest: 631e00e5a134e8a9330c9ba5ee1da7a6546f9bb13b6d08c561dd1fad20aadf90
     maintainers:
     - email: morgan@scaleoutsystems.com
       name: Morgan Ekmefjord
@@ -183,6 +184,6 @@ entries:
       name: Desislava Stoyanova
     name: stackn
     urls:
-    - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-1.0.0.tgz
-    version: 1.0.0
-generated: "2021-02-04T18:02:07.1950801+01:00"
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-0.0.1.tgz
+    version: 0.0.1
+generated: "2021-02-04T18:35:19.4811629+01:00"
