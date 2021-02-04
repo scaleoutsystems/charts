@@ -3,7 +3,7 @@ entries:
   docker-registry:
   - apiVersion: v1
     appVersion: 2.7.1
-    created: "2021-01-22T09:10:50.138100669Z"
+    created: "2021-02-04T15:30:30.0802217+01:00"
     description: A Helm chart for Docker Registry
     digest: 28518cc07f5217912aecd7939118c6c295e7660ac9cf8ebbaed681ff7f2f4088
     home: https://hub.docker.com/_/registry/
@@ -22,10 +22,9 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 7.1.1
-    created: "2021-01-22T09:10:50.139208573Z"
+    created: "2021-02-04T15:30:30.0842216+01:00"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 15058e59b6176268d47f7ca0824121403480f57a07ec90ca733a3a13f0e43bbd
-    engine: gotpl
     home: https://grafana.net
     icon: https://raw.githubusercontent.com/grafana/grafana/master/public/img/logo_transparent_400x.png
     kubeVersion: ^1.8.0-0
@@ -39,14 +38,18 @@ entries:
     name: grafana
     sources:
     - https://github.com/grafana/grafana
-    tillerVersion: '>=2.12.0'
     urls:
     - charts/grafana-5.5.5.tgz
     version: 5.5.5
   keycloak:
   - apiVersion: v1
     appVersion: 11.0.0
-    created: "2021-01-22T09:10:50.142512584Z"
+    created: "2021-02-04T15:30:30.091223+01:00"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.1.1
     description: Open Source Identity and Access Management For Modern Applications
       and Services
     digest: fb2d881ae56abb06f4781088547f63323621cc1d9399824c48fb78d9d86eda90
@@ -75,10 +78,38 @@ entries:
   loki-stack:
   - apiVersion: v1
     appVersion: v1.6.0
-    created: "2021-01-22T09:10:50.1472467Z"
+    created: "2021-02-04T15:30:30.1042249+01:00"
+    dependencies:
+    - condition: loki.enabled
+      name: loki
+      repository: file://../loki
+      version: ^0.30.0
+    - condition: promtail.enabled
+      name: promtail
+      repository: file://../promtail
+      version: ^0.23.0
+    - condition: fluent-bit.enabled
+      name: fluent-bit
+      repository: file://../fluent-bit
+      version: ^0.1.0
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: ~3.8.15
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: ~9.3.0
+    - condition: filebeat.enabled
+      name: filebeat
+      repository: https://helm.elastic.co
+      version: ~7.8.0
+    - condition: logstash.enabled
+      name: logstash
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: ~2.4.0
     description: 'Loki: like Prometheus, but for logs.'
     digest: b3e41f3b7d390ef6eda908bf1c721be3ab3161c82366ff5015f92de23d723869
-    engine: gotpl
     home: https://grafana.com/loki
     icon: https://github.com/grafana/loki/raw/master/docs/logo.png
     kubeVersion: ^1.10.0-0
@@ -94,10 +125,14 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.19.0
-    created: "2021-01-22T09:10:50.149737308Z"
+    created: "2021-02-04T15:30:30.1131738+01:00"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 2.8.*
     description: Prometheus is a monitoring system and time series database.
     digest: eda86f74b379483e798a736ace41c3484384b8190e569c4d9e1d7b072d7fd886
-    engine: gotpl
     home: https://prometheus.io/
     icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
     maintainers:
@@ -114,8 +149,7 @@ entries:
     - https://github.com/prometheus/pushgateway
     - https://github.com/prometheus/node_exporter
     - https://github.com/kubernetes/kube-state-metrics
-    tillerVersion: '>=2.8.0'
     urls:
     - charts/prometheus-11.11.1.tgz
     version: 11.11.1
-generated: "2021-01-22T09:10:50.137497767Z"
+generated: "2021-02-04T15:30:30.0722243+01:00"
