@@ -3,7 +3,7 @@ entries:
   docker-registry:
   - apiVersion: v1
     appVersion: 2.7.1
-    created: "2021-02-04T16:01:41.7383197+01:00"
+    created: "2021-02-04T18:02:07.2210799+01:00"
     description: A Helm chart for Docker Registry
     digest: 28518cc07f5217912aecd7939118c6c295e7660ac9cf8ebbaed681ff7f2f4088
     home: https://hub.docker.com/_/registry/
@@ -17,12 +17,12 @@ entries:
     sources:
     - https://github.com/docker/distribution-library-image
     urls:
-    - charts/docker-registry-1.9.1.tgz
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/docker-registry-1.9.1.tgz
     version: 1.9.1
   grafana:
   - apiVersion: v1
     appVersion: 7.1.1
-    created: "2021-02-04T16:01:41.7393219+01:00"
+    created: "2021-02-04T18:02:07.22308+01:00"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 15058e59b6176268d47f7ca0824121403480f57a07ec90ca733a3a13f0e43bbd
     home: https://grafana.net
@@ -39,12 +39,12 @@ entries:
     sources:
     - https://github.com/grafana/grafana
     urls:
-    - charts/grafana-5.5.5.tgz
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/grafana-5.5.5.tgz
     version: 5.5.5
   keycloak:
   - apiVersion: v1
     appVersion: 11.0.0
-    created: "2021-02-04T16:01:41.743322+01:00"
+    created: "2021-02-04T18:02:07.2260804+01:00"
     dependencies:
     - condition: postgresql.enabled
       name: postgresql
@@ -73,12 +73,12 @@ entries:
     - https://github.com/jboss-dockerfiles/keycloak
     - https://github.com/bitnami/charts/tree/master/bitnami/postgresql
     urls:
-    - charts/keycloak-9.0.1.tgz
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/keycloak-9.0.1.tgz
     version: 9.0.1
   loki-stack:
   - apiVersion: v1
     appVersion: v1.6.0
-    created: "2021-02-04T16:01:41.7513197+01:00"
+    created: "2021-02-04T18:02:07.2330803+01:00"
     dependencies:
     - condition: loki.enabled
       name: loki
@@ -120,12 +120,12 @@ entries:
     sources:
     - https://github.com/grafana/loki
     urls:
-    - charts/loki-stack-0.40.0.tgz
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/loki-stack-0.40.0.tgz
     version: 0.40.0
   prometheus:
   - apiVersion: v1
     appVersion: 2.19.0
-    created: "2021-02-04T16:01:41.7553211+01:00"
+    created: "2021-02-04T18:02:07.2380806+01:00"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -150,11 +150,11 @@ entries:
     - https://github.com/prometheus/node_exporter
     - https://github.com/kubernetes/kube-state-metrics
     urls:
-    - charts/prometheus-11.11.1.tgz
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/prometheus-11.11.1.tgz
     version: 11.11.1
   stackn:
   - apiVersion: v1
-    created: "2021-02-04T16:01:41.7373203+01:00"
+    created: "2021-02-04T18:02:07.22008+01:00"
     dependencies:
     - condition: docker-registry.enabled
       name: docker-registry
@@ -173,7 +173,7 @@ entries:
       repository: https://kubernetes-charts.storage.googleapis.com
       version: 5.5.5
     description: A Helm chart for deploying STACKn by Scaleout
-    digest: 73c271a5be7fedb085882c08adae6f0cdf0a6c288af362305c359d6ce6902e0c
+    digest: 9f2a7007d622cf4922b72632e1104048b0f45e71d5297a4663c753dcbbb197ad
     maintainers:
     - email: morgan@scaleoutsystems.com
       name: Morgan Ekmefjord
@@ -183,6 +183,6 @@ entries:
       name: Desislava Stoyanova
     name: stackn
     urls:
-    - stackn-1.0.0.tgz
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-1.0.0.tgz
     version: 1.0.0
-generated: "2021-02-04T16:01:41.7143199+01:00"
+generated: "2021-02-04T18:02:07.1950801+01:00"
