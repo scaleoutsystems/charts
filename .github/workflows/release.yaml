@@ -51,10 +51,23 @@ jobs:
           if [ -f "$FILE" ]; then
               rm scaleout/stackn/index.yaml
           fi
-          
-      - name: Update index.yaml
+      
+      - name: Remove existing helm package
         run: |
-          helm repo index scaleout/stackn/
+          FILE=scaleout/stackn/stackn-0.0.1.tgz
+          if [ -f "$FILE" ]; then
+              rm scaleout/stackn/stackn-0.0.1.tgz
+          fi
+          
+      - name: Update index.yaml and helm package
+        run: |
+          helm package scaleout/stackn/
+          mv stackn-0.0.1.tgz scaleout/stackn/
+          helm repo index scaleout/stackn/ --url https://scaleoutsystems.github.io/charts/scaleout/stackn
+
+      - name: Commit updated index.yaml and helm package
+        run: |
           git add scaleout/stackn/index.yaml
-          git commit -m "Updated scaleout/stackn/index.yaml"
+          git add scaleout/stackn/stackn-0.0.1.tgz
+          git commit -m "Updated index.yaml and helm package"
           git push origin gh-pages
