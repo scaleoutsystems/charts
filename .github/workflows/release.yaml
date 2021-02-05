@@ -64,9 +64,6 @@ jobs:
           helm package scaleout/stackn/
           mv stackn-0.0.1.tgz scaleout/stackn/
           helm repo index scaleout/stackn/ --url https://scaleoutsystems.github.io/charts/scaleout/stackn
-
-      - name: Commit updated index.yaml and helm package
-        run: |
           git add scaleout/stackn/index.yaml
           git add scaleout/stackn/stackn-0.0.1.tgz
           git commit -m "Updated index.yaml and helm package"
