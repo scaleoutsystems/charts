@@ -1,0 +1,337 @@
+global:
+  db:
+    name: &db_name stackn
+    user: &db_user stackn
+    password: &db_password fdfweorkpokf931d0vsdf9
+    port: &db_port 5432
+    host: &db_host stackn-postgresql-ha-pgpool
+  keycloak:
+    db:
+      name: keycloak
+      user: keycloak
+      password: sdf8324jfb2324
+      port: *db_port
+      host: *db_host
+
+
+postgresql-ha:
+  postgresql:
+    replicaCount: 2
+    extraVolumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 512Mi
+    extraVolumeMounts:
+      - name: dshm
+        mountPath: /dev/shm
+    initdbScripts:
+      init.sql: |
+        CREATE DATABASE keycloak;
+        CREATE USER keycloak WITH PASSWORD 'sdf8324jfb2324';
+        GRANT ALL PRIVILIGES ON DATABASE keycloak TO keycloak;
+        CREATE DATABASE stackn;
+        CREATE USER stackn WITH PASSWORD 'fdfweorkpokf931d0vsdf9';
+        GRANT ALL PRIVILIGES ON DATABASE stackn TO stackn;
+    # database: *db_name
+    username: admin
+    password: vva=9;sdf9032kfcmoc5658c-=;
+    repmgrUsername: admin
+    repmgrPassword: vva=9;sdf9032kfcmoc5658c-=;
+    repmgrDatabase: repmgrdb
+  pgpool:
+    replicaCount: 1
+    initdbScripts:
+      setup_user.sh: |
+        #!/bin/bash
+
+        pg_md5 -m --config-file="/opt/bitnami/pgpool/conf/pgpool.conf" -u "keycloak" "sdf8324jfb2324"
+        pg_md5 -m --config-file="/opt/bitnami/pgpool/conf/pgpool.conf" -u "stackn" "fdfweorkpokf931d0vsdf9"
+
+  persistence:
+    size: 20Gi
+
+# Default values for alliance-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
+## Name: imagePullSecret
+## Description: Secret to pull images from our private repository.
+imagePullSecrets:
+  - name: regcred
+
+## to create a regcred
+## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
+
+# REQUIREMENT: set a storage class with ability to serve ReadWriteMany
+# Name: storageClassName
+# Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
+# Default: microk8s-hostpath (works with docker-for-desktop)
+storageClassName: microk8s-hostpath
+namespace: studio-develop
+
+studio:
+  servicename: studio
+  image: #tell which image to deploy for studio
+    repository: scaleoutsystems/studio:develop # point to the latest beta image
+    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
+  storage:
+    StorageClassName: microk8s-hostpath
+    size: 2Gi
+
+# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
+domain: studio-dev.local.stackn.dev
+ingress:
+  enabled: true
+  image: #tell which image to deploy for studio
+    repository: scaleoutsystems/ingress:master
+    pullPolicy: Always
+  annotations: {}
+  hosts:
+    - host: studio-dev.local.stackn.dev
+
+  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
+  tls:
+    - secretName: prod-ingress
+      hosts:
+        - studio-dev.local.stackn.dev
+
+
+service:
+  type: ClusterIP #override if you want to use NodePort instead to access cluster services
+
+#override if you want to try out a HA (HIGH AVAILABILITY) setup.
+replicaCount: 1
+
+# override if certain resource requirements should apply
+resources: {}
+
+# override if certain nodes should be used for the deployed resources.
+nodeSelector: {}
+
+# override if declaring that some criteria is tolerated for resource co-existing.
+tolerations: []
+
+affinity: {}
+
+
+
+# Postgres default credentials for backend DB. Override for security!
+postgres:
+  db:
+    name: *db_name
+    user: *db_user
+    password: *db_password
+  port: *db_port
+  host: *db_host
+
+
+# postgresql:
+#   extraVolumes:
+#     - name: dshm
+#       emptyDir:
+#         medium: Memory
+#         sizeLimit: 512Mi
+#   extraVolumeMounts:
+#     - name: dshm
+#       mountPath: /dev/shm
+
+
+# default credentials for rabbitmq. override in production!
+rabbit:
+  username: admin
+  password: LJqEG9RE4FdZbVWoJzZIOQEI
+
+chartcontroller:
+  enabled: false
+  image:
+    repository: scaleoutsystems/chart-controller:develop
+    pullPolicy: Always
+  branch: develop
+
+
+
+cluster_config: |-
+  apiVersion: v1
+  clusters:
+  - cluster:
+      certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURBVENDQWVtZ0F3SUJBZ0lKQU5MVTBTRkxieXdnTUEwR0NTcUdTSWIzRFFFQkN3VUFNQmN4RlRBVEJnTlYKQkFNTURERXdMakUxTWk0eE9ETXVNVEFlRncweU1UQXhNVGt5TVRJNU5EVmFGdzB6TVRBeE1UY3lNVEk1TkRWYQpNQmN4RlRBVEJnTlZCQU1NRERFd0xqRTFNaTR4T0RNdU1UQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQCkFEQ0NBUW9DZ2dFQkFQTW9hTFNQenhZcFhwV2FVY1YrUytyTmRCWjZWSS9HY3Y1UDB2VjRzVFJEUHdObjVMeDMKTUtBL3VkMStlN3lTcmEzVUwxbzFyd0FXbzlnS3d3a3Rkd1FzRlFkeW02d3g1aTVOZVZFM1huSm9DamZERVNaVgptS0U3TytIa1k1dVcrOVMyYXFHOHVUMiswL0t6NjQwSjNUNFFJdEowREVrL25wTFNNeWVramU4aDJuS3VLMWZrCkRKQTIxaTFuSkFia1UvR3dIdm45K3lVcGpWb1lhRm9MdFViNGJWNW40WnZZVy9lOG1sVEp4eUUySExnVGZUR2IKTXZWL3BnM2V3SXJBa3VSUUphRjF0eW51ZS9LRURaME10T1A1OXlwT2pKNjhrUFB3WndpNkxrY0xwSEJlWjZzbgpJZFVjekZVYXN5eDdpVlBMcE5lbjRVZ3huRytOTWFaQWtaMENBd0VBQWFOUU1FNHdIUVlEVlIwT0JCWUVGREo4CmJpSFhKL0kyQUFMMXE0UE5CY1lDU2JSck1COEdBMVVkSXdRWU1CYUFGREo4YmlIWEovSTJBQUwxcTRQTkJjWUMKU2JSck1Bd0dBMVVkRXdRRk1BTUJBZjh3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQURuVWFvZUEwRldmZGoyRgpwbUFLbGpiNjVLM2xUbzkxTGFqM0wzVVRDU2g0SVBLVGo4T0pwUFZEaGt2L2hrZTJiK3AxVk9ZS20zbEJpL3lpClF2TGR3bGRnbkkrVlFIT0lrcUpOS01HLzE5MnQ3eU5rYkh4MUxOZk1VVmNlRUVRanJTZjlrOEsrN012S2hpUlYKY3pYSW5TbTZTcEdaOC94MzdzL1V5NUk3Q0RDR1loK2xrS3Mxa0dMMWdEYk1FSVUxZHNQQ1hkc2hzeU9HV1ltTAo5SXVZNU82MlZRQnc3YUZEZWF0b0o0NWtDbVk2amsrZFFBY3h1WXUwS29CZHA3cnFiZXVjVk51ZlkvK24xdkhECi9XdnZoRUVWOCt3SkV4aHV5M0s0MllIU0xCVDQ4Sm0vSlNyNkszSjFVRmxiTk1SRHNJU2szS0E3T0dWOURoOTQKenRMWmpOVT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      server: https://109.228.190.159:16443
+    name: desktop
+  contexts:
+  - context:
+      cluster: desktop
+      user: desktop
+    name: desktop
+  current-context: desktop
+  kind: Config
+  preferences: {}
+  users:
+  - name: desktop
+    user:
+      password: N25tVWRzK0FvbDkxUkpNZFMxUEJSUEh6U1V1Q0c2bWltMENNMHBlZFpyWT0K
+      username: admin
+
+
+docker-registry:
+    enabled: true
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+        hosts:
+            - registry-dev.local.stackn.dev
+        tls:
+            - secretName: prod-ingress
+              hosts:
+                  - registry-dev.local.stackn.dev
+
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 2Gi
+      storageClass: microk8s-hostpath
+
+argo:
+  enabled: false
+
+argo-events:
+  enabled: false
+
+
+openfaas:
+    enabled: false
+
+
+keycloak:
+  replicas: 1
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    rules:
+      - host: "keycloak-dev.local.stackn.dev"
+        paths: 
+          - /
+    tls:
+      - secretName: prod-ingress
+        hosts:
+          - keycloak-dev.local.stackn.dev
+  # persistence:
+  #   deployPostgres: true
+  #   dbVendor: postgres
+  #   pullPolicy: Always
+
+  extraVolumes: |
+    - name: realm-secret
+      secret:
+        secretName: realm-secret
+
+  extraVolumeMounts: |
+    - name: realm-secret
+      mountPath: "/realm/"
+      readOnly: true
+
+  extraEnv: |
+    - name: KEYCLOAK_IMPORT
+      value: /realm/realm.json
+    - name: KEYCLOAK_USER
+      value: keycloak_admin
+    - name: KEYCLOAK_PASSWORD
+      value: MxaspoewFEWERLLGBasde
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
+    - name: JGROUPS_DISCOVERY_PROTOCOL
+      value: kubernetes.KUBE_PING
+    - name: KUBERNETES_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: CACHE_OWNERS_COUNT
+      value: "2"
+    - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
+      value: "2"
+    - name: DB_VENDOR
+      value: postgres
+    - name: DB_ADDR
+      value: {{ .Values.global.keycloak.db.host }}
+    - name: DB_PORT
+      value: "{{ .Values.global.keycloak.db.port }}"
+    - name: DB_DATABASE
+      value: {{ .Values.global.keycloak.db.name }}
+
+  extraEnvFrom: |
+    - secretRef:
+        name: '{{ include "keycloak.fullname" . }}-db'
+
+  secrets:
+    db:
+      stringData:
+        DB_USER: '{{ .Values.global.keycloak.db.user }}'
+        DB_PASSWORD: '{{ .Values.global.keycloak.db.password }}'
+
+  postgresql:
+    enabled: false
+    # postgresqlUsername: keycloak
+    # postgresqlPassword: usOcCo+lh\TuIO:(p:Om9'
+    # postgresqlDatabase: keycloak
+    # persistence:
+    #   enabled: true
+    #   storageClass: microk8s-hostpath
+    #   size: 2Gi
+  
+  args:
+    - "-Dkeycloak.profile.feature.token_exchange=enabled"
+
+oidc:
+    enabled: true
+    realm: STACKn
+    client_id: studio
+    client_secret: Q#cdsIA(2MDAKLS00caradsf<OLAL:KSDn(kvd 
+    host: http://keycloak-dev.local.stackn.dev
+    sign_algo: RS256
+    verify_ssl: true
+
+prometheus:
+  enabled: false
+  server:
+    ingress:
+      enabled: true
+      hosts:
+        - prometheus-dev.local.stackn.dev
+      tls:
+        - secretName: prod-ingress
+          hosts:
+            - prometheus-dev.local.stackn.dev
+    persistentVolume:
+      storageClass: microk8s-hostpath
+      size: 2Gi
+
+loki-stack:
+  enabled: false
+
+grafana:
+  enabled: false
+  grafana.ini:
+    server:
+      domain: grafana-dev.local.stackn.dev
+      root_url: "%(protocol)s://%(domain)s/"
+      serve_from_sub_path: true
+  ingress:
+    enabled: true
+    hosts:
+      - "grafana-dev.local.stackn.dev"
+    path: "/"
+
+    tls:
+        - secretName: prod-ingress
+          hosts:
+            - grafana-dev.local.stackn.dev
+
+  persistence:
+    enabled: true
+    type: pvc
+    size: 2Gi
+    storageClassName: microk8s-hostpath
