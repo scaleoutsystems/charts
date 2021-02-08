@@ -124,8 +124,8 @@ data:
         'workflows',
         'experiments',
         'deployments',
-        'studio_admin',
-        'bootstrap_modal_forms'
+        'bootstrap_modal_forms',
+        'studio_admin'
     ]
 
     REST_FRAMEWORK = {
