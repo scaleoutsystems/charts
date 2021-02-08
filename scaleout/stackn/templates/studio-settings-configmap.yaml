@@ -197,8 +197,8 @@ data:
             'NAME': '{{ .Values.postgres.db.name }}',
             'USER': '{{ .Values.postgres.db.user}}',
             'PASSWORD': '{{ .Values.postgres.db.password}}',
-            'HOST': '{{ .Release.Name }}-studio-db',
-            'PORT': 5432,
+            'HOST': '{{ .Values.postgres.host }}', #'{{ .Release.Name }}-studio-db',
+            'PORT': {{ .Values.postgres.port | default 5432}},
         }
     }
 
