@@ -45,6 +45,10 @@ spec:
           failureThreshold: 3
           periodSeconds: 30
           timeoutSeconds: 20
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "mkdir -p data/dataset data/reports data/models data/deploy"]
         name: {{ .Release.Name }}-minio
         ports:
         - containerPort: 9000
