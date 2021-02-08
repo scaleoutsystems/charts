@@ -69,7 +69,7 @@ imagePullSecrets:
 # Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 # Default: microk8s-hostpath (works with docker-for-desktop)
 storageClassName: microk8s-hostpath
-namespace: studio-develop
+namespace: studioelop
 
 studio:
   servicename: studio
@@ -81,7 +81,7 @@ studio:
     size: 2Gi
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio-dev.local.stackn.dev
+domain: studio.your-domain.com
 ingress:
   enabled: true
   image: #tell which image to deploy for studio
@@ -89,13 +89,13 @@ ingress:
     pullPolicy: Always
   annotations: {}
   hosts:
-    - host: studio-dev.local.stackn.dev
+    - host: studio.your-domain.com
 
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
   tls:
     - secretName: prod-ingress
       hosts:
-        - studio-dev.local.stackn.dev
+        - studio.your-domain.com
 
 
 service:
@@ -181,11 +181,11 @@ docker-registry:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
         hosts:
-            - registry-dev.local.stackn.dev
+            - registry.your-domain.com
         tls:
             - secretName: prod-ingress
               hosts:
-                  - registry-dev.local.stackn.dev
+                  - registry.your-domain.com
 
     persistence:
       enabled: true
@@ -211,13 +211,13 @@ keycloak:
     annotations:
       nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
     rules:
-      - host: "keycloak-dev.local.stackn.dev"
+      - host: "keycloak.your-domain.com"
         paths: 
           - /
     tls:
       - secretName: prod-ingress
         hosts:
-          - keycloak-dev.local.stackn.dev
+          - keycloak.your-domain.com
   # persistence:
   #   deployPostgres: true
   #   dbVendor: postgres
@@ -290,7 +290,7 @@ oidc:
     realm: STACKn
     client_id: studio
     client_secret: Q#cdsIA(2MDAKLS00caradsf<OLAL:KSDn(kvd 
-    host: http://keycloak-dev.local.stackn.dev
+    host: http://keycloak.your-domain.com
     sign_algo: RS256
     verify_ssl: true
 
@@ -300,11 +300,11 @@ prometheus:
     ingress:
       enabled: true
       hosts:
-        - prometheus-dev.local.stackn.dev
+        - prometheus.your-domain.com
       tls:
         - secretName: prod-ingress
           hosts:
-            - prometheus-dev.local.stackn.dev
+            - prometheus.your-domain.com
     persistentVolume:
       storageClass: microk8s-hostpath
       size: 2Gi
@@ -316,19 +316,19 @@ grafana:
   enabled: false
   grafana.ini:
     server:
-      domain: grafana-dev.local.stackn.dev
+      domain: grafana.your-domain.com
       root_url: "%(protocol)s://%(domain)s/"
       serve_from_sub_path: true
   ingress:
     enabled: true
     hosts:
-      - "grafana-dev.local.stackn.dev"
+      - "grafana.your-domain.com"
     path: "/"
 
     tls:
         - secretName: prod-ingress
           hosts:
-            - grafana-dev.local.stackn.dev
+            - grafana.your-domain.com
 
   persistence:
     enabled: true
