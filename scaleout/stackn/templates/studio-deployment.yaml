@@ -48,6 +48,9 @@ spec:
         imagePullPolicy: Always
         name: {{ .Release.Name }}-studio
         volumeMounts:
+          - name: config
+            mountPath: "/app/chartcontroller/config/"
+            readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
@@ -69,6 +72,9 @@ spec:
     {{- end }}
       restartPolicy: Always
       volumes:
+      - name: config
+        secret:
+          secretName: {{ .Release.Name }}-chart-controller-secret
       - name: {{ .Release.Name}}-settings-configmap
         configMap:
           name: {{ .Release.Name}}-settings-configmap
