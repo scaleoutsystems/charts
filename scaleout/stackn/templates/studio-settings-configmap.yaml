@@ -24,6 +24,12 @@ data:
 
     PROJECT_ROLES = ['guest', 'member', 'admin']
 
+    {{ if .Values.ingress.v1beta1 }}
+    INGRESS_V1BETA1 = True
+    {{ else }}
+    INGRESS_V1BETA1 = False
+    {{ end }}
+
     # Permissions
 
     # Project settings
@@ -125,7 +131,9 @@ data:
         'experiments',
         'deployments',
         'bootstrap_modal_forms',
-        'studio_admin'
+        'studio_admin',
+        'apps',
+        'django_celery_beat'
     ]
 
     REST_FRAMEWORK = {
