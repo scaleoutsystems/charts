@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.20.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: {{ .Release.Name }}-celery-beat
+    name: {{ .Release.Name }}-celery-beat
+  name: {{ .Release.Name }}-celery-beat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-celery-beat
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.20.0 ()
+      creationTimestamp: null
+      labels:
+        io.kompose.service: {{ .Release.Name }}-celery-beat
+        name: {{ .Release.Name }}-celery-beat
+    spec:
+      containers:
+      - args:
+        - sh
+        - ./scripts/run_beat.sh
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        image: {{ .Values.studio.image.repository }}
+        imagePullPolicy: Always
+        name: {{ .Release.Name }}-celery-beat
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "2Gi"
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+        volumeMounts:
+          - mountPath: /app/studio/settings.py
+            subPath: settings.py
+            name: {{ .Release.Name}}-settings-configmap
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Release.Name}}-settings-configmap
+        configMap:
+          name: {{ .Release.Name}}-settings-configmap
+          items:
+          - key: settings.py
+            path: settings.py
+
+status: {}
