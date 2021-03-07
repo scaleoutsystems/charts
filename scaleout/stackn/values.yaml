@@ -40,6 +40,7 @@ domain: studio.your-domain.com
 # domain -- Domain name, should match ingress.hosts.host
 ingress:
   enabled: true
+  v1beta1: true
   image: #tell which image to deploy for studio
     repository: scaleoutsystems/ingress:master
     pullPolicy: Always
