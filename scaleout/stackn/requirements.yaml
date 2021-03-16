@@ -14,11 +14,6 @@ dependencies:
   #   version: 0.7.3
   #   repository: "https://argoproj.github.io/argo-helm"
   #   condition: argo.enabled
-
-  # - name: docker-registry
-  #   version: 1.9.1
-  #   repository: "https://kubernetes-charts.storage.googleapis.com"
-  #   condition: docker-registry.enabled
   
   - name: keycloak
     version: 9.0.1

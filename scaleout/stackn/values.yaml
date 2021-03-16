@@ -138,25 +138,6 @@ cluster_config: |-
 fixtures: |-
   []
 
-docker-registry:
-    enabled: true
-    ingress:
-        enabled: false
-        annotations:
-          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
-        hosts:
-            - registry.your-domain.com
-        tls:
-            - secretName: prod-ingress
-              hosts:
-                  - registry.your-domain.com
-
-    persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
-      size: 4Gi
-      storageClass: microk8s-hostpath
-
 argo:
   installCRD: false
   enabled: false
