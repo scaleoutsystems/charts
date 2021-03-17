@@ -26,6 +26,17 @@ spec:
         io.kompose.service: {{ .Release.Name }}-celery-worker
         name: {{ .Release.Name }}-celery-worker
     spec:
+      initContainers:
+        - name: wait-for-db
+          image: postgres
+          command: ['sh', '-c', 'until pg_isready --host={{ .Release.Name }}-studio-db.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port=5432; do echo waiting for database; sleep 2; done;']
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
       containers:
       - args:
         - sh
@@ -44,6 +55,9 @@ spec:
             cpu: "100m"
             memory: "256Mi"
         volumeMounts:
+          - name: config
+            mountPath: "/app/chartcontroller/config/"
+            readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
@@ -53,6 +67,9 @@ spec:
     {{- end }}
       restartPolicy: Always
       volumes:
+      - name: config
+        secret:
+          secretName: {{ .Release.Name }}-chart-controller-secret
       - name: {{ .Release.Name}}-settings-configmap
         configMap:
           name: {{ .Release.Name}}-settings-configmap

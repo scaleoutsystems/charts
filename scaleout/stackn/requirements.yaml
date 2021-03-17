@@ -14,11 +14,6 @@ dependencies:
   #   version: 0.7.3
   #   repository: "https://argoproj.github.io/argo-helm"
   #   condition: argo.enabled
-
-  - name: docker-registry
-    version: 1.9.1
-    repository: "https://kubernetes-charts.storage.googleapis.com"
-    condition: docker-registry.enabled
   
   - name: keycloak
     version: 9.0.1
@@ -38,3 +33,8 @@ dependencies:
     version: 5.5.5
     repository: https://kubernetes-charts.storage.googleapis.com
     condition: grafana.enabled
+
+  - name: reloader
+    version: v0.0.81
+    repository: https://stakater.github.io/stakater-charts
+    condition: reloader.enabled
