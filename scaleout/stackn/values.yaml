@@ -76,7 +76,14 @@ tolerations: []
 
 affinity: {}
 
-
+celeryWorkers:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "8Gi"
 
 # Postgres default credentials for backend DB. Override for security!
 postgres:
