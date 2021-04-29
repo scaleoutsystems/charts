@@ -33,7 +33,7 @@ spec:
         - path: /static/
           backend:
             serviceName: {{ $.Release.Name }}-studio
-            servicePort: 8080
+            servicePort: 8081
   {{- end }}
 {{- else }}
 apiVersion: networking.k8s.io/v1
@@ -73,9 +73,15 @@ spec:
         - path: /static/
           backend:
             service:
+            {{ if $.Values.studio.debug }}
               name: {{ $.Release.Name }}-studio
               port:
                 number: 8080
+            {{ else }}
+              name: {{ $.Release.Name }}-static
+              port:
+                number: 8081
+            {{ end }}
           pathType: ImplementationSpecific
   {{- end }}
 {{- end }}

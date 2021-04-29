@@ -20,6 +20,17 @@ namespace: default
 
 studio:
   servicename: studio
+  debug: false
+  static:
+    replicas: 1
+    image: scaleoutsystems/stackn-static:develop
+    resources:
+      limits:
+        cpu: 1
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
   image: #tell which image to deploy for studio
     repository: scaleoutsystems/studio:master # point to the latest beta image
     # studio.image.repository -- Select which version of Studio to deploy, default is master branch.
@@ -77,6 +88,7 @@ tolerations: []
 affinity: {}
 
 celeryWorkers:
+  replicas: 2
   resources:
     requests:
       cpu: "100m"
