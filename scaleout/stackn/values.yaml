@@ -23,7 +23,7 @@ studio:
   debug: false
   static:
     replicas: 1
-    image: scaleoutsystems/stackn-static:develop
+    image: scaleoutsystems/ingress:develop
     resources:
       limits:
         cpu: 1
@@ -52,10 +52,6 @@ domain: studio.your-domain.com
 ingress:
   enabled: true
   v1beta1: false
-  image: #tell which image to deploy for studio
-    repository: scaleoutsystems/ingress:master
-    pullPolicy: Always
-  annotations: {}
   hosts:
     - host: studio.your-domain.com
     # ingress.hosts[0].host -- Ingress to Studio. Should match domain.
