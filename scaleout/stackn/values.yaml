@@ -20,6 +20,17 @@ namespace: default
 
 studio:
   servicename: studio
+  debug: false
+  static:
+    replicas: 1
+    image: scaleoutsystems/ingress:develop
+    resources:
+      limits:
+        cpu: 1
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
   image: #tell which image to deploy for studio
     repository: scaleoutsystems/studio:master # point to the latest beta image
     # studio.image.repository -- Select which version of Studio to deploy, default is master branch.
@@ -41,10 +52,6 @@ domain: studio.your-domain.com
 ingress:
   enabled: true
   v1beta1: false
-  image: #tell which image to deploy for studio
-    repository: scaleoutsystems/ingress:master
-    pullPolicy: Always
-  annotations: {}
   hosts:
     - host: studio.your-domain.com
     # ingress.hosts[0].host -- Ingress to Studio. Should match domain.
@@ -76,7 +83,15 @@ tolerations: []
 
 affinity: {}
 
-
+celeryWorkers:
+  replicas: 2
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "8Gi"
 
 # Postgres default credentials for backend DB. Override for security!
 postgres:

@@ -10,7 +10,7 @@ metadata:
     name: {{ .Release.Name }}-celery-worker
   name: {{ .Release.Name }}-celery-worker
 spec:
-  replicas: 2
+  replicas: {{ .Values.celeryWorkers.replicas | default 2 }}
   strategy:
     type: Recreate
   selector:
@@ -49,11 +49,11 @@ spec:
         name: {{ .Release.Name }}-celery-worker
         resources:
           limits:
-            cpu: "500m"
-            memory: "2Gi"
+            cpu: {{ .Values.celeryWorkers.resources.limits.cpu }}
+            memory: {{ .Values.celeryWorkers.resources.limits.memory }}
           requests:
-            cpu: "100m"
-            memory: "256Mi"
+            cpu: {{ .Values.celeryWorkers.resources.requests.cpu }}
+            memory: {{ .Values.celeryWorkers.resources.requests.memory }}
         volumeMounts:
           - name: config
             mountPath: "/app/chartcontroller/config/"
