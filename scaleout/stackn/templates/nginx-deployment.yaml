@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-static
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: {{ .Values.studio.static.replicas }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      app: stackn-studio
+      type: app
+      pod: nginx-static
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8501"
+      labels:
+        release: {{ .Release.Name }}
+        app: stackn-studio
+        type: app
+        pod: nginx-static
+    spec:
+      volumes:
+      - name: rp-conf
+        configMap:
+          name: {{ .Release.Name }}-static-config
+      containers:
+      - name: static
+        image: {{ .Values.studio.static.image }}
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: rp-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          limits:
+            cpu: {{ .Values.studio.static.resources.limits.cpu }}
+            memory: {{ .Values.studio.static.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.studio.static.resources.requests.cpu }}
+            memory: {{ .Values.studio.static.resources.requests.cpu }}
+

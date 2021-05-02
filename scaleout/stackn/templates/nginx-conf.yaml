@@ -1,0 +1,22 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-static-config
+  namespace: {{ .Values.namespace }}
+data:
+  # Configuration values can be set as key-value properties
+  nginx.conf: |-
+    worker_processes 4;
+    events { worker_connections 512; }
+    http {
+        include /etc/nginx/mime.types;
+        server {
+            listen 8081;
+
+            client_max_body_size 0;
+            large_client_header_buffers 4 128k;
+
+            location / {
+            }
+        }
+    }
