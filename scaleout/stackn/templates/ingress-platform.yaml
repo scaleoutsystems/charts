@@ -1,41 +1,4 @@
 {{- if .Values.ingress.enabled }}
-{{- if .Values.ingress.v1beta1 }}
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: {{ .Release.Name }}-ingress
-  annotations:
-  {{- with .Values.ingress.annotations }}
-     {{- toYaml . | nindent 4 }}
-  {{- end }}
-  labels:
-    io.kompose.service: {{ .Release.Name }}-ingress
-spec:
-  {{- if .Values.ingress.tls }}
-  tls:
-  {{- range .Values.ingress.tls }}
-    - hosts:
-      {{- range .hosts }}
-        - {{ . | quote }}
-      {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
-  {{- end }}
-  rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
-        paths:
-        - path: /
-          backend:
-            serviceName: {{ $.Release.Name }}-studio
-            servicePort: 8080
-        - path: /static/
-          backend:
-            serviceName: {{ $.Release.Name }}-studio
-            servicePort: 8081
-  {{- end }}
-{{- else }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -47,7 +10,7 @@ metadata:
   labels:
     io.kompose.service: {{ .Release.Name }}-ingress
 spec:
-  ingressClassName: public
+  # ingressClassName: public
   {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -83,8 +46,14 @@ spec:
                 number: 8081
             {{ end }}
           pathType: ImplementationSpecific
+        - path: /media/
+          backend:
+            service:
+              name: {{ $.Release.Name }}-static
+              port:
+                number: 8081
+          pathType: ImplementationSpecific
   {{- end }}
-{{- end }}
 {{- end }}
 
 

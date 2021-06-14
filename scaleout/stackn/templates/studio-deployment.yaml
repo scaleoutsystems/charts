@@ -2,15 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.19.0 ()
-  creationTimestamp: null
+    reloader.stakater.com/auto: "true"
   labels:
     io.kompose.service: {{ .Release.Name }}-studio
     name: {{ .Release.Name }}-studio
   name: {{ .Release.Name }}-studio
 spec:
-  replicas: 1
+  replicas: {{ .Values.studio.replicas }}
   strategy:
     type: Recreate
   selector:
@@ -18,10 +16,6 @@ spec:
       name: {{ .Release.Name }}-studio
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.19.0 ()
-      creationTimestamp: null
       labels:
         io.kompose.service: {{ .Release.Name }}-studio
         name: {{ .Release.Name }}-studio
@@ -29,7 +23,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Release.Name }}-studio-db.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port=5432; do echo waiting for database; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgres.host }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgres.port }}; do echo waiting for database; sleep 2; done;']
           resources:
             limits:
               cpu: 100m
@@ -42,6 +36,10 @@ spec:
         - sh
         - scripts/run_web.sh
         env:
+        {{ if .Values.studio.debug }}
+        - name: DEBUG
+          value: "true"
+        {{ end }}
         - name: GET_HOSTS_FROM
           value: dns
         image: {{ .Values.studio.image.repository }}
@@ -54,10 +52,11 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-
           - mountPath: /app/projects/fixtures/fixtures.json
             subPath: fixtures.json
             name: {{ .Release.Name }}-fixtures-configmap
+          - name: mediavol
+            mountPath: /media
         resources:
           limits:
             cpu: {{ .Values.studio.resources.limits.cpu }}
@@ -81,10 +80,12 @@ spec:
           items:
           - key: settings.py
             path: settings.py
-
       - name: {{ .Release.Name }}-fixtures-configmap
         configMap:
           name: {{ .Release.Name }}-fixtures-configmap
           items:
           - key: fixtures.json
             path: fixtures.json
+      - name: mediavol
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-studio-media

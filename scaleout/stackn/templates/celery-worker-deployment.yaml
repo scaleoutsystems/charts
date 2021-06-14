@@ -2,9 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.20.0 ()
-  creationTimestamp: null
+    reloader.stakater.com/auto: "true"
   labels:
     io.kompose.service: {{ .Release.Name }}-celery-worker
     name: {{ .Release.Name }}-celery-worker
@@ -29,7 +27,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Release.Name }}-studio-db.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port=5432; do echo waiting for database; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgres.host }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgres.port }}; do echo waiting for database; sleep 2; done;']
           resources:
             limits:
               cpu: 100m
@@ -61,6 +59,8 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
+          - name: mediavol
+            mountPath: /media
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -76,5 +76,8 @@ spec:
           items:
           - key: settings.py
             path: settings.py
+      - name: mediavol
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-studio-media
 
 status: {}

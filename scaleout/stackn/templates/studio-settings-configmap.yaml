@@ -54,9 +54,11 @@ data:
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
     OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
     OIDC_OP_REALM_AUTH = "{{ .Values.oidc.host }}/auth/realms"
-    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/auth"
-    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/token"
-    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/userinfo"
+    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/auth"
+    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/token"
+    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/userinfo"
+    OIDC_OP_LOGOUT_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/logout"
+    OIDC_OP_LOGOUT_URL_METHOD = 'studio.OIDClogout.keycloak_logout'
     OIDC_STORE_ACCESS_TOKEN = True
     OIDC_STORE_ID_TOKEN = True
     {{ if eq .Values.oidc.verify_ssl false }}
@@ -70,7 +72,7 @@ data:
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
-    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/certs"
+    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/certs"
     {{ end }}
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
@@ -135,7 +137,10 @@ data:
         'bootstrap_modal_forms',
         'studio_admin',
         'apps',
-        'django_celery_beat'
+        'portal',
+        'django_celery_beat',
+        'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+        'channels',
     ]
 
     X_FRAME_OPTIONS = 'SAMEORIGIN'
@@ -157,7 +162,8 @@ data:
         {{ end }}
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'corsheaders.middleware.CorsMiddleware'
+        'corsheaders.middleware.CorsMiddleware',
+        'django_plotly_dash.middleware.BaseMiddleware'
     ]
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -191,6 +197,7 @@ data:
     ]
 
     WSGI_APPLICATION = 'studio.wsgi.application'
+    ASGI_APPLICATION = 'studio.asgi.application'
 
     # Lab settings
     LABS = {
@@ -209,8 +216,8 @@ data:
             'NAME': '{{ .Values.postgres.db.name }}',
             'USER': '{{ .Values.postgres.db.user}}',
             'PASSWORD': '{{ .Values.postgres.db.password}}',
-            'HOST': '{{ .Release.Name }}-studio-db',
-            'PORT': 5432,
+            'HOST': '{{ .Values.postgres.host }}', #'{{ .Release.Name }}-studio-db',
+            'PORT': {{ .Values.postgres.port | default 5432 }},
         }
     }
 
@@ -254,7 +261,7 @@ data:
     STATIC_ROOT = os.path.join(REPO_DIR, 'static/')
 
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(REPO_DIR, 'media/')
+    MEDIA_ROOT = '/media/'
 
     import socket
 
@@ -279,6 +286,15 @@ data:
     REDIS_PORT = 6379
     REDIS_DB = 0
     REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis')
+
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [(REDIS_HOST, REDIS_PORT),],
+            },
+        },
+    }
 
     CELERY_BROKER_URL = 'amqp://{{ .Values.rabbit.username }}:{{ .Values.rabbit.password }}@{{ .Release.Name }}-rabbit:5672//'
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)

@@ -16,25 +16,30 @@ dependencies:
   #   condition: argo.enabled
   
   - name: keycloak
-    version: 9.0.1
+    version: 10.1.0
     repository: https://codecentric.github.io/helm-charts
 
   - name: prometheus
-    version: 11.11.1
-    repository: https://kubernetes-charts.storage.googleapis.com
+    version: 13.8.0
+    repository: https://prometheus-community.github.io/helm-charts
     condition: prometheus.enabled
 
   - name: loki-stack
-    version: 0.40.0
-    repository: https://grafana.github.io/loki/charts
+    version: 2.3.1
+    repository: https://grafana.github.io/helm-charts
     condition: loki-stack.enabled
   
   - name: grafana
-    version: 5.5.5
-    repository: https://kubernetes-charts.storage.googleapis.com
+    version: 6.8.4
+    repository: https://grafana.github.io/helm-charts
     condition: grafana.enabled
 
   - name: reloader
-    version: v0.0.81
+    version: v0.0.86
     repository: https://stakater.github.io/stakater-charts
     condition: reloader.enabled
+
+  - name: postgresql-ha
+    version: 7.3.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgres-ha.enabled

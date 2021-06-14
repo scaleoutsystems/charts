@@ -1,52 +1,52 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: {{ .Release.Name }}-studio-db
-    name: {{ .Release.Name }}-studio-db
-  name: {{ .Release.Name }}-studio-db
-spec:
-  replicas: 1
-  strategy: {}
-  selector:
-    matchLabels:
-      name: {{ .Release.Name }}-studio-db
-  template:
-    metadata:
-      labels:
-        io.kompose.service: {{ .Release.Name }}-studio-db
-        name: {{ .Release.Name }}-studio-db
-    spec:
-      containers:
-      - env:
-        - name: GET_HOSTS_FROM
-          value: dns
-        - name: POSTGRES_DB
-          value: {{ .Values.postgres.db.name }}
-        - name: POSTGRES_PASSWORD
-          value: {{ .Values.postgres.db.password }}
-        - name: POSTGRES_USER
-          value: {{ .Values.postgres.db.user }}
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        image: {{ .Values.postgres.image }}
-        name: studio-db
-        resources:
-          limits:
-            cpu: {{ .Values.postgres.resources.limits.cpu }}
-            memory: {{ .Values.postgres.resources.limits.memory }}
-          requests:
-            cpu: {{ .Values.postgres.resources.requests.cpu }}
-            memory: {{ .Values.postgres.resources.requests.memory }}
-        volumeMounts:
-        - mountPath: "/var/lib/postgresql/data"
-          name: db
-      restartPolicy: Always
-      volumes:
-        - name: db
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-studio-db-pvc
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   annotations:
+#   creationTimestamp: null
+#   labels:
+#     io.kompose.service: {{ .Release.Name }}-studio-db
+#     name: {{ .Release.Name }}-studio-db
+#   name: {{ .Release.Name }}-studio-db
+# spec:
+#   replicas: 1
+#   strategy: {}
+#   selector:
+#     matchLabels:
+#       name: {{ .Release.Name }}-studio-db
+#   template:
+#     metadata:
+#       labels:
+#         io.kompose.service: {{ .Release.Name }}-studio-db
+#         name: {{ .Release.Name }}-studio-db
+#     spec:
+#       containers:
+#       - env:
+#         - name: GET_HOSTS_FROM
+#           value: dns
+#         - name: POSTGRES_DB
+#           value: {{ .Values.postgres.db.name }}
+#         - name: POSTGRES_PASSWORD
+#           value: {{ .Values.postgres.db.password }}
+#         - name: POSTGRES_USER
+#           value: {{ .Values.postgres.db.user }}
+#         - name: PGDATA
+#           value: /var/lib/postgresql/data/pgdata
+#         image: {{ .Values.postgres.image }}
+#         name: studio-db
+#         resources:
+#           limits:
+#             cpu: {{ .Values.postgres.resources.limits.cpu }}
+#             memory: {{ .Values.postgres.resources.limits.memory }}
+#           requests:
+#             cpu: {{ .Values.postgres.resources.requests.cpu }}
+#             memory: {{ .Values.postgres.resources.requests.memory }}
+#         volumeMounts:
+#         - mountPath: "/var/lib/postgresql/data"
+#           name: db
+#       restartPolicy: Always
+#       volumes:
+#         - name: db
+#           persistentVolumeClaim:
+#             claimName: {{ .Release.Name }}-studio-db-pvc
       
-status: {}
+# status: {}
