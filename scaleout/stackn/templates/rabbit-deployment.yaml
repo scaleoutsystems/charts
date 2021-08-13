@@ -31,7 +31,7 @@ spec:
           value: {{ .Values.rabbit.password | quote }}
         - name: RABBITMQ_DEFAULT_USER
           value: {{ .Values.rabbit.username }}
-        image: rabbitmq
+        image: rabbitmq:3.8
         name: {{ .Release.Name }}-rabbit
         ports:
         - containerPort: 5672
