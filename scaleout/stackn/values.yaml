@@ -423,11 +423,11 @@ argo:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: 1000m
         hosts:
-            - workflow.your-domain.com
+            - workflow.<your-domain.com>
         tls:
             - secretName: prod-ingress
               hosts:
-                  - workflow.your-domain.com
+                  - workflow.<your-domain.com>
 
 argo-events:
   enabled: false
@@ -450,14 +450,14 @@ openfaas:
     ingress:
       enabled: false
       hosts:
-        - host: serve.your-domain.com
+        - host: serve.<your-domain.com>
           serviceName: gateway
           servicePort: 8080
           path: /
       tls:
         - secretName: prod-ingress
           hosts:
-            - serve.your-domain.com
+            - serve.<your-domain.com>
 
 keycloak:
   replicas: 1
