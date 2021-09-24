@@ -535,11 +535,11 @@ prometheus:
     ingress:
       enabled: true
       hosts:
-        - prometheus.10.0.144.239.nip.io
+        - prometheus.<your-domain.com>
       tls:
         - secretName: prod-ingress
           hosts:
-            - prometheus.10.0.144.239.nip.io
+            - prometheus.<your-domain.com>
     persistentVolume:
       storageClass: *storage_class
       size: 2Gi
