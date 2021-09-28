@@ -37,6 +37,11 @@ spec:
           value: dns
         - name: DJANGO_SUPERUSER_PASSWORD
           value: {{ .Values.studio.django.password }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "postgresql.secretName" .Subcharts.postgresql }}
+              key: postgresql-password
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         volumeMounts:

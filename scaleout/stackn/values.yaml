@@ -19,22 +19,21 @@ global:
     user: &db_user stackn
     password: &db_password fdfweorkpokf931d0vsdf9
     port: &db_port 5432
-    host: &db_host stackn-postgres-chart
   storage:
     storage_class: &storage_class microk8s-hostpath
 
   
-### A Postgres database for Studio and Keycloak ###
-# You can use one database instance for Studio and one for Keycloak, or one database used by both applications
-# Here we use https://charts.bitnami.com/bitnami high-availability mode (postgresql-ha) or postgresql (default)
+### A Postgres database for STACKn ###
+# Here we use https://charts.bitnami.com/bitnami postgresql chart 
 
 
-# Postgres deploy with a single-pod database (alias "postgres-chart”):
-postgres-chart:
+# Postgres deploy with a single-pod database:
+postgresql:
   enabled: true
   postgresqlUsername: *db_user
-  postgresqlPassword: *db_password
+  postgresqlPassword: ""
   postgresqlDatabase: *db_name
+  fullnameOverride: stackn-postgreql-default
   persistence:
     enabled: true
     size: 20Gi
@@ -44,53 +43,8 @@ postgres-chart:
   service:
     port: *db_port
 
-
-
-# An example of a HA setup configuration:
-postgresql-ha:
+postgres-ha:
   enabled: false
-  postgresql:
-    replicaCount: 2
-    extraVolumes:
-      - name: dshm
-        emptyDir:
-          medium: Memory
-          sizeLimit: 1024Mi
-    extraVolumeMounts:
-      - name: dshm
-        mountPath: /dev/shm
-    initdbScripts:
-      init.sql: |
-        CREATE DATABASE keycloak;
-        CREATE USER keycloak WITH PASSWORD 'keycloak_pass';
-        GRANT ALL PRIVILIGES ON DATABASE keycloak TO keycloak;
-        CREATE DATABASE stackn;
-        CREATE USER stackn WITH PASSWORD 'stackn_pass';
-        GRANT ALL PRIVILIGES ON DATABASE stackn TO stackn;
-    username: admin
-    password: admin_pass
-    repmgrUsername: admin
-    repmgrPassword: admin_pass
-    repmgrDatabase: repmgrdb
-    extendedConf: |-
-      max_wal_size = 1GB
-    resources:
-      requests:
-        cpu: 250m
-        memory: 2Gi
-      limits:
-        cpu: 2000m
-        memory: 12Gi
-
-  pgpool:
-    replicaCount: 2
-    initdbScripts:
-      setup_user.sh: |
-        #!/bin/bash
-        pg_md5 -m --config-file="/opt/bitnami/pgpool/conf/pgpool.conf" -u "keycloak" "keycloak_pass"
-        pg_md5 -m --config-file="/opt/bitnami/pgpool/conf/pgpool.conf" -u "stackn" "stackn_pass"
-  persistence:
-    size: 20Gi
 
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
 ## Name: imagePullSecret
@@ -149,7 +103,6 @@ postgres:
     user: *db_user
     password: *db_password
   port: *db_port
-  host: *db_host
   resources:
     limits:
       cpu: 400m

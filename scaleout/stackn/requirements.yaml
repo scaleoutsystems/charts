@@ -42,10 +42,9 @@ dependencies:
   - name: postgresql-ha
     version: 7.3.0
     repository: https://charts.bitnami.com/bitnami
-    condition: postgresql-ha.enabled
+    condition: postgres-ha.enabled
 
   - name: postgresql
     version: 10.4.2
     repository: https://charts.bitnami.com/bitnami
-    condition: postgres-chart.enabled
-    alias: postgres-chart
+    condition: postgresql.enabled

@@ -213,11 +213,11 @@ data:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '{{ .Values.postgres.db.name }}',
-            'USER': '{{ .Values.postgres.db.user}}',
-            'PASSWORD': '{{ .Values.postgres.db.password}}',
-            'HOST': '{{ .Values.postgres.host }}', #'{{ .Release.Name }}-studio-db',
-            'PORT': {{ .Values.postgres.port | default 5432 }},
+            'NAME': '{{ include "stackn.postgres.name" . }}',
+            'USER': '{{ include "stackn.postgres.user" . }}',
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': '{{ include "stackn.postgres.host" . }}',
+            'PORT': {{ include "stackn.postgres.port" . }},
         }
     }
 
