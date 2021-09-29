@@ -29,7 +29,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ include "stackn.postgres.host" . }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgres.port }}; do echo waiting for database; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ include "stackn.postgres.host" . }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ include "stackn.postgres.port" . }}; do echo waiting for database; sleep 2; done;']
           resources:
             limits:
               cpu: 100m
