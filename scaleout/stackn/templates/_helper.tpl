@@ -3,7 +3,7 @@ Return postgres host
 */}}
 {{- define "stackn.postgres.host" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- .Values.postgresql.fullnameOverride -}}
+    {{- include "postgresql.fullname" .Subcharts.postgresql -}}
 {{- else -}}
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
@@ -14,7 +14,7 @@ Return postgres DB name
 */}}
 {{- define "stackn.postgres.name" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- .Values.postgresql.postgresqlDatabase -}}
+    {{- include "postgresql.database" .Subcharts.postgresql -}}
 {{- else -}}
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
@@ -25,7 +25,7 @@ Return postgres port
 */}}
 {{- define "stackn.postgres.port" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- .Values.postgresql.service.port -}}
+    {{- include "postgresql.port" .Subcharts.postgresql -}}
 {{- else -}}
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
@@ -36,7 +36,7 @@ Return postgres user
 */}}
 {{- define "stackn.postgres.user" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- .Values.postgresql.postgresqlUsername -}}
+    {{- include "postgresql.username" .Subcharts.postgresql -}}
 {{- else -}}
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
