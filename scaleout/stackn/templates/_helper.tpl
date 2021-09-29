@@ -42,4 +42,15 @@ Return postgres user
 {{- end -}}
 {{- end -}}
 
+{{/*
+Return postgres secret
+*/}}
+{{- define "stackn.postgres.secretName" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- include "postgresql.secretName" .Subcharts.postgresql -}}
+{{- else -}}
+    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
+{{- end -}}
+{{- end -}}
+
 

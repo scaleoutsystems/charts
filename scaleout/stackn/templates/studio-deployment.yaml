@@ -45,7 +45,7 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "postgresql.secretName" .Subcharts.postgresql }}
+              name: {{ include "stackn.postgres.secretName" . }}
               key: postgresql-password
 
         image: {{ .Values.studio.image.repository }}
