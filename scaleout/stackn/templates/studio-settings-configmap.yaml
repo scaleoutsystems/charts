@@ -296,7 +296,7 @@ data:
         },
     }
 
-    CELERY_BROKER_URL = 'amqp://{{ .Values.rabbit.username }}:{{ .Values.rabbit.password }}@{{ .Release.Name }}-rabbit:5672//'
+    CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ .Release.Name }}-rabbit:5672//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'

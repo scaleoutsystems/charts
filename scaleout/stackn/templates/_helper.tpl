@@ -123,3 +123,25 @@ Return STACKn studio superuser email
     admin@test.com
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return STACKn rabbit password
+*/}}
+{{- define "stackn.rabbit.password" -}}
+{{- if .Values.rabbit.password -}}
+    {{- .Values.rabbit.password -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return STACKn rabbit username
+*/}}
+{{- define "stackn.rabbit.username" -}}
+{{- if .Values.rabbit.username -}}
+    {{- .Values.rabbit.username -}}
+{{- else -}}
+    admin
+{{- end -}}
+{{- end -}}

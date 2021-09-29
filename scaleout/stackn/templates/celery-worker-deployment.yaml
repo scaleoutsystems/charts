@@ -47,6 +47,11 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: postgresql-password
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: rabbit-password
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         name: {{ .Release.Name }}-celery-worker
