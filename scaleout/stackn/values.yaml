@@ -14,6 +14,11 @@
 
 #node anchors used to reduce manual configuration
 global:
+  studio:
+    superUser: ""
+    superuserPassword: ""
+    superuserEmail: ""
+  existingSecret: ""
   db:
     name: &db_name stackn
     user: &db_user stackn
@@ -30,19 +35,19 @@ global:
 # Postgres deploy with a single-pod database:
 postgresql:
   enabled: true
-  postgresqlUsername: *db_user
+  postgresqlUsername: stackn
   postgresqlPassword: ""
-  postgresqlDatabase: *db_name
-  fullnameOverride: stackn-postgreql-default
+  postgresqlDatabase: stackn
+  existingSecret: ""
+  fullnameOverride: stackn-studio-postgres
   persistence:
     enabled: true
     size: 20Gi
     storageClass: *storage_class
     accessModes:
     - ReadWriteMany
-  service:
-    port: *db_port
 
+# Will be added in future realease, for now keep "enabled:false"
 postgres-ha:
   enabled: false
 
@@ -58,6 +63,7 @@ imagePullSecrets:
 #Set stoargeClass
 storageClassName: *storage_class
 namespace: default
+existingSecret: ""
 
 studio:
   servicename: studio
@@ -91,10 +97,9 @@ studio:
       storageClassName: *storage_class
       size: 5Gi
       accessModes: ReadWriteMany
-  django: # Used to create django superuser
-    superUser: admin
-    password: admin_password
-    email: admin@test.com
+  superUser: admin
+  superuserPassword: ""
+  superuserEmail: admin@test.com
 
 # Postgres default credentials for backend DB. Override for security!
 postgres:

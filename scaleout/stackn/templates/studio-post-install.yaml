@@ -27,7 +27,7 @@ spec:
       - name: post-install-job
         image: {{ .Values.studio.image.repository }}
         command: ["/bin/sh"]
-        args: ["-c", "python3 manage.py createsuperuser --email {{ .Values.studio.django.email }} --username {{ .Values.studio.django.superUser }} --noinput && python3 manage.py loaddata fixtures.json"]
+        args: ["-c", "python3 manage.py createsuperuser --email {{ include "stackn.studio.superuser.email" . }} --username {{ include "stackn.studio.superuser" . }} --noinput && python3 manage.py loaddata fixtures.json"]
         env:
         {{ if .Values.studio.debug }}
         - name: DEBUG
@@ -36,7 +36,10 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         - name: DJANGO_SUPERUSER_PASSWORD
-          value: {{ .Values.studio.django.password }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-superuser-password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
