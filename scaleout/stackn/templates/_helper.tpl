@@ -168,3 +168,17 @@ Return STACKn keycloak admin password
     {{- randAlphaNum 10 -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return STACKn oidc client secret
+*/}}
+{{- define "stackn.oidc.clientsecret" -}}
+{{- if .Values.global.keycloak.clientsecret }}
+    {{- .Values.global.keycloak.clientsecret }}
+{{- else if .Values.oidc.client_secret }}
+    {{- .Values.oidc.client_secret -}}
+{{- else -}}
+    a-client-secret
+{{- end -}}
+{{- end -}}
+

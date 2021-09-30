@@ -21,6 +21,7 @@ global:
   keycloak:
     adminUser: ""
     adminPassword: ""
+    clientSecret: a-client-secret #Override in production
   existingSecret: ""
 
   db:
@@ -489,9 +490,10 @@ oidc:
     enabled: true
     realm: STACKn
     client_id: studio
-    client_secret: Q#cdsIA(2MDAKLS00caradsf<OLAL:KSDn(kvd 
+    client_secret: ""
     host: https://keycloak.<your-domain.com>
     sign_algo: RS256
+    id_token_expiry_seconds: 180
     verify_ssl: true #setting this to false should only be used for local development, will require flag --insecure for stackn cli  
 
 prometheus:
