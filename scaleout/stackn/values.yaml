@@ -12,7 +12,7 @@
 #NOTES
 # - For local development/testing consider setting "oidc.verify_ssl" to false 
 
-#node anchors used to reduce manual configuration
+#Set global values to overide default
 global:
   studio:
     superUser: ""
@@ -23,14 +23,7 @@ global:
     adminPassword: ""
     clientSecret: a-client-secret #Override in production
   existingSecret: ""
-
-  db:
-    name: &db_name stackn
-    user: &db_user stackn
-    password: &db_password fdfweorkpokf931d0vsdf9
-    port: &db_port 5432
-  storage:
-    storage_class: &storage_class microk8s-hostpath
+  storageClass: &storage_class microk8s-hostpath
 
   
 ### A Postgres database for STACKn ###
@@ -105,21 +98,6 @@ studio:
   superUser: admin
   superuserPassword: ""
   superuserEmail: admin@test.com
-
-# Postgres default credentials for backend DB. Override for security!
-postgres:
-  db:
-    name: *db_name
-    user: *db_user
-    password: *db_password
-  port: *db_port
-  resources:
-    limits:
-      cpu: 400m
-      memory: 2Gi
-    requests:
-      cpu: 200m
-      memory: 1Gi
 
 celeryWorkers:
   replicas: 2
