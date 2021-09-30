@@ -18,7 +18,11 @@ global:
     superUser: ""
     superuserPassword: ""
     superuserEmail: ""
+  keycloak:
+    adminUser: ""
+    adminPassword: ""
   existingSecret: ""
+
   db:
     name: &db_name stackn
     user: &db_user stackn
@@ -150,7 +154,7 @@ service:
 # default credentials for rabbitmq. override in production!
 rabbit:
   username: admin
-  password: LJqEG9RE4FdZbVWoJzZIOQEI
+  password: ""
 
 chartcontroller:
   enabled: false
@@ -446,9 +450,12 @@ keycloak:
     - name: KEYCLOAK_IMPORT
       value: /realm/realm.json
     - name: KEYCLOAK_USER
-      value: keycloak
+      value: '{{ include "stackn.keycloak.admin.user" .}}'
     - name: KEYCLOAK_PASSWORD
-      value: MxaspoewFEWERLLGBasde
+      valueFrom:
+            secretKeyRef:
+              name: '{{ include "stackn.secretName" . }}'
+              key: keycloak-admin-password
     - name: PROXY_ADDRESS_FORWARDING
       value: "true"
 

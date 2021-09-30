@@ -25,7 +25,7 @@ Get the password secret.
 {{- else if .Values.existingSecret -}}
     {{- printf "%s" (tpl .Values.existingSecret $) -}}
 {{- else -}}
-    {{- printf "%s" (include "common.names.fullname" .) -}}
+    stackn
 {{- end -}}
 {{- end -}}
 
@@ -143,5 +143,28 @@ Return STACKn rabbit username
     {{- .Values.rabbit.username -}}
 {{- else -}}
     admin
+{{- end -}}
+{{- end -}}
+
+
+{{/*
+Return STACKn keycloak admin user
+*/}}
+{{- define "stackn.keycloak.admin.user" -}}
+{{- if .Values.global.keycloak.adminUser }}
+    {{- .Values.global.keycloak.adminUser -}}
+{{- else -}}
+    keycloak
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return STACKn keycloak admin password
+*/}}
+{{- define "stackn.keycloak.admin.password" -}}
+{{- if .Values.global.keycloak.adminPassword }}
+    {{- .Values.global.keycloak.adminPassword -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
 {{- end -}}
 {{- end -}}
