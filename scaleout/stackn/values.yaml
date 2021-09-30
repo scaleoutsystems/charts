@@ -473,7 +473,7 @@ keycloak:
   postgresql:
     enabled: true
     postgresqlUsername: keycloak
-    postgresqlPassword: kd93l.s/2094lfOSd;d
+    postgresqlPassword: ""
     postgresqlDatabase: keycloak
     persistence:
       enabled: true
