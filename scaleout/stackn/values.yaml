@@ -46,7 +46,7 @@ postgresql:
     - ReadWriteMany
 
 # Will be added in future realease, for now keep "enabled:false"
-postgres-ha:
+postgresql-ha:
   enabled: false
 
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
