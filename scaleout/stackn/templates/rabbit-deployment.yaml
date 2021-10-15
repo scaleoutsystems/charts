@@ -28,9 +28,12 @@ spec:
       containers:
       - env:
         - name: RABBITMQ_DEFAULT_PASS
-          value: {{ .Values.rabbit.password | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: rabbit-password
         - name: RABBITMQ_DEFAULT_USER
-          value: {{ .Values.rabbit.username }}
+          value: {{ include "stackn.rabbit.username" . }}
         image: rabbitmq:3.8
         name: {{ .Release.Name }}-rabbit
         ports:

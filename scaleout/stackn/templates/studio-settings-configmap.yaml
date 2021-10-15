@@ -52,7 +52,7 @@ data:
     KC_URL = "{{ .Values.oidc.host }}"
     KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
-    OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
+    OIDC_RP_CLIENT_SECRET = {{ include "stackn.oidc.clientsecret" . | quote }}
     OIDC_OP_REALM_AUTH = "{{ .Values.oidc.host }}/auth/realms"
     OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/auth"
     OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/token"
@@ -213,11 +213,11 @@ data:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '{{ .Values.postgres.db.name }}',
-            'USER': '{{ .Values.postgres.db.user}}',
-            'PASSWORD': '{{ .Values.postgres.db.password}}',
-            'HOST': '{{ .Values.postgres.host }}', #'{{ .Release.Name }}-studio-db',
-            'PORT': {{ .Values.postgres.port | default 5432 }},
+            'NAME': '{{ include "stackn.postgres.name" . }}',
+            'USER': '{{ include "stackn.postgres.user" . }}',
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': '{{ include "stackn.postgres.host" . }}',
+            'PORT': {{ include "stackn.postgres.port" . }},
         }
     }
 
@@ -296,7 +296,7 @@ data:
         },
     }
 
-    CELERY_BROKER_URL = 'amqp://{{ .Values.rabbit.username }}:{{ .Values.rabbit.password }}@{{ .Release.Name }}-rabbit:5672//'
+    CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ .Release.Name }}-rabbit:5672//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'

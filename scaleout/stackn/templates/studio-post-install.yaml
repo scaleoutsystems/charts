@@ -1,40 +1,33 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  annotations:
-    reloader.stakater.com/auto: "true"
+  name: {{ .Release.Name }}-post-install
   labels:
-    io.kompose.service: {{ .Release.Name }}-studio
-    name: {{ .Release.Name }}-studio
-  name: {{ .Release.Name }}-studio
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
-  replicas: {{ .Values.studio.replicas }}
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      name: {{ .Release.Name }}-studio
   template:
     metadata:
+      name: {{ .Release.Name }}-post-install
       labels:
-        io.kompose.service: {{ .Release.Name }}-studio
-        name: {{ .Release.Name }}-studio
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
-      initContainers:
-        - name: wait-for-db
-          image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ include "stackn.postgres.host" . }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ include "stackn.postgres.port" . }}; do echo waiting for database; sleep 2; done;']
-          resources:
-            limits:
-              cpu: 100m
-              memory: 512Mi
-            requests:
-              cpu: 100m
-              memory: 512Mi
+      restartPolicy: Never
       containers:
-      - args:
-        - sh
-        - scripts/run_web.sh
+      - name: post-install-job
+        image: {{ .Values.studio.image.repository }}
+        command: ["/bin/sh"]
+        args: ["-c", "python3 manage.py createsuperuser --email {{ include "stackn.studio.superuser.email" . }} --username {{ include "stackn.studio.superuser" . }} --noinput && python3 manage.py loaddata fixtures.json"]
         env:
         {{ if .Values.studio.debug }}
         - name: DEBUG
@@ -42,20 +35,18 @@ spec:
         {{ end }}
         - name: GET_HOSTS_FROM
           value: dns
+        - name: DJANGO_SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-superuser-password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: postgresql-password
-        - name: RABBITMQ_DEFAULT_PASS
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: rabbit-password
-
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
-        name: {{ .Release.Name }}-studio
         volumeMounts:
           - name: config
             mountPath: "/app/chartcontroller/config/"
@@ -80,7 +71,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      restartPolicy: Always
+      restartPolicy: OnFailure
       volumes:
       - name: config
         secret:
@@ -100,3 +91,4 @@ spec:
       - name: mediavol
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-studio-media
+

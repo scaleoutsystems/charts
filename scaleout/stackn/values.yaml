@@ -1,6 +1,53 @@
-# Default values for alliance-chart.
 # This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# Declare variables to be passed into STACKn templates.
+
+# REQUIREMENT: 
+# - set a storage class with ability to serve ReadWriteMany
+#   Name: storageClassName, and/or set anchor &śtorage_class
+#   Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
+#   Default: microk8s-hostpath, use nfs-client for docker-for-desktop
+# - replace <your-domain.com>, search and replace 
+# - cluster_config , kubernetes cluster
+
+#NOTES
+# - For local development/testing consider setting "oidc.verify_ssl" to false 
+
+#Set global values to overide default
+global:
+  studio:
+    superUser: ""
+    superuserPassword: ""
+    superuserEmail: ""
+  keycloak:
+    adminUser: ""
+    adminPassword: ""
+    clientSecret: a-client-secret #Override in production
+  existingSecret: ""
+  storageClass: &storage_class microk8s-hostpath
+
+  
+### A Postgres database for STACKn ###
+# Here we use https://charts.bitnami.com/bitnami postgresql chart 
+
+
+# Postgres deploy with a single-pod database:
+postgresql:
+  enabled: true
+  postgresqlUsername: stackn
+  postgresqlPassword: ""
+  postgresqlDatabase: stackn
+  existingSecret: ""
+  fullnameOverride: stackn-studio-postgres
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: *storage_class
+    accessModes:
+    - ReadWriteMany
+
+# Will be added in future realease, for now keep "enabled:false"
+postgresql-ha:
+  enabled: false
 
 ### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
 ## Name: imagePullSecret
@@ -11,19 +58,18 @@ imagePullSecrets:
 ## to create a regcred
 ## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
 
-# REQUIREMENT: set a storage class with ability to serve ReadWriteMany
-# Name: storageClassName
-# Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
-# Default: hostpath (works with docker-for-desktop)
-storageClassName: microk8s-hostpath
+#Set stoargeClass
+storageClassName: *storage_class
 namespace: default
+existingSecret: ""
 
 studio:
   servicename: studio
-  debug: false
+  replicas: 1
+  debug: true
   static:
     replicas: 1
-    image: scaleoutsystems/ingress:develop
+    image: scaleoutsystems/ingress:develop #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     resources:
       limits:
         cpu: 1
@@ -32,8 +78,7 @@ studio:
         cpu: 100m
         memory: 256Mi
   image: #tell which image to deploy for studio
-    repository: scaleoutsystems/studio:master # point to the latest beta image
-    # studio.image.repository -- Select which version of Studio to deploy, default is master branch.
+    repository: scaleoutsystems/studio:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -43,115 +88,272 @@ studio:
       cpu: 400m
       memory: 2Gi
   storage:
-    StorageClassName: microk8s-hostpath
-    size: 5Gi
-      
-# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio.your-domain.com
-# domain -- Domain name, should match ingress.hosts.host
-ingress:
-  enabled: true
-  v1beta1: false
-  hosts:
-    - host: studio.your-domain.com
-    # ingress.hosts[0].host -- Ingress to Studio. Should match domain.
-  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
-  tls:
-    - secretName: prod-ingress
-    # ingress.tls[0].secretName -- The certificate should be a wildcard cert for *.your-domain.com and *.studio.your-domain.com
-      hosts:
-        - studio.your-domain.com
-
-labs:
-  ingress:
-    secretName: prod-ingress
-
-service:
-  type: ClusterIP #override if you want to use NodePort instead to access cluster services
-
-#override if you want to try out a HA (HIGH AVAILABILITY) setup.
-replicaCount: 1
-
-# override if certain resource requirements should apply
-resources: {}
-
-# override if certain nodes should be used for the deployed resources.
-nodeSelector: {}
-
-# override if declaring that some criteria is tolerated for resource co-existing.
-tolerations: []
-
-affinity: {}
+    StorageClassName: *storage_class
+    size: 2Gi
+  media:
+    storage:
+      storageClassName: *storage_class
+      size: 5Gi
+      accessModes: ReadWriteMany
+  superUser: admin
+  superuserPassword: ""
+  superuserEmail: admin@test.com
 
 celeryWorkers:
   replicas: 2
   resources:
     requests:
-      cpu: "100m"
-      memory: "1Gi"
-    limits:
-      cpu: "1000m"
-      memory: "8Gi"
-
-# Postgres default credentials for backend DB. Override for security!
-postgres:
-  image: postgres
-  db:
-    name: postgres
-    user: postgres
-    password: postgres
-  resources:
-    limits:
-      cpu: 400m
-      memory: 2Gi
-    requests:
-      cpu: 200m
+      cpu: 100m
       memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 8Gi
+
+# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
+domain: studio.<your-domain.com> 
+ingress:
+  enabled: true
+  image: #tell which image to deploy for studio
+    repository: scaleoutsystems/ingress:develop #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    pullPolicy: Always
+  annotations: {}
+  hosts:
+    - host: studio.<your-domain.com>
+
+  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
+  tls:
+    - secretName: prod-ingress
+      hosts:
+        - studio.<your-domain.com>
+
+service:
+  type: ClusterIP #override if you want to use NodePort instead to access cluster services
+
 
 # default credentials for rabbitmq. override in production!
 rabbit:
   username: admin
-  password: LJqEG9RE4FdZbVWoJzZIOQEI
+  password: ""
 
 chartcontroller:
+  enabled: false
   image:
-    repository: scaleoutsystems/chart-controller:master
-    # studio.image.repository -- Select which version of the chart controller to deploy, default is master branch.
+    repository: registry.<your-domain.com>/chart-controller:develop
     pullPolicy: Always
-  branch: master
-  resources:
-    limits:
-      cpu: 200m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 512Mi
+  branch: develop
 
 
-
+### Cluster config ###
+# kubectl config view --raw
 cluster_config: |-
-    apiVersion: v1
-    kind: Config
-    clusters:
-    - name: "local"
-      cluster:
-        server: "your.server.here"
-    users:
-    - name: "local"
-      user:
-        token: "your.token.here"
+  apiVersion: v1
+  clusters:
+  - cluster:
+      certificate-authority-data: 
+      server: <your-server-here>
+    name: <name-of-cluster>
+  contexts:
+  - context:
+      cluster: <name-of-cluster>
+      user: admin
+    name: <name-of-context>
+  current-context:
+  kind: Config
+  preferences: {}
+  users:
+  - name: admin
+    user:
+      token: <user-token-here>
 
-    contexts:
-    - name: "local"
-      context:
-        user: "local"
-        cluster: "local"
-
-    current-context: "local"
-# cluster_config -- Config file for your cluster. Should allow admin access for your namespace.
-
+# Django fixtures for defining:
+# - app categories
+# - object types (to categorize “objects”, often model objects). We might for instance want a few different 
+#   categories such as “models”, “tensorflow models”, and “FEDn Compute Packages”). An object is a pointer to a file stored in S3.
+# - Periodic Celery tasks. These are controlled from the Django database. By default, we have three tasks: One that syncs MLflow 
+#   models to STACKn objects, one that checks app statuses, and one that checks resource usage.
 fixtures: |-
-  []
+  [{
+    "model": "apps.appcategories",
+    "pk": "compute",
+    "fields": {
+      "name": "Compute_Now"
+    }
+  },
+  {
+    "model": "apps.appcategories",
+    "pk": "fedn",
+    "fields": {
+      "name": "FEDn"
+    }
+  },
+  {
+    "model": "apps.appcategories",
+    "pk": "develop",
+    "fields": {
+      "name": "Develop"
+    }
+  },
+  {
+  "model": "apps.appcategories",
+  "pk": "serve",
+  "fields": {
+    "name": "Serve"
+    }
+  },
+  {
+  "model": "apps.appcategories",
+  "pk": "store",
+  "fields": {
+    "name": "Store"
+    }
+  },
+  {
+    "model": "django_celery_beat.intervalschedule",
+    "pk": 1,
+    "fields": {
+      "every": 3,
+      "period": "seconds"
+    }
+  },
+  {
+    "model": "django_celery_beat.intervalschedule",
+    "pk": 2,
+    "fields": {
+      "every": 15,
+      "period": "seconds"
+    }
+  },
+  {
+    "model": "django_celery_beat.periodictask",
+    "pk": 1,
+    "fields": {
+      "name": "celery.backend_cleanup",
+      "task": "celery.backend_cleanup",
+      "interval": null,
+      "crontab": 1,
+      "solar": null,
+      "clocked": null,
+      "args": "[]",
+      "kwargs": "{}",
+      "queue": null,
+      "exchange": null,
+      "routing_key": null,
+      "headers": "{}",
+      "priority": null,
+      "expires": null,
+      "expire_seconds": 43200,
+      "one_off": false,
+      "start_time": null,
+      "enabled": true,
+      "last_run_at": null,
+      "total_run_count": 0,
+      "date_changed": "2021-02-26T13:49:34.038Z",
+      "description": ""
+    }
+  },
+  {
+    "model": "django_celery_beat.periodictask",
+    "pk": 2,
+    "fields": {
+      "name": "check_resource_usage",
+      "task": "apps.tasks.get_resource_usage",
+      "interval": 2,
+      "crontab": null,
+      "solar": null,
+      "clocked": null,
+      "args": "[]",
+      "kwargs": "{}",
+      "queue": null,
+      "exchange": null,
+      "routing_key": null,
+      "headers": "{}",
+      "priority": null,
+      "expires": null,
+      "expire_seconds": null,
+      "one_off": false,
+      "start_time": null,
+      "enabled": true,
+      "last_run_at": "2021-02-26T14:03:34.731Z",
+      "total_run_count": 45,
+      "date_changed": "2021-02-26T14:03:40.178Z",
+      "description": ""
+    }
+  },
+  {
+    "model": "django_celery_beat.periodictask",
+    "pk": 3,
+    "fields": {
+      "name": "check_app_status",
+      "task": "apps.tasks.check_status",
+      "interval": 1,
+      "crontab": null,
+      "solar": null,
+      "clocked": null,
+      "args": "[]",
+      "kwargs": "{}",
+      "queue": null,
+      "exchange": null,
+      "routing_key": null,
+      "headers": "{}",
+      "priority": null,
+      "expires": null,
+      "expire_seconds": null,
+      "one_off": false,
+      "start_time": null,
+      "enabled": true,
+      "last_run_at": "2021-02-26T14:03:37.169Z",
+      "total_run_count": 174,
+      "date_changed": "2021-02-26T14:03:40.168Z",
+      "description": ""
+    }
+  },
+  {
+  "model": "models.objecttype",
+  "pk": 1,
+  "fields": {
+    "name": "Model",
+    "slug": "model",
+    "apps": []
+    }
+  },
+  {
+  "model": "models.objecttype",
+  "pk": 2,
+  "fields": {
+    "name": "FEDn Client",
+    "slug": "fedn-client",
+    "apps": []
+    }
+  },
+  {
+  "model": "models.objecttype",
+  "pk": 3,
+  "fields": {
+    "name": "MLFlow Model",
+    "slug": "mlflow-model",
+    "apps": []
+    }
+  }
+  ]
+
+docker-registry:
+    enabled: false
+    ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
+        hosts:
+            - registry.<your-domain.com>
+        tls:
+            - secretName: prod-ingress
+              hosts:
+                  - registry.<your-domain.com>
+
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 2Gi
+      storageClass: *storage_class
 
 argo:
   installCRD: false
@@ -162,11 +364,11 @@ argo:
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: 1000m
         hosts:
-            - workflow.your-domain.com
+            - workflow.<your-domain.com>
         tls:
             - secretName: prod-ingress
               hosts:
-                  - workflow.your-domain.com
+                  - workflow.<your-domain.com>
 
 argo-events:
   enabled: false
@@ -189,32 +391,29 @@ openfaas:
     ingress:
       enabled: false
       hosts:
-        - host: serve.your-domain.com
+        - host: serve.<your-domain.com>
           serviceName: gateway
           servicePort: 8080
           path: /
-      #annotations: {}
       tls:
         - secretName: prod-ingress
           hosts:
-            - serve.your-domain.com
+            - serve.<your-domain.com>
 
 keycloak:
+  replicas: 1
   ingress:
     enabled: true
     annotations:
       nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
     rules:
-      - host: "keycloak.your-domain.com"
-        paths: [/]
+      - host: "keycloak.<your-domain.com>"
+        paths: 
+          - /
     tls:
       - secretName: prod-ingress
         hosts:
-          - keycloak.your-domain.com
-  persistence:
-    deployPostgres: true
-    dbVendor: postgres
-    pullPolicy: Always
+          - keycloak.<your-domain.com>
 
   extraVolumes: |
     - name: realm-secret
@@ -225,78 +424,107 @@ keycloak:
     - name: realm-secret
       mountPath: "/realm/"
       readOnly: true
-    
+
   extraEnv: |
     - name: KEYCLOAK_IMPORT
       value: /realm/realm.json
     - name: KEYCLOAK_USER
-      value: admin
+      value: '{{ include "stackn.keycloak.admin.user" .}}'
     - name: KEYCLOAK_PASSWORD
-      value: password
+      valueFrom:
+            secretKeyRef:
+              name: '{{ include "stackn.secretName" . }}'
+              key: keycloak-admin-password
     - name: PROXY_ADDRESS_FORWARDING
       value: "true"
 
+  rbac:
+    create: true
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+
   postgresql:
+    enabled: true
     postgresqlUsername: keycloak
-    postgresqlPassword: db_password
+    postgresqlPassword: ""
     postgresqlDatabase: keycloak
     persistence:
       enabled: true
-      storageClass: microk8s-hostpath
-      size: 1Gi
-
+      size: 10Gi
+      storageClass: *storage_class
+      accessModes:
+      - ReadWriteMany
+  
   args:
     - "-Dkeycloak.profile.feature.token_exchange=enabled"
 
+oidc:
+    enabled: true
+    realm: STACKn
+    client_id: studio
+    client_secret: ""
+    host: https://keycloak.<your-domain.com>
+    sign_algo: RS256
+    id_token_expiry_seconds: 180
+    verify_ssl: true #setting this to false should only be used for local development, will require flag --insecure for stackn cli  
+
 prometheus:
-  enabled: true
+  enabled: false
   server:
     ingress:
       enabled: true
       hosts:
-        - prometheus.your-domain.com
+        - prometheus.<your-domain.com>
       tls:
         - secretName: prod-ingress
           hosts:
-            - prometheus.your-domain.com
+            - prometheus.<your-domain.com>
+    persistentVolume:
+      storageClass: *storage_class
+      size: 2Gi
 
 loki-stack:
-  enabled: true
+  enabled: false
 
 grafana:
-  enabled: true
+  enabled: false
   grafana.ini:
     server:
-      domain: grafana.your-domain.com
+      domain: grafana.<your-domain.com>
       root_url: "%(protocol)s://%(domain)s/"
       serve_from_sub_path: true
   ingress:
     enabled: true
     hosts:
-      - "grafana.your-domain.com"
+      - "grafana.<your-domain.com>"
     path: "/"
 
     tls:
         - secretName: prod-ingress
           hosts:
-            - grafana.your-domain.com
+            - grafana.<your-domain.com>
 
   persistence:
     enabled: true
     type: pvc
-    size: 4Gi
-    storageClassName: microk8s-hostpath
+    size: 2Gi
+    storageClassName: *storage_class
 
-oidc:
+reloader:
   enabled: true
-  realm: STACKn
-  client_id: studio
-  client_secret: a-client-secret
-  host: https://keycloak.your-domain.com
-  sign_algo: RS256
-  id_token_expiry_seconds: 180
-  verify_ssl: true
+  namespace: default
+  reloader:
+    watchGlobally: false
 
 fedn:
   enabled: false
 
+labs:
+  ingress:
+    secretName: prod-ingress
