@@ -176,7 +176,7 @@ fixtures: |-
     "model": "apps.appcategories",
     "pk": "compute",
     "fields": {
-      "name": "Compute_Now"
+      "name": "Compute"
     }
   },
   {
