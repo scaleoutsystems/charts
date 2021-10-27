@@ -66,8 +66,7 @@ jobs:
       - name: Commit index.yaml and helm package to gh-pages
         run: |
           git pull origin gh-pages
-          git add index.yaml
-          git add stackn-*
+          git add -A
           git commit -m "Updated index.yaml and helm package"
           git push origin gh-pages
           
