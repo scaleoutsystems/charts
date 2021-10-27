@@ -2,23 +2,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    reloader.stakater.com/auto: "true"
+    kompose.cmd: kompose convert
+    kompose.version: 1.20.0 ()
+  creationTimestamp: null
   labels:
-    io.kompose.service: {{ .Release.Name }}-studio
-    name: {{ .Release.Name }}-studio
-  name: {{ .Release.Name }}-studio
+    io.kompose.service: {{ .Release.Name }}-celery-flower
+    name: {{ .Release.Name }}-celery-flower
+  name: {{ .Release.Name }}-celery-flower
 spec:
-  replicas: {{ .Values.studio.replicas }}
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-studio
+      name: {{ .Release.Name }}-celery-flower
   template:
     metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.20.0 ()
+      creationTimestamp: null
       labels:
-        io.kompose.service: {{ .Release.Name }}-studio
-        name: {{ .Release.Name }}-studio
+        io.kompose.service: {{ .Release.Name }}-celery-flower
+        name: {{ .Release.Name }}-celery-flower
     spec:
       initContainers:
         - name: wait-for-db
@@ -34,12 +40,8 @@ spec:
       containers:
       - args:
         - sh
-        - scripts/run_web.sh
+        - ./scripts/run_flower.sh
         env:
-        {{ if .Values.studio.debug }}
-        - name: DEBUG
-          value: "true"
-        {{ end }}
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_PASSWORD
@@ -52,51 +54,31 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
-
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
-        name: {{ .Release.Name }}-studio
+        name: {{ .Release.Name }}-celery-flower
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "4Gi"
+          requests:
+            cpu: "100m"
+            memory: "512Mi"
         volumeMounts:
-          - name: config
-            mountPath: "/app/chartcontroller/config/"
-            readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-          - mountPath: /app/projects/fixtures/fixtures.json
-            subPath: fixtures.json
-            name: {{ .Release.Name }}-fixtures-configmap
-          - name: mediavol
-            mountPath: /media
-        resources:
-          limits:
-            cpu: {{ .Values.studio.resources.limits.cpu }}
-            memory: {{ .Values.studio.resources.limits.memory }}
-          requests:
-            cpu: {{ .Values.studio.resources.requests.cpu }}
-            memory: {{ .Values.studio.resources.requests.memory }}
-
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       restartPolicy: Always
       volumes:
-      - name: config
-        secret:
-          secretName: {{ .Release.Name }}-chart-controller-secret
       - name: {{ .Release.Name}}-settings-configmap
         configMap:
           name: {{ .Release.Name}}-settings-configmap
           items:
           - key: settings.py
             path: settings.py
-      - name: {{ .Release.Name }}-fixtures-configmap
-        configMap:
-          name: {{ .Release.Name }}-fixtures-configmap
-          items:
-          - key: fixtures.json
-            path: fixtures.json
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-studio-media
+
+status: {}

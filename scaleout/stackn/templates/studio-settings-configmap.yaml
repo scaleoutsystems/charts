@@ -24,6 +24,12 @@ data:
 
     PROJECT_ROLES = ['guest', 'member', 'admin']
 
+    {{ if .Values.ingress.v1beta1 }}
+    INGRESS_V1BETA1 = True
+    {{ else }}
+    INGRESS_V1BETA1 = False
+    {{ end }}
+
     # Permissions
 
     # Project settings
@@ -46,11 +52,13 @@ data:
     KC_URL = "{{ .Values.oidc.host }}"
     KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
     OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
-    OIDC_RP_CLIENT_SECRET = {{ .Values.oidc.client_secret | quote }}
+    OIDC_RP_CLIENT_SECRET = {{ include "stackn.oidc.clientsecret" . | quote }}
     OIDC_OP_REALM_AUTH = "{{ .Values.oidc.host }}/auth/realms"
-    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/auth"
-    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/token"
-    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/userinfo"
+    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/auth"
+    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/token"
+    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/userinfo"
+    OIDC_OP_LOGOUT_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/logout"
+    OIDC_OP_LOGOUT_URL_METHOD = 'studio.OIDClogout.keycloak_logout'
     OIDC_STORE_ACCESS_TOKEN = True
     OIDC_STORE_ID_TOKEN = True
     {{ if eq .Values.oidc.verify_ssl false }}
@@ -64,7 +72,7 @@ data:
     LOGIN_REDIRECT_URL = "/projects"
     LOGOUT_REDIRECT_URL = "/"
     OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
-    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/STACKn/protocol/openid-connect/certs"
+    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/certs"
     {{ end }}
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
@@ -85,8 +93,12 @@ data:
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = 'pyey3^@n)$id1tc3_g7xcb55n7ii1989jy#&%!yk^z(u1us4@*'
 
-    # SECURITY WARNING: don't run with debug turned on in production!
+    # SECURITY WARNING: don't run with debug turned on in production
+    {{ if .Values.studio.debug }}
     DEBUG = True
+    {{ else }}
+    DEBUG = False
+    {{ end }}
 
     if DEBUG:
         ALLOWED_HOSTS = ['*']
@@ -115,17 +127,23 @@ data:
         'ingress',
         'api',
         'projects',
-        'labs',
         'models',
         'monitor',
         'reports',
         'files',
         'datasets',
         'workflows',
-        'experiments',
         'deployments',
-        'bootstrap_modal_forms'
+        'bootstrap_modal_forms',
+        'studio_admin',
+        'apps',
+        'portal',
+        'django_celery_beat',
+        'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+        'channels',
     ]
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -145,6 +163,7 @@ data:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'corsheaders.middleware.CorsMiddleware',
+        'django_plotly_dash.middleware.BaseMiddleware'
     ]
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -178,6 +197,7 @@ data:
     ]
 
     WSGI_APPLICATION = 'studio.wsgi.application'
+    ASGI_APPLICATION = 'studio.asgi.application'
 
     # Lab settings
     LABS = {
@@ -193,11 +213,11 @@ data:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '{{ .Values.postgres.db.name }}',
-            'USER': '{{ .Values.postgres.db.user}}',
-            'PASSWORD': '{{ .Values.postgres.db.password}}',
-            'HOST': '{{ .Release.Name }}-studio-db',
-            'PORT': 5432,
+            'NAME': '{{ include "stackn.postgres.name" . }}',
+            'USER': '{{ include "stackn.postgres.user" . }}',
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': '{{ include "stackn.postgres.host" . }}',
+            'PORT': {{ include "stackn.postgres.port" . }},
         }
     }
 
@@ -241,7 +261,7 @@ data:
     STATIC_ROOT = os.path.join(REPO_DIR, 'static/')
 
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(REPO_DIR, 'media/')
+    MEDIA_ROOT = '/media/'
 
     import socket
 
@@ -267,7 +287,16 @@ data:
     REDIS_DB = 0
     REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis')
 
-    CELERY_BROKER_URL = 'amqp://{{ .Values.rabbit.username }}:{{ .Values.rabbit.password }}@{{ .Release.Name }}-rabbit:5672//'
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [(REDIS_HOST, REDIS_PORT),],
+            },
+        },
+    }
+
+    CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ .Release.Name }}-rabbit:5672//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'

@@ -1,5 +1,5 @@
-{{- if .Values.ingress.enabled -}}
-apiVersion: extensions/v1beta1
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
@@ -10,6 +10,7 @@ metadata:
   labels:
     io.kompose.service: {{ .Release.Name }}-ingress
 spec:
+  # ingressClassName: public
   {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -27,11 +28,32 @@ spec:
         paths:
         - path: /
           backend:
-            serviceName: {{ $.Release.Name }}-studio
-            servicePort: 8080
+            service:
+              name: {{ $.Release.Name }}-studio
+              port:
+                number: 8080
+          pathType: ImplementationSpecific
         - path: /static/
           backend:
-            serviceName: {{ $.Release.Name }}-studio
-            servicePort: 8080
+            service:
+            {{ if $.Values.studio.debug }}
+              name: {{ $.Release.Name }}-studio
+              port:
+                number: 8080
+            {{ else }}
+              name: {{ $.Release.Name }}-static
+              port:
+                number: 8081
+            {{ end }}
+          pathType: ImplementationSpecific
+        - path: /media/
+          backend:
+            service:
+              name: {{ $.Release.Name }}-static
+              port:
+                number: 8081
+          pathType: ImplementationSpecific
   {{- end }}
 {{- end }}
+
+
