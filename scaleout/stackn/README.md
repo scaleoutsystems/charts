@@ -1,41 +1,43 @@
-stackn
+STACKn 
 ======
 
 ## Description
 
 A Helm chart for deploying STACKn by Scaleout
 
-Current chart version is 0.0.1
+Current chart version is 0.1.0
 
 ## Chart Requirements
 
-| Repository | Name | Version |
-|------------|------|---------|
+| Repository | Name | Version | Note |
+|------------|------|---------|------|
 | https://codecentric.github.io/helm-charts | keycloak | 9.0.1 |
-| https://kubernetes-charts.storage.googleapis.com | docker-registry | 1.9.1 |
+| https://kubernetes-charts.storage.googleapis.com | docker-registry | 1.9.1 | optional
+| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 | 
+| https://stakater.github.io/stakater-charts | reloader | 0.0.86 |
+| https://prometheus-community.github.io/helm-charts | prometheus| 13.8.0 | optional 
+| https://grafana.github.io/helm-charts | grafana | 6.8.4 | optional
+| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 | optional  
+
 
 ## Configuration
 
 You will need to change some of the default values:
 
-`your-domain.com` should be replaced with your actual domain name everywhere.
-
-<!-- `domain`, `ingress.hosts[0].host`, and `ingress.tls[0].hosts` should point to Studio and should be the same (e.g. studio.your-domain.com)
-
-`keycloak.ingress.rules[0].host` needs to be updated with your domain, e.g. keycloak.your-domain.com. It should have the same value as `oidc.host`. -->
+`<your-domain.com>` should be replaced with your actual domain name everywhere.
 
 `cluster_config` should be updated with the config file for your cluster. You need to have admin access to the namespace in which STACKn is to be deployed.
 
 You might have to update `storageClassName`, `storageClass`, and `namespace`, depending on your cluster setup.
 
+## Deploy locally without SSL certificates
+For local testing/development set `oidc.verify = false`, this will enable insecure options in STACKn without certificates.
 ## Deploy an SSL certificate
 
-You need a domain name with a wildcard SSL certificate. If your domain is your-domain.com, you will need a certificate for *.your-domain.com and *.studio.your-domain.com. Assuming that your certificate is fullchain.pem and your private key privkey.pem, you can create a secret `prod-ingress` containing the certificate with the command:
+For production you need a domain name with a wildcard SSL certificate. If your domain is your-domain.com, you will need a certificate for *.your-domain.com and *.studio.your-domain.com. Assuming that your certificate is fullchain.pem and your private key privkey.pem, you can create a secret `prod-ingress` containing the certificate with the command:
 ```
 kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 ```
-An alternative is to deploy STACKn without a certificate, but you will then receive warnings from your browser, and the command-line tool will not work properly. To deploy without SSL, simply comment out the corresponding lines in your `values.yaml`.
-
 ## Chart Values
 
 | Key | Type | Default | Description |
