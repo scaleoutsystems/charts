@@ -1,4 +1,4 @@
-STACKn 
+STACKn
 ======
 
 ## Description
@@ -9,16 +9,15 @@ Current chart version is 0.1.0
 
 ## Chart Requirements
 
-| Repository | Name | Version | Note |
-|------------|------|---------|------|
-| https://codecentric.github.io/helm-charts | keycloak | 9.0.1 |
-| https://kubernetes-charts.storage.googleapis.com | docker-registry | 1.9.1 | optional
-| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 | 
-| https://stakater.github.io/stakater-charts | reloader | 0.0.86 |
-| https://prometheus-community.github.io/helm-charts | prometheus| 13.8.0 | optional 
-| https://grafana.github.io/helm-charts | grafana | 6.8.4 | optional
-| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 | optional  
-
+| Repository | Name | Version |
+|------------|------|---------|
+| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 |
+| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 |
+| https://codecentric.github.io/helm-charts | keycloak | 10.1.0 |
+| https://grafana.github.io/helm-charts | grafana | 6.8.4 |
+| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 |
+| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 |
+| https://stakater.github.io/stakater-charts | reloader | v0.0.86 |
 
 ## Configuration
 
@@ -38,111 +37,155 @@ For production you need a domain name with a wildcard SSL certificate. If your d
 ```
 kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 ```
-## Chart Values
+
+## Global values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| argo-events.enabled | bool | `false` |  |
-| argo-events.installCRD | bool | `false` |  |
-| argo-events.namespace | string | `"argo-events"` |  |
-| argo-events.singleNamespace | bool | `false` |  |
-| argo.enabled | bool | `false` |  |
-| argo.installCRD | bool | `false` |  |
-| argo.ui.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"1000m"` |  |
-| argo.ui.ingress.enabled | bool | `true` |  |
-| argo.ui.ingress.hosts[0] | string | `"workflow.your-domain.com"` |  |
-| argo.ui.ingress.tls[0].hosts[0] | string | `"workflow.your-domain.com"` |  |
-| argo.ui.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| chartcontroller.branch | string | `"master"` |  |
+| global.existingSecret | string | `""` |  |
+| global.keycloak.adminPassword | string | `""` |  |
+| global.keycloak.adminUser | string | `""` |  |
+| global.keycloak.clientSecret | string | `"a-client-secret"` | Overwrite this value for production |
+| global.storageClass | string | `"microk8s-hostpath"` |  |
+| global.studio.superUser | string | `""` |  |
+| global.studio.superuserEmail | string | `""` |  |
+| global.studio.superuserPassword | string | `""` |  |
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| celeryWorkers.replicas | int | `2` |  |
+| celeryWorkers.resources.limits.cpu | string | `"1000m"` |  |
+| celeryWorkers.resources.limits.memory | string | `"8Gi"` |  |
+| celeryWorkers.resources.requests.cpu | string | `"100m"` |  |
+| celeryWorkers.resources.requests.memory | string | `"1Gi"` |  |
+| chartcontroller.branch | string | `"develop"` |  |
+| chartcontroller.enabled | bool | `false` |  |
 | chartcontroller.image.pullPolicy | string | `"Always"` |  |
-| chartcontroller.image.repository | string | `"scaleoutsystems/chart-controller:master"` |  |
-| chartcontroller.resources.limits.cpu | string | `"200m"` |  |
-| chartcontroller.resources.limits.memory | string | `"512Mi"` |  |
-| chartcontroller.resources.requests.cpu | string | `"200m"` |  |
-| chartcontroller.resources.requests.memory | string | `"512Mi"` |  |
-| cluster_config | string | `"apiVersion: v1\nkind: Config\nclusters:\n- name: \"local\"\n  cluster:\n    server: \"your.server.here\"\nusers:\n- name: \"local\"\n  user:\n    token: \"your.token.here\"\n\ncontexts:\n- name: \"local\"\n  context:\n    user: \"local\"\n    cluster: \"local\"\n\ncurrent-context: \"local\""` | Config file for your cluster. Should allow admin access for your namespace. |
-| docker-registry.enabled | bool | `true` |  |
-| docker-registry.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"5500m"` |  |
-| docker-registry.ingress.enabled | bool | `false` |  |
-| docker-registry.ingress.hosts[0] | string | `"registry.your-domain.com"` |  |
-| docker-registry.ingress.tls[0].hosts[0] | string | `"registry.your-domain.com"` |  |
+| chartcontroller.image.repository | string | `"registry.<your-domain.com>/chart-controller:develop"` |  |
+| cluster_config | string | `""` | Config file for your cluster. Should allow admin access for your namespace. |
+| docker-registry.enabled | bool | `false` |  |
+| docker-registry.ingress.enabled | bool | `true` |  |
+| docker-registry.ingress.hosts[0] | string | `"registry.<your-domain.com>"` |  |
+| docker-registry.ingress.tls[0].hosts[0] | string | `"registry.<your-domain.com>"` |  |
 | docker-registry.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
 | docker-registry.persistence.accessMode | string | `"ReadWriteOnce"` |  |
 | docker-registry.persistence.enabled | bool | `true` |  |
-| docker-registry.persistence.size | string | `"4Gi"` |  |
+| docker-registry.persistence.size | string | `"2Gi"` |  |
 | docker-registry.persistence.storageClass | string | `"microk8s-hostpath"` |  |
-| domain | string | `"studio.your-domain.com"` | Domain name, should match ingress.hosts.host |
+| domain | string | `"studio.<your-domain.com>"` |  |
+| existingSecret | string | `""` |  |
 | fedn.enabled | bool | `false` |  |
-| fixtures | string | `"[]"` |  |
+| fixtures | string | `""` |  |
+| grafana."grafana.ini".server.domain | string | `"grafana.<your-domain.com>"` |  |
+| grafana."grafana.ini".server.root_url | string | `"%(protocol)s://%(domain)s/"` |  |
+| grafana."grafana.ini".server.serve_from_sub_path | bool | `true` |  |
+| grafana.enabled | bool | `false` |  |
+| grafana.ingress.enabled | bool | `true` |  |
+| grafana.ingress.hosts[0] | string | `"grafana.<your-domain.com>"` |  |
+| grafana.ingress.path | string | `"/"` |  |
+| grafana.ingress.tls[0].hosts[0] | string | `"grafana.<your-domain.com>"` |  |
+| grafana.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
+| grafana.persistence.enabled | bool | `true` |  |
+| grafana.persistence.size | string | `"2Gi"` |  |
+| grafana.persistence.storageClassName | string | `"microk8s-hostpath"` |  |
+| grafana.persistence.type | string | `"pvc"` |  |
 | imagePullSecrets[0].name | string | `"regcred"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `true` |  |
-| ingress.hosts[0].host | string | `"studio.your-domain.com"` | Ingress to Studio. Should match domain. setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate. |
+| ingress.hosts[0].host | string | `"studio.<your-domain.com>"` |  |
 | ingress.image.pullPolicy | string | `"Always"` |  |
-| ingress.image.repository | string | `"scaleoutsystems/ingress:master"` |  |
-| ingress.tls[0].hosts[0] | string | `"studio.your-domain.com"` |  |
-| ingress.tls[0].secretName | string | `"prod-ingress"` | The certificate should be a wildcard cert for *.your-domain.com and *.studio.your-domain.com |
-| keycloak.extraEnv | string | `"- name: KEYCLOAK_IMPORT\n  value: /realm/realm.json\n- name: KEYCLOAK_USER\n  value: admin\n- name: KEYCLOAK_PASSWORD\n  value: password\n- name: PROXY_ADDRESS_FORWARDING\n  value: \"true\"\n"` |  |
+| ingress.image.repository | string | `"scaleoutsystems/ingress:develop"` |  |
+| ingress.tls[0].hosts[0] | string | `"studio.<your-domain.com>"` |  |
+| ingress.tls[0].secretName | string | `"prod-ingress"` |  |
+| keycloak.args[0] | string | `"-Dkeycloak.profile.feature.token_exchange=enabled"` |  |
+| keycloak.extraEnv | string | `""` |  |
 | keycloak.extraVolumeMounts | string | `"- name: realm-secret\n  mountPath: \"/realm/\"\n  readOnly: true\n"` |  |
 | keycloak.extraVolumes | string | `"- name: realm-secret\n  secret:\n    secretName: realm-secret\n"` |  |
 | keycloak.ingress.enabled | bool | `true` |  |
-| keycloak.ingress.rules[0].host | string | `"keycloak.your-domain.com"` |  |
+| keycloak.ingress.rules[0].host | string | `"keycloak.<your-domain.com>"` |  |
 | keycloak.ingress.rules[0].paths[0] | string | `"/"` |  |
-| keycloak.ingress.tls[0].hosts[0] | string | `"keycloak.your-domain.com"` |  |
+| keycloak.ingress.tls[0].hosts[0] | string | `"keycloak.<your-domain.com>"` |  |
 | keycloak.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| keycloak.persistence.dbVendor | string | `"postgres"` |  |
-| keycloak.persistence.deployPostgres | bool | `true` |  |
-| keycloak.persistence.pullPolicy | string | `"Always"` |  |
+| keycloak.postgresql.enabled | bool | `true` |  |
+| keycloak.postgresql.persistence.accessModes[0] | string | `"ReadWriteMany"` |  |
 | keycloak.postgresql.persistence.enabled | bool | `true` |  |
-| keycloak.postgresql.persistence.size | string | `"1Gi"` |  |
+| keycloak.postgresql.persistence.size | string | `"10Gi"` |  |
 | keycloak.postgresql.persistence.storageClass | string | `"microk8s-hostpath"` |  |
 | keycloak.postgresql.postgresqlDatabase | string | `"keycloak"` |  |
-| keycloak.postgresql.postgresqlPassword | string | `"db_password"` |  |
+| keycloak.postgresql.postgresqlPassword | string | `""` |  |
 | keycloak.postgresql.postgresqlUsername | string | `"keycloak"` |  |
+| keycloak.rbac.create | bool | `true` |  |
+| keycloak.rbac.rules[0].apiGroups[0] | string | `""` |  |
+| keycloak.rbac.rules[0].resources[0] | string | `"pods"` |  |
+| keycloak.rbac.rules[0].verbs[0] | string | `"get"` |  |
+| keycloak.rbac.rules[0].verbs[1] | string | `"list"` |  |
+| keycloak.replicas | int | `1` |  |
 | labs.ingress.secretName | string | `"prod-ingress"` |  |
+| loki-stack.enabled | bool | `false` |  |
 | namespace | string | `"default"` |  |
-| nodeSelector | object | `{}` |  |
 | oidc.client_id | string | `"studio"` |  |
-| oidc.client_secret | string | `"a-client-secret"` |  |
+| oidc.client_secret | string | `""` |  |
 | oidc.enabled | bool | `true` |  |
-| oidc.host | string | `"https://keycloak.your-domain.com"` |  |
+| oidc.host | string | `"https://keycloak.<your-domain.com>"` |  |
+| oidc.id_token_expiry_seconds | int | `180` |  |
 | oidc.realm | string | `"STACKn"` |  |
 | oidc.sign_algo | string | `"RS256"` |  |
-| openfaas.async | bool | `true` |  |
-| openfaas.basic_auth | bool | `false` |  |
-| openfaas.enabled | bool | `false` |  |
-| openfaas.exposeServices | bool | `false` |  |
-| openfaas.functionNamespace | string | `"stack-fn"` |  |
-| openfaas.ingress.enabled | bool | `false` |  |
-| openfaas.ingress.hosts[0].host | string | `"serve.your-domain.com"` |  |
-| openfaas.ingress.hosts[0].path | string | `"/"` |  |
-| openfaas.ingress.hosts[0].serviceName | string | `"gateway"` |  |
-| openfaas.ingress.hosts[0].servicePort | int | `8080` |  |
-| openfaas.ingress.tls[0].hosts[0] | string | `"serve.your-domain.com"` |  |
-| openfaas.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| openfaas.operator.create | bool | `true` |  |
-| openfaas.psp | bool | `false` |  |
-| openfaas.rbac | bool | `false` |  |
-| openfaas.securityContext | bool | `true` |  |
-| postgres.db.name | string | `"postgres"` |  |
-| postgres.db.password | string | `"postgres"` |  |
-| postgres.db.user | string | `"postgres"` |  |
-| postgres.resources.limits.cpu | string | `"400m"` |  |
-| postgres.resources.limits.memory | string | `"2Gi"` |  |
-| postgres.resources.requests.cpu | string | `"200m"` |  |
-| postgres.resources.requests.memory | string | `"1Gi"` |  |
-| rabbit.password | string | `"LJqEG9RE4FdZbVWoJzZIOQEI"` |  |
+| oidc.verify_ssl | bool | `true` |  |
+| postgresql-ha.enabled | bool | `false` |  |
+| postgresql.enabled | bool | `true` |  |
+| postgresql.existingSecret | string | `""` |  |
+| postgresql.fullnameOverride | string | `"stackn-studio-postgres"` |  |
+| postgresql.persistence.accessModes[0] | string | `"ReadWriteMany"` |  |
+| postgresql.persistence.enabled | bool | `true` |  |
+| postgresql.persistence.size | string | `"20Gi"` |  |
+| postgresql.persistence.storageClass | string | `"microk8s-hostpath"` |  |
+| postgresql.postgresqlDatabase | string | `"stackn"` |  |
+| postgresql.postgresqlPassword | string | `""` |  |
+| postgresql.postgresqlUsername | string | `"stackn"` |  |
+| prometheus.enabled | bool | `false` |  |
+| prometheus.server.ingress.enabled | bool | `true` |  |
+| prometheus.server.ingress.hosts[0] | string | `"prometheus.<your-domain.com>"` |  |
+| prometheus.server.ingress.tls[0].hosts[0] | string | `"prometheus.<your-domain.com>"` |  |
+| prometheus.server.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
+| prometheus.server.persistentVolume.size | string | `"2Gi"` |  |
+| prometheus.server.persistentVolume.storageClass | string | `"microk8s-hostpath"` |  |
+| rabbit.password | string | `""` |  |
 | rabbit.username | string | `"admin"` |  |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
+| reloader.enabled | bool | `true` |  |
+| reloader.namespace | string | `"default"` |  |
+| reloader.reloader.watchGlobally | bool | `false` |  |
 | service.type | string | `"ClusterIP"` |  |
 | storageClassName | string | `"microk8s-hostpath"` |  |
+| studio.debug | bool | `true` |  |
 | studio.image.pullPolicy | string | `"Always"` |  |
-| studio.image.repository | string | `"scaleoutsystems/studio:master"` | Select which version of the chart controller to deploy, default is master branch. |
+| studio.image.repository | string | `"scaleoutsystems/studio:develop"` |  |
+| studio.media.storage.accessModes | string | `"ReadWriteMany"` |  |
+| studio.media.storage.size | string | `"5Gi"` |  |
+| studio.media.storage.storageClassName | string | `"microk8s-hostpath"` |  |
+| studio.replicas | int | `1` |  |
 | studio.resources.limits.cpu | string | `"1000m"` |  |
 | studio.resources.limits.memory | string | `"4Gi"` |  |
 | studio.resources.requests.cpu | string | `"400m"` |  |
 | studio.resources.requests.memory | string | `"2Gi"` |  |
 | studio.servicename | string | `"studio"` |  |
-| tolerations | list | `[]` |  |
+| studio.static.image | string | `"scaleoutsystems/ingress:develop"` |  |
+| studio.static.replicas | int | `1` |  |
+| studio.static.resources.limits.cpu | int | `1` |  |
+| studio.static.resources.limits.memory | string | `"512Mi"` |  |
+| studio.static.resources.requests.cpu | string | `"100m"` |  |
+| studio.static.resources.requests.memory | string | `"256Mi"` |  |
+| studio.storage.StorageClassName | string | `"microk8s-hostpath"` |  |
+| studio.storage.size | string | `"2Gi"` |  |
+| studio.superUser | string | `"admin"` |  |
+| studio.superuserEmail | string | `"admin@test.com"` |  |
+| studio.superuserPassword | string | `""` |  |
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Morgan Ekmefjord | morgan@scaleoutsystems.com |  |
+| Fredrik Wrede | fredrik@scaleoutsystems.com |  |
+| Matteo Carone | matteo@scaleoutsystems.com |  |
