@@ -2,15 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.20.0 ()
-  creationTimestamp: null
+    reloader.stakater.com/auto: "true"
   labels:
     io.kompose.service: {{ .Release.Name }}-celery-worker
     name: {{ .Release.Name }}-celery-worker
   name: {{ .Release.Name }}-celery-worker
 spec:
-  replicas: 2
+  replicas: {{ .Values.celeryWorkers.replicas | default 2 }}
   strategy:
     type: Recreate
   selector:
@@ -26,6 +24,17 @@ spec:
         io.kompose.service: {{ .Release.Name }}-celery-worker
         name: {{ .Release.Name }}-celery-worker
     spec:
+      initContainers:
+        - name: wait-for-db
+          image: postgres
+          command: ['sh', '-c', 'until pg_isready --host={{ include "stackn.postgres.host" . }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ include "stackn.postgres.port" . }}; do echo waiting for database; sleep 2; done;']
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
       containers:
       - args:
         - sh
@@ -33,31 +42,52 @@ spec:
         env:
         - name: GET_HOSTS_FROM
           value: dns
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.postgres.secretName" . }}
+              key: postgresql-password
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: rabbit-password
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         name: {{ .Release.Name }}-celery-worker
         resources:
           limits:
-            cpu: "500m"
-            memory: "2Gi"
+            cpu: {{ .Values.celeryWorkers.resources.limits.cpu }}
+            memory: {{ .Values.celeryWorkers.resources.limits.memory }}
           requests:
-            cpu: "100m"
-            memory: "256Mi"
+            cpu: {{ .Values.celeryWorkers.resources.requests.cpu }}
+            memory: {{ .Values.celeryWorkers.resources.requests.memory }}
         volumeMounts:
+          - name: config
+            mountPath: "/app/chartcontroller/config/"
+            readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
+          - name: mediavol
+            mountPath: /media
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       restartPolicy: Always
       volumes:
+      - name: config
+        secret:
+          secretName: {{ .Release.Name }}-chart-controller-secret
       - name: {{ .Release.Name}}-settings-configmap
         configMap:
           name: {{ .Release.Name}}-settings-configmap
           items:
           - key: settings.py
             path: settings.py
+      - name: mediavol
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-studio-media
 
 status: {}
