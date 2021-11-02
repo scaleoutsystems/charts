@@ -3,7 +3,7 @@ name: Release Helm charts
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   sync-branch:
@@ -16,7 +16,7 @@ jobs:
         uses: devmasx/merge-branch@v1.3.1
         with:
           type: now
-          from_branch: master
+          from_branch: main
           target_branch: gh-pages
           github_token: ${{ secrets.CR_TOKEN }}
   
