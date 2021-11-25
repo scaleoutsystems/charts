@@ -17,13 +17,11 @@ data:
     """
 
     import os
-    import sys
+
+
 
     AUTHENTICATION_BACKENDS = [
-    'social_core.backends.github.GithubOAuth2',
-    'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-    'guardian.backends.ObjectPermissionBackend',
+        'django.contrib.auth.backends.ModelBackend',
     ]
 
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -54,49 +52,40 @@ data:
 
     # Application definition
 
-    # Application definition
-    DEFAULT_APPS = [
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'django_filters',
+        'corsheaders',
+        'rest_framework',
+        'rest_framework.authtoken',
+        'api',
+        'monitor',
+        'projects',
+        'models',
+        'deployments',
+        'apps',
+        'portal',
+        'tagulous',
+        'django_celery_beat',
+        'oauth2_provider',
     ]
-
-    THIRD_PARTY_APPS = [
-    # add apps which you install using pip
-    "crispy_forms",
-    'corsheaders',
-    'django_celery_beat',
-    'django_extensions',    # for executing runscript among others
-    'django_filters',
-    'oauth2_provider',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'social_django',
-    'tagulous',
-    'guardian',
-    ]
-
-    LOCAL_APPS = [
-    # add local apps which you create using startapp
-    'api',
-    'apps',
-    'common',
-    'deployments',
-    'monitor',
-    'models',
-    'projects',
-    'portal',
-    ]
-
-    # # Application definition
-    INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
     OAUTH2_PROVIDER = {
     # this is the list of available scopes
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+    }
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework.authentication.TokenAuthentication',
+            #'rest_framework.permissions.IsAuthenticated',
+            'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        ],
     }
 
     MIDDLEWARE = [
@@ -108,47 +97,11 @@ data:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'corsheaders.middleware.CorsMiddleware',
-        'social_django.middleware.SocialAuthExceptionMiddleware',   # Add
     ]
-
-    REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework.authentication.TokenAuthentication',
-            #'rest_framework.permissions.IsAuthenticated',
-            'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        ],
-    }
-
-    # Django guardian 403 templates
-    GUARDIAN_RENDER_403 = True
-    GUARDIAN_TEMPLATE_403 = '403.html'
-
-    # Main Url conf for loading all the routing path in Studio
-    ROOT_URLCONF = 'studio.urls'
-
-    # IMPORTANT: Must be encrypted as secrets in K8S
-    # Github
-    SOCIAL_AUTH_GITHUB_KEY = 'to-be-fetched-from-k8s-secrets'
-    SOCIAL_AUTH_GITHUB_SECRET = 'to-be-fetched-from-k8s-secrets'
-    SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']   # Ask for the user's email
-
-    # Google
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'to-be-fetched-from-k8s-secrets'
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'to-be-fetched-from-k8s-secrets'
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['user:email']    # Ask for the user's email
-
-    # Tagulous serialization settings
-    SERIALIZATION_MODULES = {
-        'xml':    'tagulous.serializers.xml_serializer',
-        'json':   'tagulous.serializers.json',
-        'python': 'tagulous.serializers.python',
-        'yaml':   'tagulous.serializers.pyyaml',
-    }
 
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        # other finders
         'compressor.finders.CompressorFinder',
     )
 
@@ -181,6 +134,7 @@ data:
 
     WSGI_APPLICATION = 'studio.wsgi.application'
     ASGI_APPLICATION = 'studio.asgi.application'
+    
 
     # Database
     # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -188,11 +142,11 @@ data:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '{{ .Values.postgresql.global.postgresql.auth.database }}',
-            'USER': '{{ .Values.postgresql.global.postgresql.auth.username }}',
+            'NAME': '{{ .Values.postgresql.postgresqlDatabase }}',
+            'USER': '{{ .Values.postgresql.postgresqlUsername }}',
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
             'HOST': '{{ .Values.postgresql.fullnameOverride }}',
-            'PORT': '{{ .Values.postgresql.primary.service.ports.postgresql }}',
+            'PORT': '{{ .Values.postgresql.service.port }}',
         }
     }
 
@@ -231,11 +185,29 @@ data:
     MEDIA_URL = {{ .Values.studio.media.mount_path | quote }}
     MEDIA_ROOT = {{ .Values.studio.media.mount_path | quote }}
 
-    # Related to user registration and authetication workflow
-    LOGIN_REDIRECT_URL = '/'
-    LOGIN_URL = 'login'
-    LOGOUT_URL = 'logout'
-    INACTIVE_USERS = False
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = '/media/'
+
+    import socket
+
+    # TODO remove after refactor
+    #API_HOSTNAME = 'localhost'
+    #API_PORT = 8080
+
+    #GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
+    #GIT_REPOS_URL = '/repos/'
+
+    #LOKI_SVC = 'http://{{ .Release.Name }}-loki:3100'
+    #PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
+    #CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
+
+    REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
+    STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
+
+    try:
+        from .settings_local import *
+    except ImportError as e:
+        pass
 
     # Specific to Studio stack:
     # Redis settings
@@ -261,32 +233,11 @@ data:
     # For Model Objects creation (check models/models.py, pre_save_model() )
     VERSION_BACKEND = 'studio.version.Version'
 
-    # Other Helm/k8s deployment settings
-    CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller' #Not used
-    CHART_FOLDER = "/app/charts/apps"
     EXTERNAL_KUBECONF = True
-    KUBECONFIG = {{ .Values.studio.kubeconfig_file | quote }}
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
-    #PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
-    REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
-    STORAGECLASS = {{ include "stackn.studio.storageclass" . | quote }}
+    STORAGECLASS = {{ .Values.storageClassName | default "aws-efs" | quote }}
     
-    # Local dependecies Models
-    PROJECTS_MODEL = 'projects.Project'
-    APPINSTANCE_MODEL = 'apps.AppInstance'
-    APPS_MODEL = 'apps.Apps'
-    APPCATEGORIES_MODEL = 'apps.AppCategories'
-    MODELS_MODEL = 'models.Model'
-
-    # App statuses
-    APPS_STATUS_SUCCESS = ['Running', 'Succeeded', 'Success']
-    APPS_STATUS_WARNING = ['Pending', 'Installed',
-                        'Waiting', 'Installing', 'Created']
-
-    DOMAIN = {{ .Values.domain | quote }}
-    AUTH_DOMAIN = '{{ .Release.Name }}-studio.default.svc.cluster.local'
-    AUTH_PROTOCOL = 'http'
-    STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
-    # To enable sticky sessions for k8s ingress
-    SESSION_COOKIE_DOMAIN = {{ .Values.session_cookie_domain | quote }}
-    
+    try:
+        from .settings_local import *
+    except ImportError as e:
+        pass

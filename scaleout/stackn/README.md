@@ -11,13 +11,14 @@ Current chart version is 0.2.0
 
 ## Chart Requirements
 
-| Repository | Name | Version | Optional |
-|------------|------|---------|----------|
-| https://charts.bitnami.com/bitnami | postgresql | 11.6.14 | No
-| https://charts.bitnami.com/bitnami | postgresql-ha | 9.2.0 | Yes
-| https://grafana.github.io/helm-charts | grafana | 6.8.4 | Yes
-| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 | Yes
-| https://stakater.github.io/stakater-charts | reloader | v0.0.86 | No
+| Repository | Name | Version |
+|------------|------|---------|
+| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 |
+| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 |
+| https://grafana.github.io/helm-charts | grafana | 6.8.4 |
+| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 |
+| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 |
+| https://stakater.github.io/stakater-charts | reloader | v0.0.86 |
 
 ## Configuration
 
@@ -52,19 +53,11 @@ Minimal requirement: `global.postgresql.storageClass`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.studio.existingSecret | string | `""` | Use existing secret. See basic-secrets.yaml. |
-| global.studio.storageClass | string | `""` | StorageClassName for PVC. Overrides `studio.storage.storageClass`. If `studio.storage.storageClass` is unset (default) will inherent from `global.postgresql.storageClass`  |
-| global.studio.superUser | string | `admin` | Django superUser. Obs will always be `admin` until fixed. |
-| global.studio.superuserEmail | string | `'admin@test.com'` | Django superUser email. Obs will always be `admin@test.com` until fixed. |
-| global.studio.superuserPassword | string | `""` | Django superUser password. If left empty, will generate. |
-| global.postgresql.auth.username | string | `stackn` | Postgres user will be created |
-| global.postgresql.auth.password | string | `""` | Postgres password for user above. If empty, will be generated and stored in secret `stackn-studio-postgres` |
-| global.postgresql.auth.database | string | `stackn` | Postgres database will be created |
-| global.postgresql.auth.postgresPassword | string | `""` | Postgres password for postgres user If empty, will be generated and stored in secret `stackn-studio-postgres` |
-| global.postgresql.auth.existingSecret | string | `""` | will not create secret `stackn-studio-postgres`. Instead use existing secret for postgres|
-| global.postgresql.storageClass | string | `""` | StorageClassName for PVC |
-
-
+| global.existingSecret | string | `""` |  |
+| global.storageClass | string | `"microk8s-hostpath"` |  |
+| global.studio.superUser | string | `""` |  |
+| global.studio.superuserEmail | string | `""` |  |
+| global.studio.superuserPassword | string | `""` |  |
 
 ## Values
 
@@ -117,6 +110,8 @@ Minimal requirement: `kubeconfig`
 | ingress.image.repository | string | `"scaleoutsystems/ingress:develop"` |  |
 | ingress.tls[0].hosts[0] | string | `"studio.<your-domain.com>"` |  |
 | ingress.tls[0].secretName | string | `"prod-ingress"` |  |
+| labs.ingress.secretName | string | `"prod-ingress"` |  |
+| loki-stack.enabled | bool | `false` |  |
 | namespace | string | `"default"` |  |
 | postgresql-ha.enabled | bool | `false` |  |
 | postgresql.enabled | bool | `true` |  |
