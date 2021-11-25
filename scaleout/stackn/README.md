@@ -13,7 +13,6 @@ Current chart version is 0.1.0
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | postgresql | 10.4.2 |
 | https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 |
-| https://codecentric.github.io/helm-charts | keycloak | 10.1.0 |
 | https://grafana.github.io/helm-charts | grafana | 6.8.4 |
 | https://grafana.github.io/helm-charts | loki-stack | 2.3.1 |
 | https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 |
@@ -43,9 +42,6 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | global.existingSecret | string | `""` |  |
-| global.keycloak.adminPassword | string | `""` |  |
-| global.keycloak.adminUser | string | `""` |  |
-| global.keycloak.clientSecret | string | `"a-client-secret"` | Overwrite this value for production |
 | global.storageClass | string | `"microk8s-hostpath"` |  |
 | global.studio.superUser | string | `""` |  |
 | global.studio.superuserEmail | string | `""` |  |
@@ -76,7 +72,6 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | docker-registry.persistence.storageClass | string | `"microk8s-hostpath"` |  |
 | domain | string | `"studio.<your-domain.com>"` |  |
 | existingSecret | string | `""` |  |
-| fedn.enabled | bool | `false` |  |
 | fixtures | string | `""` |  |
 | grafana."grafana.ini".server.domain | string | `"grafana.<your-domain.com>"` |  |
 | grafana."grafana.ini".server.root_url | string | `"%(protocol)s://%(domain)s/"` |  |
@@ -99,40 +94,9 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | ingress.image.repository | string | `"scaleoutsystems/ingress:develop"` |  |
 | ingress.tls[0].hosts[0] | string | `"studio.<your-domain.com>"` |  |
 | ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| keycloak.args[0] | string | `"-Dkeycloak.profile.feature.token_exchange=enabled"` |  |
-| keycloak.extraEnv | string | `""` |  |
-| keycloak.extraVolumeMounts | string | `"- name: realm-secret\n  mountPath: \"/realm/\"\n  readOnly: true\n"` |  |
-| keycloak.extraVolumes | string | `"- name: realm-secret\n  secret:\n    secretName: realm-secret\n"` |  |
-| keycloak.ingress.enabled | bool | `true` |  |
-| keycloak.ingress.rules[0].host | string | `"keycloak.<your-domain.com>"` |  |
-| keycloak.ingress.rules[0].paths[0] | string | `"/"` |  |
-| keycloak.ingress.tls[0].hosts[0] | string | `"keycloak.<your-domain.com>"` |  |
-| keycloak.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| keycloak.postgresql.enabled | bool | `true` |  |
-| keycloak.postgresql.persistence.accessModes[0] | string | `"ReadWriteMany"` |  |
-| keycloak.postgresql.persistence.enabled | bool | `true` |  |
-| keycloak.postgresql.persistence.size | string | `"10Gi"` |  |
-| keycloak.postgresql.persistence.storageClass | string | `"microk8s-hostpath"` |  |
-| keycloak.postgresql.postgresqlDatabase | string | `"keycloak"` |  |
-| keycloak.postgresql.postgresqlPassword | string | `""` |  |
-| keycloak.postgresql.postgresqlUsername | string | `"keycloak"` |  |
-| keycloak.rbac.create | bool | `true` |  |
-| keycloak.rbac.rules[0].apiGroups[0] | string | `""` |  |
-| keycloak.rbac.rules[0].resources[0] | string | `"pods"` |  |
-| keycloak.rbac.rules[0].verbs[0] | string | `"get"` |  |
-| keycloak.rbac.rules[0].verbs[1] | string | `"list"` |  |
-| keycloak.replicas | int | `1` |  |
 | labs.ingress.secretName | string | `"prod-ingress"` |  |
 | loki-stack.enabled | bool | `false` |  |
 | namespace | string | `"default"` |  |
-| oidc.client_id | string | `"studio"` |  |
-| oidc.client_secret | string | `""` |  |
-| oidc.enabled | bool | `true` |  |
-| oidc.host | string | `"https://keycloak.<your-domain.com>"` |  |
-| oidc.id_token_expiry_seconds | int | `180` |  |
-| oidc.realm | string | `"STACKn"` |  |
-| oidc.sign_algo | string | `"RS256"` |  |
-| oidc.verify_ssl | bool | `true` |  |
 | postgresql-ha.enabled | bool | `false` |  |
 | postgresql.enabled | bool | `true` |  |
 | postgresql.existingSecret | string | `""` |  |

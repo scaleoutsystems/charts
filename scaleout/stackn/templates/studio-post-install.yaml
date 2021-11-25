@@ -43,7 +43,7 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.postgres.secretName" . }}
+              name: {{ include "stackn.studio.postgresql.secretName" . }}
               key: postgresql-password
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always

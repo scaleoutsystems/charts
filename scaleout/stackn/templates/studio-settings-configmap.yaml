@@ -17,68 +17,11 @@ data:
     """
 
     import os
-    import logging
 
-    VERSION_BACKEND = 'studio.version.Version'
-    LOGGING_LEVEL = logging.DEBUG
 
-    PROJECT_ROLES = ['guest', 'member', 'admin']
 
-    {{ if .Values.ingress.v1beta1 }}
-    INGRESS_V1BETA1 = True
-    {{ else }}
-    INGRESS_V1BETA1 = False
-    {{ end }}
-
-    # Permissions
-
-    # Project settings
-    PROJECT_SETTINGS_PERM = {
-      'view': ['member', 'admin'],
-      'view_credentials': ['member', 'admin'],
-      'env_settings': ['member', 'admin'],
-      'collab_settings': ['member', 'admin'],
-      'add_member': ['admin'],
-      'publish_github': ['member', 'admin'],
-      'danger_zone': ['admin']
-    }
-
-    MONITOR_PERM = {
-      'view': ['admin']
-    }
-
-    {{ if .Values.oidc.enabled }}
-    KC_REALM = {{ .Values.oidc.realm | quote }}
-    KC_URL = "{{ .Values.oidc.host }}"
-    KC_ADMIN_URL = "{{ .Values.oidc.host }}/auth"
-    OIDC_RP_CLIENT_ID = {{ .Values.oidc.client_id | quote }}
-    OIDC_RP_CLIENT_SECRET = {{ include "stackn.oidc.clientsecret" . | quote }}
-    OIDC_OP_REALM_AUTH = "{{ .Values.oidc.host }}/auth/realms"
-    OIDC_OP_AUTHORIZATION_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/auth"
-    OIDC_OP_TOKEN_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/token"
-    OIDC_OP_USER_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/userinfo"
-    OIDC_OP_LOGOUT_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/logout"
-    OIDC_OP_LOGOUT_URL_METHOD = 'studio.OIDClogout.keycloak_logout'
-    OIDC_STORE_ACCESS_TOKEN = True
-    OIDC_STORE_ID_TOKEN = True
-    {{ if eq .Values.oidc.verify_ssl false }}
-    print("WARNING: Skipping SSL verification.")
-    OIDC_VERIFY_SSL = False
-    {{ else }}
-    OIDC_VERIFY_SSL = True
-    {{ end }}
-    OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = {{ .Values.oidc.id_token_expiry_seconds | default "180" }}
-    LOGIN_URL = "/projects"
-    LOGIN_REDIRECT_URL = "/projects"
-    LOGOUT_REDIRECT_URL = "/"
-    OIDC_RP_SIGN_ALGO = {{ .Values.oidc.sign_algo | quote }}
-    OIDC_OP_JWKS_ENDPOINT = "{{ .Values.oidc.host }}/auth/realms/{{ .Values.oidc.realm }}/protocol/openid-connect/certs"
-    {{ end }}
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
-        {{ if .Values.oidc.enabled }}
-        'studio.OIDCbackend.OIDCbackend'
-        {{ end }}
     ]
 
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -110,44 +53,38 @@ data:
     # Application definition
 
     INSTALLED_APPS = [
-    {{ if .Values.fedn.enabled }}
-        'alliance_admin',
-    {{ end }}
-        'django.contrib.auth',
         'django.contrib.admin',
+        'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django_filters',
-        'oauth2_provider',
         'corsheaders',
         'rest_framework',
         'rest_framework.authtoken',
-        'ingress',
         'api',
+        'monitor',
         'projects',
         'models',
-        'monitor',
-        'reports',
-        'files',
-        'datasets',
-        'workflows',
         'deployments',
-        'bootstrap_modal_forms',
-        'studio_admin',
         'apps',
         'portal',
+        'tagulous',
         'django_celery_beat',
-        'django_plotly_dash.apps.DjangoPlotlyDashConfig',
-        'channels',
+        'oauth2_provider',
     ]
 
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
+    OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+    }
 
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': [
-            'studio.KCRFbackend.KeycloakAuthentication',
+            'rest_framework.authentication.TokenAuthentication',
+            #'rest_framework.permissions.IsAuthenticated',
+            'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         ],
     }
 
@@ -157,18 +94,14 @@ data:
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
-        {{ if .Values.oidc.enabled }}
-        'mozilla_django_oidc.middleware.SessionRefresh',
-        {{ end }}
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'corsheaders.middleware.CorsMiddleware',
-        'django_plotly_dash.middleware.BaseMiddleware'
     ]
+
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        # other finders..
         'compressor.finders.CompressorFinder',
     )
 
@@ -198,13 +131,6 @@ data:
 
     WSGI_APPLICATION = 'studio.wsgi.application'
     ASGI_APPLICATION = 'studio.asgi.application'
-
-    # Lab settings
-    LABS = {
-      'ingress': {
-        'secretName': '{{ .Values.labs.ingress.secretName }}'
-      }
-    }
     
 
     # Database
@@ -213,11 +139,11 @@ data:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '{{ include "stackn.postgres.name" . }}',
-            'USER': '{{ include "stackn.postgres.user" . }}',
+            'NAME': '{{ .Values.postgresql.postgresqlDatabase }}',
+            'USER': '{{ .Values.postgresql.postgresqlUsername }}',
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-            'HOST': '{{ include "stackn.postgres.host" . }}',
-            'PORT': {{ include "stackn.postgres.port" . }},
+            'HOST': '{{ .Values.postgresql.fullnameOverride }}',
+            'PORT': '{{ .Values.postgresql.service.port }}',
         }
     }
 
@@ -266,16 +192,17 @@ data:
     import socket
 
     # TODO remove after refactor
-    API_HOSTNAME = 'localhost'
-    API_PORT = 8080
+    #API_HOSTNAME = 'localhost'
+    #API_PORT = 8080
 
-    GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
-    GIT_REPOS_URL = '/repos/'
+    #GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
+    #GIT_REPOS_URL = '/repos/'
 
-    LOKI_SVC = 'http://{{ .Release.Name }}-loki:3100'
-    PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
+    #LOKI_SVC = 'http://{{ .Release.Name }}-loki:3100'
+    #PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
+    #CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
+
     REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
-    CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
     STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
 
     try:
@@ -304,21 +231,11 @@ data:
     CELERY_TIMEZONE = "UTC"
     CELERY_ENABLE_UTC = True
 
-    EXTERNAL_KUBECONF = False
-    STORAGECLASS = {{ .Values.storageClassName | default "aws-efs" | quote }}
-
+    EXTERNAL_KUBECONF = True
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
-
+    STORAGECLASS = {{ .Values.storageClassName | default "aws-efs" | quote }}
+    
     try:
         from .settings_local import *
     except ImportError as e:
-        pass
-
-    import os
-
-    try:
-        apps = [os.environ.get("APPS").split(" ")]
-        for app in apps:
-            INSTALLED_APPS += [app]
-    except Exception as e:
         pass
