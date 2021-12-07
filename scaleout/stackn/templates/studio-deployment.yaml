@@ -26,11 +26,11 @@ spec:
           command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.service.port }}; do echo waiting for database; sleep 2; done;']
           resources:
             limits:
-              cpu: 100m
-              memory: 512Mi
+              cpu: "100m"
+              memory: "512Mi"
             requests:
-              cpu: 100m
-              memory: 512Mi
+              cpu: "100m"
+              memory: "512Mi"
       containers:
       - args:
         - sh
@@ -40,32 +40,39 @@ spec:
         - name: DEBUG
           value: "true"
         {{ end }}
+        - name: DJANGO_SUPERUSER
+          value: {{ include "stackn.studio.superuser" . }}
+        - name: DJANGO_SUPERUSER_EMAIL
+          value: {{ include "stackn.studio.superuser.email" . }}
+        - name: DJANGO_SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-superuser-password
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.studio.postgresql.secretName" . }}
+              name: {{ include "stackn.secretName" . }}
               key: postgresql-password
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
-
+        - name: KUBECONFIG
+          value: "/app/chartcontroller/kubeconfig/config"
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         name: {{ .Release.Name }}-studio
         volumeMounts:
-          - name: config
-            mountPath: "/app/chartcontroller/config/"
+          - name: kubeconfig
+            mountPath: "/app/chartcontroller/kubeconfig/"
             readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-          - mountPath: /app/projects/fixtures/fixtures.json
-            subPath: fixtures.json
-            name: {{ .Release.Name }}-fixtures-configmap
           - name: mediavol
             mountPath: /media
         resources:
@@ -82,7 +89,7 @@ spec:
     {{- end }}
       restartPolicy: Always
       volumes:
-      - name: config
+      - name: kubeconfig
         secret:
           secretName: {{ .Release.Name }}-chart-controller-secret
       - name: {{ .Release.Name}}-settings-configmap
@@ -91,12 +98,6 @@ spec:
           items:
           - key: settings.py
             path: settings.py
-      - name: {{ .Release.Name }}-fixtures-configmap
-        configMap:
-          name: {{ .Release.Name }}-fixtures-configmap
-          items:
-          - key: fixtures.json
-            path: fixtures.json
       - name: mediavol
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-studio-media

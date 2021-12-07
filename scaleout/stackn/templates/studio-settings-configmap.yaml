@@ -64,12 +64,13 @@ data:
         'rest_framework',
         'rest_framework.authtoken',
         'api',
-        'monitor',
-        'projects',
-        'models',
-        'deployments',
         'apps',
+        'deployments',
+        'monitor',
+        'models',
+        'projects',
         'portal',
+        'register',
         'tagulous',
         'django_celery_beat',
         'oauth2_provider',
@@ -99,13 +100,21 @@ data:
         'corsheaders.middleware.CorsMiddleware',
     ]
 
+    ROOT_URLCONF = 'studio.urls'
+
+    # Tagulous serialization settings
+    SERIALIZATION_MODULES = {
+        'xml':    'tagulous.serializers.xml_serializer',
+        'json':   'tagulous.serializers.json',
+        'python': 'tagulous.serializers.python',
+        'yaml':   'tagulous.serializers.pyyaml',
+    }
+
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'compressor.finders.CompressorFinder',
     )
-
-    ROOT_URLCONF = 'studio.urls'
 
     TEMPLATE_LOADERS = (
         'django.template.loaders.filesystem.Loader',
