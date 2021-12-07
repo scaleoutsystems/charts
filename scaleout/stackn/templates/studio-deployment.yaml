@@ -40,8 +40,6 @@ spec:
         - name: DEBUG
           value: "true"
         {{ end }}
-        - name: INIT
-          value: {{ .Values.studio.init | quote }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
@@ -56,7 +54,7 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.studio.postgresql.secretName" . }}
+              name: {{ include "stackn.secretName" . }}
               key: postgresql-password
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
@@ -64,13 +62,13 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
         - name: KUBECONFIG
-          value: {{ .Values.studio.kubeconfig_file | quote }}
+          value: "/app/chartcontroller/kubeconfig/config"
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         volumeMounts:
           - name: kubeconfig
-            mountPath: {{ .Values.studio.kubeconfig_dir | quote }}
+            mountPath: "/app/chartcontroller/kubeconfig/"
             readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py

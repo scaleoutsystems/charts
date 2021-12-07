@@ -10,21 +10,14 @@
 #Set global values to overide default
 global:
   studio:
-    superUser: "" ##these are currently not handled by stackn: default: admin
+    superUser: ""
     superuserPassword: ""
-    superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
-    existingSecret: ""
-    storageClass: ""
-  postgresql:
-      auth:
-        username: stackn
-        password: ""
-        postgresPassword: ""
-        database: stackn
-        existingSecret: ""
-      storageClass:
+    superuserEmail: ""
+  existingSecret: 
+  storageClass: &storage_class microk8s-hostpath
 
-
+#Set stoargeClass
+storageClassName: *storage_class
 namespace: default
 existingSecret: ""
 
@@ -32,13 +25,9 @@ studio:
   servicename: studio
   replicas: 1
   debug: true
-  init: true
-  kubeconfig_file: /app/chartcontroller/kubeconfig/config
-  kubeconfig_dir: /app/chartcontroller/kubeconfig/
   static:
     replicas: 1
-    image: ghcr.io/scaleoutsystems/stackn/ingress:v0.6.0
-    pullPolicy: IfNotPresent
+    image: ghcr.io/morganekmefjord/stackn/ingress:master #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     resources:
       limits:
         cpu: 1
@@ -47,8 +36,8 @@ studio:
         cpu: "100m"
         memory: "256Mi"
   image: #tell which image to deploy for studio
-    repository: ghcr.io/scaleoutsystems/stackn/studio:v0.6.0 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
-    pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
+    repository: scaleoutsystems/carmat-dev:revamp #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
       cpu: "1000m"
@@ -57,33 +46,32 @@ studio:
       cpu: "400m"
       memory: "2Gi"
   storage:
-    storageClass: ""
+    StorageClassName: *storage_class
+    size: "2Gi"
   media:
     storage:
-      storageClass: ""
+      storageClassName: *storage_class
       size: "5Gi"
       accessModes: ReadWriteMany
-    mount_path: /app/media/
   superUser: admin
   superuserPassword: ""
   superuserEmail: admin@test.com
 
-#kubernetes config
-kubeconfig: ""
-
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio.127.0.0.1.nip.io
-session_cookie_domain: .127.0.0.1.nip.io
+domain: studio.<your-domain.com> 
 ingress:
   enabled: true
+  image: #tell which image to deploy for studio
+    repository: ghcr.io/morganekmefjord/stackn/ingress:master #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    pullPolicy: Always
   annotations: {}
   hosts:
-    - host: studio.127.0.0.1.nip.io
+    - host: studio.<your-domain.com>
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
   tls:
     - secretName: prod-ingress
       hosts:
-        - studio.127.0.0.1.nip.io
+        - studio.<your-domain.com>
 
 ### A Postgres database for STACKn ###
 # Here we use https://charts.bitnami.com/bitnami postgresql chart 
@@ -91,16 +79,20 @@ ingress:
 # Postgres deploy with a single-pod database:
 postgresql:
   enabled: true
+  postgresqlUsername: stackn
+  postgresqlPassword: stackn
+  postgresqlPostgresPassword: stackn    #NOTE! To be changed in production!
+  postgresqlDatabase: stackn
+  existingSecret: stackn
   fullnameOverride: stackn-studio-postgres
-  primary:
-    service:
-      ports: 
-        postgresql: 5432
-    persistence:
-      enabled: true
-      size: "10Gi"
-      accessModes:
-        - ReadWriteMany
+  service:
+    port: 5432
+  persistence:
+    enabled: true
+    size: "20Gi"
+    storageClass: *storage_class
+    accessModes:
+      - ReadWriteMany
 
 # Will be added in future realease, for now keep "enabled:false"
 postgresql-ha:
@@ -130,6 +122,16 @@ rabbit:
   username: admin
   password: ""
 
+reloader:
+  enabled: true
+  namespace: default
+  reloader:
+    watchGlobally: false
+
+labs:
+  ingress:
+    secretName: prod-ingress
+
 chartcontroller:
   enabled: false
   #addSecret -- if true create chart-controller-secret from cluster_config, if false it must be added manually
@@ -141,11 +143,8 @@ docker-registry:
 prometheus:
   enabled: false
 
-grafana:
+loki-stack:
   enabled: false
 
-reloader:
-  enabled: true
-  namespace: default
-  reloader:
-    watchGlobally: false
+grafana:
+  enabled: false

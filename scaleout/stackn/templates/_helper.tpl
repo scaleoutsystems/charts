@@ -70,15 +70,27 @@ Return STACKn studio superuser email
 
 
 {{/*
-Get the password secret.
+Return STACKn studio postgres password
 */}}
-{{- define "stackn.studio.postgresql.secretName" -}}
-{{- if .Values.postgresql.existingSecret -}}
-    {{- printf "%s" (tpl .Values.existingSecret $) -}}
+{{- define "stackn.studio.postgres.password" -}}
+{{- if .Values.postgresql.postgresqlPassword -}}
+    {{- .Values.postgresql.postgresqlPassword -}}
 {{- else -}}
-    {{- printf "%s" .Values.postgresql.fullnameOverride  -}}
+    {{- randAlphaNum 10 -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return STACKn studio postgresql-postgres password
+*/}}
+{{- define "stackn.studio.postgresql-postgres.password" -}}
+{{- if .Values.postgresql.postgresqlPostgresPassword -}}
+    {{- .Values.postgresql.postgresqlPostgresPassword -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
+{{- end -}}
+{{- end -}}
+
 
 
 {{/*
