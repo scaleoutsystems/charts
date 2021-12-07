@@ -65,6 +65,7 @@ data:
         'rest_framework.authtoken',
         'api',
         'apps',
+        "crispy_forms",
         'deployments',
         'monitor',
         'models',
@@ -146,6 +147,8 @@ data:
     WSGI_APPLICATION = 'studio.wsgi.application'
     ASGI_APPLICATION = 'studio.asgi.application'
     
+    # Django Crispy Forms   
+    django-crispy-forms
 
     # Database
     # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
