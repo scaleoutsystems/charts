@@ -18,9 +18,9 @@ data:
 
     import os
 
-
-
     AUTHENTICATION_BACKENDS = [
+        'social_core.backends.github.GithubOAuth2',
+        'social_core.backends.google.GoogleOAuth2',
         'django.contrib.auth.backends.ModelBackend',
     ]
 
@@ -30,6 +30,11 @@ data:
     # Crispy Forms
     CRISPY_TEMPLATE_PACK="bootstrap4"
 
+    # Crispy Forms
+    CRISPY_TEMPLATE_PACK="bootstrap4"
+
+    DOMAIN = {{ .Values.domain | quote }}
+    STUDIO_HOST = "https://{{ .Values.domain }}"
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -52,42 +57,47 @@ data:
 
     # Application definition
 
-    INSTALLED_APPS = [
+    # Application definition
+    DEFAULT_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        'django_filters',
+    ]
+
+    THIRD_PARTY_APPS = [
+        # add apps which you install using pip
+        "crispy_forms",            
         'corsheaders',
+        'django_celery_beat',
+        'django_filters',
+        'oauth2_provider',
         'rest_framework',
         'rest_framework.authtoken',
+        'social_django',
+        'tagulous',
+    ]
+
+    LOCAL_APPS =[
+        # add local apps which you create using startapp
         'api',
         'apps',
-        "crispy_forms",
+        'common',
         'deployments',
         'monitor',
         'models',
         'projects',
         'portal',
-        'register',
-        'tagulous',
-        'django_celery_beat',
-        'oauth2_provider',
     ]
+
+    # # Application definition
+    INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
     OAUTH2_PROVIDER = {
     # this is the list of available scopes
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
-    }
-
-    REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework.authentication.TokenAuthentication',
-            #'rest_framework.permissions.IsAuthenticated',
-            'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        ],
     }
 
     MIDDLEWARE = [
@@ -99,9 +109,30 @@ data:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'corsheaders.middleware.CorsMiddleware',
+        'social_django.middleware.SocialAuthExceptionMiddleware',   # Add
     ]
 
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework.authentication.TokenAuthentication',
+            #'rest_framework.permissions.IsAuthenticated',
+            'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        ],
+    }
+
+    # Main Url conf for loading all the routing path in Studio
     ROOT_URLCONF = 'studio.urls'
+
+    # IMPORTANT: Must be encrypted as secrets in K8S
+    # Github
+    SOCIAL_AUTH_GITHUB_KEY = 'to-be-fetched-from-k8s-secrets'
+    SOCIAL_AUTH_GITHUB_SECRET = 'to-be-fetched-from-k8s-secrets'
+    SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']   # Ask for the user's email
+
+    # Google
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'to-be-fetched-from-k8s-secrets'
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'to-be-fetched-from-k8s-secrets'
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['user:email']    # Ask for the user's email
 
     # Tagulous serialization settings
     SERIALIZATION_MODULES = {
@@ -114,6 +145,7 @@ data:
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        # other finders
         'compressor.finders.CompressorFinder',
     )
 
@@ -126,7 +158,7 @@ data:
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, 'common/templates')],
+            'DIRS': [os.path.join(REPO_DIR, 'templates'), os.path.join(REPO_DIR, 'common/templates')],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
@@ -146,9 +178,6 @@ data:
 
     WSGI_APPLICATION = 'studio.wsgi.application'
     ASGI_APPLICATION = 'studio.asgi.application'
-    
-    # Django Crispy Forms   
-    django-crispy-forms
 
     # Database
     # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -192,50 +221,31 @@ data:
 
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/2.2/howto/static-files/
-    #STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
     STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+    STATIC_ROOT = os.path.join(REPO_DIR, 'static/')
     # Media Files for Studio apps
-    MEDIA_URL = {{ .Values.studio.media.mount_path | quote }}
-    MEDIA_ROOT = {{ .Values.studio.media.mount_path | quote }}
-
     MEDIA_URL = '/media/'
     MEDIA_ROOT = '/media/'
 
-    import socket
-
-    # TODO remove after refactor
-    #API_HOSTNAME = 'localhost'
-    #API_PORT = 8080
-
-    #GIT_REPOS_ROOT = os.path.join(REPO_DIR, 'repos')
-    #GIT_REPOS_URL = '/repos/'
-
-    #LOKI_SVC = 'http://{{ .Release.Name }}-loki:3100'
-    #PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
-    #CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
-
-    REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
-    STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
-
-    try:
-        from .settings_local import *
-    except ImportError as e:
-        pass
+    # Related to user registration and authetication workflow
+    LOGIN_REDIRECT_URL = '/'
+    LOGIN_URL = 'login'
+    LOGOUT_URL = 'logout'
 
     # Specific to Studio stack:
     # Redis settings
     REDIS_PORT = 6379
     REDIS_DB = 0
     REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis')
-    #CHANNEL_LAYERS = {
-    #    'default': {
-    #        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-    #        'CONFIG': {
-    #            'hosts': [(REDIS_HOST, REDIS_PORT),],
-    #        },
-    #    },
-    #}
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [(REDIS_HOST, REDIS_PORT),],
+            },
+        },
+    }
     # Celery settings
     CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ .Release.Name }}-rabbit:5672//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
     CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
@@ -247,11 +257,12 @@ data:
     # For Model Objects creation (check models/models.py, pre_save_model() )
     VERSION_BACKEND = 'studio.version.Version'
 
+    # Other Helm/k8s deployment settings
+    #CHART_CONTROLLER_URL = 'http://{{ .Release.Name }}-chart-controller'
     EXTERNAL_KUBECONF = True
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
+    #PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
+    REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
     STORAGECLASS = {{ .Values.storageClassName | default "aws-efs" | quote }}
+    STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
     
-    try:
-        from .settings_local import *
-    except ImportError as e:
-        pass
