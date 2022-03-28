@@ -19,5 +19,3 @@ $ helm install stackn scaleout/stackn -f <path_to_values.yaml>
 ### Local configs
 If you want local configurations place them in a directory named configs/ as the .gitignore will ignore that foldername and contents.
 
-## License
-APACHE 2.0
