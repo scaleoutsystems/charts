@@ -10,9 +10,9 @@
 #Set global values to overide default
 global:
   studio:
-    superUser: ""
+    superUser: "" ##these are currently not handled by stackn: default: admin
     superuserPassword: ""
-    superuserEmail: ""
+    superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
   existingSecret: 
   storageClass: &storage_class microk8s-hostpath
 
@@ -27,7 +27,7 @@ studio:
   debug: true
   static:
     replicas: 1
-    image: ghcr.io/morganekmefjord/stackn/ingress:master #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    image: ghcr.io/scaleoutsystems/stackn/ingress:develop
     resources:
       limits:
         cpu: 1
@@ -36,7 +36,7 @@ studio:
         cpu: "100m"
         memory: "256Mi"
   image: #tell which image to deploy for studio
-    repository: scaleoutsystems/carmat-dev:revamp #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: ghcr.io/scaleoutsystems/stackn/studio:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -59,11 +59,10 @@ studio:
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 domain: studio.<your-domain.com> 
+auth_domain: studio.<your-domain.com>
+session_cookie_domain: .<your-domain.com>
 ingress:
   enabled: true
-  image: #tell which image to deploy for studio
-    repository: ghcr.io/morganekmefjord/stackn/ingress:master #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
-    pullPolicy: Always
   annotations: {}
   hosts:
     - host: studio.<your-domain.com>
@@ -89,7 +88,7 @@ postgresql:
     port: 5432
   persistence:
     enabled: true
-    size: "20Gi"
+    size: "10Gi"
     storageClass: *storage_class
     accessModes:
       - ReadWriteMany
@@ -121,16 +120,6 @@ celeryWorkers:
 rabbit:
   username: admin
   password: ""
-
-reloader:
-  enabled: true
-  namespace: default
-  reloader:
-    watchGlobally: false
-
-labs:
-  ingress:
-    secretName: prod-ingress
 
 chartcontroller:
   enabled: false
