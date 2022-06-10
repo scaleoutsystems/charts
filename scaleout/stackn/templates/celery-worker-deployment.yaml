@@ -27,31 +27,45 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ include "stackn.postgres.host" . }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ include "stackn.postgres.port" . }}; do echo waiting for database; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.service.port }}; do echo waiting for database; sleep 5; done;']
           resources:
             limits:
-              cpu: 100m
-              memory: 512Mi
+              cpu: "100m"
+              memory: "512Mi"
             requests:
-              cpu: 100m
-              memory: 512Mi
+              cpu: "100m"
+              memory: "512Mi"
+        - name: wait-for-studio
+          image: busybox
+          command: ['sh', '-c', "until nslookup {{ .Release.Name }}-{{ .Values.studio.servicename }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for {{ .Release.Name }}-{{ .Values.studio.servicename }} service; sleep 5; done"]
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
       containers:
       - args:
         - sh
         - ./scripts/run_worker.sh
         env:
+        - name: BASE_PATH
+          value: "/app"
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.postgres.secretName" . }}
+              name: {{ include "stackn.secretName" . }}
               key: postgresql-password
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
+        - name: KUBECONFIG
+          value: {{ .Values.studio.kubeconfig_file | quote }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: Always
         name: {{ .Release.Name }}-celery-worker
@@ -64,13 +78,13 @@ spec:
             memory: {{ .Values.celeryWorkers.resources.requests.memory }}
         volumeMounts:
           - name: config
-            mountPath: "/app/chartcontroller/config/"
+            mountPath: {{ .Values.studio.kubeconfig_dir | quote }}
             readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
           - name: mediavol
-            mountPath: /media
+            mountPath: {{ .Values.studio.media.mount_path }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

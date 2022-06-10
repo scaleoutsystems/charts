@@ -17,7 +17,7 @@ Return true if we should use an existingSecret.
 {{- end -}}
 
 {{/*
-Get the password secret.
+Get the STACKn password secret.
 */}}
 {{- define "stackn.secretName" -}}
 {{- if .Values.global.existingSecret }}
@@ -28,62 +28,6 @@ Get the password secret.
     stackn
 {{- end -}}
 {{- end -}}
-
-{{/*
-Return postgres host
-*/}}
-{{- define "stackn.postgres.host" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- include "postgresql.fullname" .Subcharts.postgresql -}}
-{{- else -}}
-    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return postgres DB name
-*/}}
-{{- define "stackn.postgres.name" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- include "postgresql.database" .Subcharts.postgresql -}}
-{{- else -}}
-    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return postgres port
-*/}}
-{{- define "stackn.postgres.port" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- include "postgresql.port" .Subcharts.postgresql -}}
-{{- else -}}
-    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return postgres user
-*/}}
-{{- define "stackn.postgres.user" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- include "postgresql.username" .Subcharts.postgresql -}}
-{{- else -}}
-    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return postgres secret
-*/}}
-{{- define "stackn.postgres.secretName" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- include "postgresql.secretName" .Subcharts.postgresql -}}
-{{- else -}}
-    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
-{{- end -}}
-{{- end -}}
-
 
 {{/*
 Return STACKn studio superuser
@@ -124,6 +68,31 @@ Return STACKn studio superuser email
 {{- end -}}
 {{- end -}}
 
+
+{{/*
+Return STACKn studio postgres password
+*/}}
+{{- define "stackn.studio.postgres.password" -}}
+{{- if .Values.postgresql.postgresqlPassword -}}
+    {{- .Values.postgresql.postgresqlPassword -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return STACKn studio postgresql-postgres password
+*/}}
+{{- define "stackn.studio.postgresql-postgres.password" -}}
+{{- if .Values.postgresql.postgresqlPostgresPassword -}}
+    {{- .Values.postgresql.postgresqlPostgresPassword -}}
+{{- else -}}
+    {{- randAlphaNum 10 -}}
+{{- end -}}
+{{- end -}}
+
+
+
 {{/*
 Return STACKn rabbit password
 */}}
@@ -146,39 +115,13 @@ Return STACKn rabbit username
 {{- end -}}
 {{- end -}}
 
-
-{{/*
-Return STACKn keycloak admin user
-*/}}
-{{- define "stackn.keycloak.admin.user" -}}
-{{- if .Values.global.keycloak.adminUser }}
-    {{- .Values.global.keycloak.adminUser -}}
-{{- else -}}
-    keycloak
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return STACKn keycloak admin password
-*/}}
-{{- define "stackn.keycloak.admin.password" -}}
-{{- if .Values.global.keycloak.adminPassword }}
-    {{- .Values.global.keycloak.adminPassword -}}
-{{- else -}}
-    {{- randAlphaNum 10 -}}
-{{- end -}}
-{{- end -}}
-
 {{/*
 Return STACKn oidc client secret
 */}}
 {{- define "stackn.oidc.clientsecret" -}}
-{{- if .Values.global.keycloak.clientsecret }}
-    {{- .Values.global.keycloak.clientsecret }}
-{{- else if .Values.oidc.client_secret }}
+{{- if .Values.oidc.client_secret }}
     {{- .Values.oidc.client_secret -}}
 {{- else -}}
     a-client-secret
 {{- end -}}
 {{- end -}}
-

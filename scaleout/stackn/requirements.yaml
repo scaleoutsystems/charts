@@ -14,10 +14,6 @@ dependencies:
   #   version: 0.7.3
   #   repository: "https://argoproj.github.io/argo-helm"
   #   condition: argo.enabled
-  
-  - name: keycloak
-    version: 10.1.0
-    repository: https://codecentric.github.io/helm-charts
 
   - name: prometheus
     version: 13.8.0
