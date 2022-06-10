@@ -19,7 +19,7 @@ echo "Your current IP address is: $my_ip"
 # Replace <your-domain.com> field with extracted IP adress in values.yaml file
 echo "Replacing $my_ip inside the values.yaml file..."
 echo "Appending nip.io wildcardars..."
-sed -i "s/<your-domain.com>/$my_ip.nip.io/g" ./my-revamp-values.yaml
+sed -i "s/<your-domain.com>/$my_ip.nip.io/g" ./values.yaml
 echo "Your current STACKn domain will be: $my_ip.nip.io"
 
 

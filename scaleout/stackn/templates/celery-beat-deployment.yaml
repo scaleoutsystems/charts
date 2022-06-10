@@ -55,7 +55,7 @@ spec:
         - name: BASE_PATH
           value: "/app"
         - name: KUBECONFIG
-          value: "/app/chartcontroller/kubeconfig/config"
+          value: {{ .Values.studio.kubeconfig_file | quote }}
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_DB
