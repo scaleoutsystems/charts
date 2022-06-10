@@ -25,6 +25,9 @@ studio:
   servicename: studio
   replicas: 1
   debug: true
+  init: true
+  kubeconfig_file: /app/chartcontroller/kubeconfig/config
+  kubeconfig_dir: /app/chartcontroller/kubeconfig/
   static:
     replicas: 1
     image: ghcr.io/scaleoutsystems/stackn/ingress:develop
@@ -53,24 +56,25 @@ studio:
       storageClassName: *storage_class
       size: "5Gi"
       accessModes: ReadWriteMany
+    mount_path: /app/media/
   superUser: admin
   superuserPassword: ""
   superuserEmail: admin@test.com
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio.<your-domain.com> 
-auth_domain: studio.<your-domain.com>
-session_cookie_domain: .<your-domain.com>
+domain: studio.127.0.0.1.nip.io 
+auth_domain: stackn-studio.default.svc.cluster.local
+session_cookie_domain: .127.0.0.1.nip.io
 ingress:
   enabled: true
   annotations: {}
   hosts:
-    - host: studio.<your-domain.com>
+    - host: studio.127.0.0.1.nip.io
   # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
   tls:
     - secretName: prod-ingress
       hosts:
-        - studio.<your-domain.com>
+        - studio.127.0.0.1.nip.io
 
 ### A Postgres database for STACKn ###
 # Here we use https://charts.bitnami.com/bitnami postgresql chart 
@@ -79,10 +83,10 @@ ingress:
 postgresql:
   enabled: true
   postgresqlUsername: stackn
-  postgresqlPassword: stackn
-  postgresqlPostgresPassword: stackn    #NOTE! To be changed in production!
+  postgresqlPassword: ""
+  postgresqlPostgresPassword: ""
   postgresqlDatabase: stackn
-  existingSecret: stackn
+  existingSecret: 
   fullnameOverride: stackn-studio-postgres
   service:
     port: 5432
