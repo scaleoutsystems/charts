@@ -40,6 +40,8 @@ spec:
         - name: DEBUG
           value: "true"
         {{ end }}
+        - name: INIT
+          value: {{ .Values.studio.init | quote }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
@@ -62,13 +64,13 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
         - name: KUBECONFIG
-          value: "/app/chartcontroller/kubeconfig/config"
+          value: {{ .Values.studio.kubeconfig_file | quote }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         volumeMounts:
           - name: kubeconfig
-            mountPath: "/app/chartcontroller/kubeconfig/"
+            mountPath: {{ .Values.studio.kubeconfig_dir | quote }}
             readOnly: true
           - mountPath: /app/studio/settings.py
             subPath: settings.py
