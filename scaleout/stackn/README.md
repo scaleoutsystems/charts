@@ -49,11 +49,11 @@ Minimal requirement: `global.postgresql.storageClass`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.existingSecret | string | `""` |  |
-| global.storageClass | string | `"microk8s-hostpath"` |  |
-| global.studio.superUser | string | `""` |  |
-| global.studio.superuserEmail | string | `""` |  |
-| global.studio.superuserPassword | string | `""` |  |
+| global.existingSecret | string | `""` | Use existing secret. See basic-secrets.yaml. |
+| global.storageClass | string | `"microk8s-hostpath"` | K8s storageClass for PVC. |
+| global.studio.superUser | string | `admin` | Django superUser. Obs will always be `admin` until fixed. |
+| global.studio.superuserEmail | string | `'admin@test.com'` | Django superUser email. Obs will always be `admin@test.com` until fixed. |
+| global.studio.superuserPassword | string | `""` | Django superUser password. If left empty, will generate. |
 
 ## Values
 
@@ -149,8 +149,7 @@ Minimal requirement: `kubeconfig`
 | studio.resources.requests.cpu | string | `"400m"` |  |
 | studio.resources.requests.memory | string | `"2Gi"` |  |
 | studio.servicename | string | `"studio"` |  |
-| studio.static.image | string | `"scaleoutsystems/ingress:develop"` |  |
-| studio.static.pullPolicy | string | `IfNotPresent` |  |
+| studio.static.image | string | `"ghcr.io/scaleoutsystems/stackn/ingress:develop"` |  |
 | studio.static.replicas | int | `1` |  |
 | studio.static.resources.limits.cpu | int | `1` |  |
 | studio.static.resources.limits.memory | string | `"512Mi"` |  |
