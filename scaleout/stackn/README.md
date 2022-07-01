@@ -41,11 +41,11 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.existingSecret | string | `""` |  |
-| global.storageClass | string | `"microk8s-hostpath"` |  |
-| global.studio.superUser | string | `""` |  |
-| global.studio.superuserEmail | string | `""` |  |
-| global.studio.superuserPassword | string | `""` |  |
+| global.existingSecret | string | `""` | Use existing secret. See basic-secrets.yaml. |
+| global.storageClass | string | `"microk8s-hostpath"` | K8s storageClass for PVC. |
+| global.studio.superUser | string | `admin` | Django superUser. Obs will always be `admin` until fixed. |
+| global.studio.superuserEmail | string | `'admin@test.com'` | Django superUser email. Obs will always be `admin@test.com` until fixed. |
+| global.studio.superuserPassword | string | `""` | Django superUser password. If left empty, will generate. |
 
 ## Values
 
@@ -70,7 +70,9 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | docker-registry.persistence.enabled | bool | `true` |  |
 | docker-registry.persistence.size | string | `"2Gi"` |  |
 | docker-registry.persistence.storageClass | string | `"microk8s-hostpath"` |  |
-| domain | string | `"studio.<your-domain.com>"` |  |
+| domain | string | `studio.<your-domain.com>` |  |
+| auth_domain | string | `"stackn-studio.default.svc.cluster.local"` |  |
+| session_cookie_domain | string | `.<your-domain.com>` |  |
 | existingSecret | string | `""` |  |
 | fixtures | string | `""` |  |
 | grafana."grafana.ini".server.domain | string | `"grafana.<your-domain.com>"` |  |
@@ -123,8 +125,11 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | service.type | string | `"ClusterIP"` |  |
 | storageClassName | string | `"microk8s-hostpath"` |  |
 | studio.debug | bool | `true` |  |
+| studio.init | bool | `true` |  |
+| studio.kubeconfig_file | string | `/app/chartcontroller/kubeconfig/config` |  |
+| studio.kubeconfig_dir | string | `/app/chartcontroller/kubeconfig/` |  |
 | studio.image.pullPolicy | string | `"Always"` |  |
-| studio.image.repository | string | `"scaleoutsystems/studio:develop"` |  |
+| studio.image.repository | string | `"ghcr.io/scaleoutsystems/stackn/studio:develop"` |  |
 | studio.media.storage.accessModes | string | `"ReadWriteMany"` |  |
 | studio.media.storage.size | string | `"5Gi"` |  |
 | studio.media.storage.storageClassName | string | `"microk8s-hostpath"` |  |
@@ -134,7 +139,7 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | studio.resources.requests.cpu | string | `"400m"` |  |
 | studio.resources.requests.memory | string | `"2Gi"` |  |
 | studio.servicename | string | `"studio"` |  |
-| studio.static.image | string | `"scaleoutsystems/ingress:develop"` |  |
+| studio.static.image | string | `"ghcr.io/scaleoutsystems/stackn/ingress:develop"` |  |
 | studio.static.replicas | int | `1` |  |
 | studio.static.resources.limits.cpu | int | `1` |  |
 | studio.static.resources.limits.memory | string | `"512Mi"` |  |
@@ -152,4 +157,3 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | ---- | ------ | --- |
 | Morgan Ekmefjord | morgan@scaleoutsystems.com |  |
 | Fredrik Wrede | fredrik@scaleoutsystems.com |  |
-| Matteo Carone | matteo@scaleoutsystems.com |  |
