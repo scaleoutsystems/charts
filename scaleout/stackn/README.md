@@ -9,27 +9,32 @@ Current chart version is 0.1.0
 
 ## Chart Requirements
 
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 |
-| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 |
-| https://grafana.github.io/helm-charts | grafana | 6.8.4 |
-| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 |
-| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 |
-| https://stakater.github.io/stakater-charts | reloader | v0.0.86 |
+| Repository | Name | Version | Optional |
+|------------|------|---------|----------|
+| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 | No
+| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 | Yes
+| https://grafana.github.io/helm-charts | grafana | 6.8.4 | Yes
+| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 | Yes
+| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 | Yes
+| https://stakater.github.io/stakater-charts | reloader | v0.0.86 | No
 
 ## Configuration
 
-You will need to change some of the default values:
+By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml. Futher, the k8s StorageClass is by default microk8s-hostpath. Change this value in accordance to your k8s cluster.  
 
-`<your-domain.com>` should be replaced with your actual domain name everywhere.
+STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it need the cluster config provided in ./templates/chart-controller-secret.yaml. For example if you are using
+microk8s:
 
-`cluster_config` should be updated with the config file for your cluster. You need to have admin access to the namespace in which STACKn is to be deployed.
+```bash
+# Generate k8s cluster config file - NOTE: we assume that microk8s is already installed and configured
+cluster_config=$(microk8s.config | base64 | tr -d '\n')
 
-You might have to update `storageClassName`, `storageClass`, and `namespace`, depending on your cluster setup.
+# Replace <your-k8s-config> field in the chart-controller-secret.yaml file with the above create variable
+sed -i "s/<your-k8s-config>/$cluster_config/g" ./templates/chart-controller-secret.yaml
+```
 
-## Deploy locally without SSL certificates
-For local testing/development set `oidc.verify = false`, this will enable insecure options in STACKn without certificates.
+All resources will by default be created in the Namescape "default".
+
 ## Deploy an SSL certificate
 
 For production you need a domain name with a wildcard SSL certificate. If your domain is your-domain.com, you will need a certificate for *.your-domain.com and *.studio.your-domain.com. Assuming that your certificate is fullchain.pem and your private key privkey.pem, you can create a secret `prod-ingress` containing the certificate with the command:
