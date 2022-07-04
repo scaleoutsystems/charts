@@ -11,35 +11,31 @@ Current chart version is 0.2.0
 
 ## Chart Requirements
 
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 |
-| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 |
-| https://grafana.github.io/helm-charts | grafana | 6.8.4 |
-| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 |
-| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 |
-| https://stakater.github.io/stakater-charts | reloader | v0.0.86 |
+| Repository | Name | Version | Optional |
+|------------|------|---------|----------|
+| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 | No
+| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 | Yes
+| https://grafana.github.io/helm-charts | grafana | 6.8.4 | Yes
+| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 | Yes
+| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 | Yes
+| https://stakater.github.io/stakater-charts | reloader | v0.0.86 | No
 
 ## Configuration
 
-By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml.
+By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml. Futher, the k8s StorageClass is by default microk8s-hostpath. Change this value in accordance to your k8s cluster.  
 
-STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it needs the cluster config as a secret in ./templates/chart-controller-secret.yaml.
-
-By default no StorageClassName is set and needs to provided in the values.yaml or by using `--set` argument.
-
-### Quick deployment
+STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it need the cluster config provided in ./templates/chart-controller-secret.yaml. For example if you are using
+microk8s:
 
 ```bash
-# Generate k8s cluster config file - NOTE: we assume a k8s cluster is already installed and configured
-cluster_config=$(cat ~/.kube/config  | base64 | tr -d '\n')
+# Generate k8s cluster config file - NOTE: we assume that microk8s is already installed and configured
+cluster_config=$(microk8s.config | base64 | tr -d '\n')
 
-# Deploy STACKn from this repository
-helm install --set kubeconfig=$cluster_config --set global.postgresql.storageClass=<your-storage-class> stackn .
+# Replace <your-k8s-config> field in the chart-controller-secret.yaml file with the above create variable
+sed -i "s/<your-k8s-config>/$cluster_config/g" ./templates/chart-controller-secret.yaml
 ```
 
 All resources will by default be created in the Namescape "default".
-STACKn studio will be avaliable at http://studio.127.0.0.1.nip.io
 
 ## Deploy an SSL certificate
 
