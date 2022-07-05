@@ -149,7 +149,8 @@ Minimal requirement: `kubeconfig`
 | studio.resources.requests.cpu | string | `"400m"` |  |
 | studio.resources.requests.memory | string | `"2Gi"` |  |
 | studio.servicename | string | `"studio"` |  |
-| studio.static.image | string | `"ghcr.io/scaleoutsystems/stackn/ingress:develop"` |  |
+| studio.static.image | string | `"scaleoutsystems/ingress:develop"` |  |
+| studio.static.pullPolicy | string | `IfNotPresent` |  |
 | studio.static.replicas | int | `1` |  |
 | studio.static.resources.limits.cpu | int | `1` |  |
 | studio.static.resources.limits.memory | string | `"512Mi"` |  |
