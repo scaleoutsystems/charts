@@ -141,9 +141,6 @@ docker-registry:
 prometheus:
   enabled: false
 
-loki-stack:
-  enabled: false
-
 grafana:
   enabled: false
 
