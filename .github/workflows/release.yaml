@@ -7,7 +7,7 @@ on:
 
 jobs:
   sync-branch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
           github_token: ${{ secrets.CR_TOKEN }}
   
   chart-releaser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: sync-branch
     steps:
       - name: Checkout
@@ -44,23 +44,12 @@ jobs:
       - name: Add chart dependencies
         run: |
           helm repo add stable https://charts.helm.sh/stable
-      
-      - name: Remove existing index.yaml
-        run: |
-          FILE=scaleout/stackn/index.yaml
-          if [ -f "$FILE" ]; then
-              rm scaleout/stackn/index.yaml
-          fi
-      
-      - name: Remove existing helm package
-        run: |
-          rm -v scaleout/stackn/stackn-* || true
           
       - name: Update index.yaml and helm package
         run: |
           cd scaleout/stackn
           helm package .
-          helm repo index . --url https://scaleoutsystems.github.io/charts/scaleout/stackn
+          helm repo index . --url https://scaleoutsystems.github.io/charts/scaleout/stackn --merge index.yaml
 
       - name: Commit index.yaml and helm package to gh-pages
         run: |
