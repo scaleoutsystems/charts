@@ -13,8 +13,8 @@ Current chart version is 0.2.0
 
 | Repository | Name | Version | Optional |
 |------------|------|---------|----------|
-| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 | No
-| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 | Yes
+| https://charts.bitnami.com/bitnami | postgresql | 11.6.14 | No
+| https://charts.bitnami.com/bitnami | postgresql-ha | 9.2.0 | Yes
 | https://grafana.github.io/helm-charts | grafana | 6.8.4 | Yes
 | https://grafana.github.io/helm-charts | loki-stack | 2.3.1 | Yes
 | https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 | Yes
@@ -22,20 +22,24 @@ Current chart version is 0.2.0
 
 ## Configuration
 
-By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml. Futher, the k8s StorageClass is by default microk8s-hostpath. Change this value in accordance to your k8s cluster.  
+By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml.
 
-STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it need the cluster config provided in ./templates/chart-controller-secret.yaml. For example if you are using
-microk8s:
+STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it needs the cluster config as a secret in ./templates/chart-controller-secret.yaml.
+
+By default no StorageClassName is set and needs to provided in the values.yaml or by using `--set` argument.
+
+### Quick deployment
 
 ```bash
-# Generate k8s cluster config file - NOTE: we assume that microk8s is already installed and configured
-cluster_config=$(microk8s.config | base64 | tr -d '\n')
+# Generate k8s cluster config file - NOTE: we assume a k8s cluster is already installed and configured
+cluster_config=$(cat ~/.kube/config  | base64 | tr -d '\n')
 
-# Replace <your-k8s-config> field in the chart-controller-secret.yaml file with the above create variable
-sed -i "s/<your-k8s-config>/$cluster_config/g" ./templates/chart-controller-secret.yaml
+# Deploy STACKn from this repository
+helm install --set kubeconfig=$cluster_config --set global.postgresql.storageClass=<your-storage-class> stackn .
 ```
 
 All resources will by default be created in the Namescape "default".
+STACKn studio will be avaliable at http://studio.127.0.0.1.nip.io
 
 ## Deploy an SSL certificate
 
@@ -49,11 +53,19 @@ Minimal requirement: `global.postgresql.storageClass`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.existingSecret | string | `""` | Use existing secret. See basic-secrets.yaml. |
-| global.storageClass | string | `"microk8s-hostpath"` | K8s storageClass for PVC. |
+| global.studio.existingSecret | string | `""` | Use existing secret. See basic-secrets.yaml. |
+| global.studio.storageClass | string | `""` | StorageClassName for PVC. Overrides `studio.storage.storageClass`. If `studio.storage.storageClass` is unset (default) will inherent from `global.postgresql.storageClass`  |
 | global.studio.superUser | string | `admin` | Django superUser. Obs will always be `admin` until fixed. |
 | global.studio.superuserEmail | string | `'admin@test.com'` | Django superUser email. Obs will always be `admin@test.com` until fixed. |
 | global.studio.superuserPassword | string | `""` | Django superUser password. If left empty, will generate. |
+| global.postgresql.auth.username | string | `stackn` | Postgres user will be created |
+| global.postgresql.auth.password | string | `""` | Postgres password for user above. If empty, will be generated and stored in secret `stackn-studio-postgres` |
+| global.postgresql.auth.database | string | `stackn` | Postgres database will be created |
+| global.postgresql.auth.postgresPassword | string | `""` | Postgres password for postgres user If empty, will be generated and stored in secret `stackn-studio-postgres` |
+| global.postgresql.auth.existingSecret | string | `""` | will not create secret `stackn-studio-postgres`. Instead use existing secret for postgres|
+| global.postgresql.storageClass | string | `""` | StorageClassName for PVC |
+
+
 
 ## Values
 
