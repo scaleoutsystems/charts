@@ -14,7 +14,6 @@ Current chart version is 0.2.0
 | https://charts.bitnami.com/bitnami | postgresql | 11.6.14 | No
 | https://charts.bitnami.com/bitnami | postgresql-ha | 9.2.0 | Yes
 | https://grafana.github.io/helm-charts | grafana | 6.8.4 | Yes
-| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 | Yes
 | https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 | Yes
 | https://stakater.github.io/stakater-charts | reloader | v0.0.86 | No
 
