@@ -13,14 +13,24 @@ Current chart version is {{ template "chart.version" . }}
 
 ## Configuration
 
-You will need to change some of the default values:
+By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml.
 
-`<your-domain.com>` should be replaced with your actual domain name everywhere.
+STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it needs the cluster config as a secret in ./templates/chart-controller-secret.yaml.
 
-`cluster_config` should be updated with the config file for your cluster. You need to have admin access to the namespace in which STACKn is to be deployed.
+By default no StorageClassName is set and needs to provided in the values.yaml or by using `--set` argument.
 
-You might have to update `storageClassName`, `storageClass`, and `namespace`, depending on your cluster setup.
+### Quick deployment
 
+```bash
+# Generate k8s cluster config file - NOTE: we assume a k8s cluster is already installed and configured
+cluster_config=$(cat ~/.kube/config  | base64 | tr -d '\n')
+
+# Deploy STACKn from this repository
+helm install --set kubeconfig=$cluster_config --set global.postgresql.storageClass=<your-storage-class> stackn .
+```
+
+All resources will by default be created in the Namescape "default".
+STACKn studio will be avaliable at http://studio.127.0.0.1.nip.io
 ## Deploy locally without SSL certificates
 For local testing/development set `oidc.verify = false`, this will enable insecure options in STACKn without certificates.
 ## Deploy an SSL certificate
