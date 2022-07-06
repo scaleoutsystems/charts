@@ -19,11 +19,6 @@ dependencies:
     version: 13.8.0
     repository: https://prometheus-community.github.io/helm-charts
     condition: prometheus.enabled
-
-  - name: loki-stack
-    version: 2.3.1
-    repository: https://grafana.github.io/helm-charts
-    condition: loki-stack.enabled
   
   - name: grafana
     version: 6.8.4
