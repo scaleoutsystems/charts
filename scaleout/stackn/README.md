@@ -1,5 +1,7 @@
 STACKn
 ======
+[<img src="https://github.com/scaleoutsystems/charts/actions/workflows/release.yaml/badge.svg">](https://github.com/scaleoutsystems/charts/actions/workflows/release.yaml)
+[<img src="https://github.com/scaleoutsystems/charts/actions/workflows/code-checks.yaml/badge.svg">](https://github.com/scaleoutsystems/charts/actions/workflows/code-checks.yaml)
 
 ## Description
 
@@ -115,8 +117,6 @@ Minimal requirement: `kubeconfig`
 | ingress.image.repository | string | `"scaleoutsystems/ingress:develop"` |  |
 | ingress.tls[0].hosts[0] | string | `"studio.<your-domain.com>"` |  |
 | ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| labs.ingress.secretName | string | `"prod-ingress"` |  |
-| loki-stack.enabled | bool | `false` |  |
 | namespace | string | `"default"` |  |
 | postgresql-ha.enabled | bool | `false` |  |
 | postgresql.enabled | bool | `true` |  |
