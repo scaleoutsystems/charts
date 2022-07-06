@@ -29,7 +29,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.service.port }}; do echo waiting for database; sleep 5; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 5; done;']
           resources:
             limits:
               cpu: "100m"
@@ -59,21 +59,21 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_DB
-          value: {{ .Values.postgresql.postgresqlDatabase }}
+          value: {{ .Values.postgresql.global.postgresql.auth.database }}
         - name: POSTGRES_USER
-          value: {{ .Values.postgresql.postgresqlUsername }}
+          value: {{ .Values.postgresql.global.postgresql.auth.database }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: postgresql-password
+              name: {{ include "stackn.postgres.secretName" . }}
+              key: password
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
         image: {{ .Values.studio.image.repository }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-celery-beat
         resources:
           limits:

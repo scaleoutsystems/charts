@@ -13,11 +13,18 @@ global:
     superUser: "" ##these are currently not handled by stackn: default: admin
     superuserPassword: ""
     superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
-  existingSecret: 
-  storageClass: &storage_class microk8s-hostpath
+    existingSecret: ""
+    storageClass: ""
+  postgresql:
+      auth:
+        username: stackn
+        password: ""
+        postgresPassword: ""
+        database: stackn
+        existingSecret: ""
+      storageClass:
 
-#Set stoargeClass
-storageClassName: *storage_class
+
 namespace: default
 existingSecret: ""
 
@@ -31,6 +38,7 @@ studio:
   static:
     replicas: 1
     image: ghcr.io/scaleoutsystems/stackn/ingress:develop
+    pullPolicy: IfNotPresent
     resources:
       limits:
         cpu: 1
@@ -40,7 +48,7 @@ studio:
         memory: "256Mi"
   image: #tell which image to deploy for studio
     repository: ghcr.io/scaleoutsystems/stackn/studio:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
-    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
+    pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
       cpu: "1000m"
@@ -49,11 +57,10 @@ studio:
       cpu: "400m"
       memory: "2Gi"
   storage:
-    StorageClassName: *storage_class
-    size: "2Gi"
+    storageClass: ""
   media:
     storage:
-      storageClassName: *storage_class
+      storageClass: ""
       size: "5Gi"
       accessModes: ReadWriteMany
     mount_path: /app/media/
@@ -61,9 +68,11 @@ studio:
   superuserPassword: ""
   superuserEmail: admin@test.com
 
+#kubernetes config
+kubeconfig: ""
+
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio.127.0.0.1.nip.io 
-auth_domain: stackn-studio.default.svc.cluster.local
+domain: studio.127.0.0.1.nip.io
 session_cookie_domain: .127.0.0.1.nip.io
 ingress:
   enabled: true
@@ -82,20 +91,16 @@ ingress:
 # Postgres deploy with a single-pod database:
 postgresql:
   enabled: true
-  postgresqlUsername: stackn
-  postgresqlPassword: ""
-  postgresqlPostgresPassword: ""
-  postgresqlDatabase: stackn
-  existingSecret: 
   fullnameOverride: stackn-studio-postgres
-  service:
-    port: 5432
-  persistence:
-    enabled: true
-    size: "10Gi"
-    storageClass: *storage_class
-    accessModes:
-      - ReadWriteMany
+  primary:
+    service:
+      ports: 
+        postgresql: 5432
+    persistence:
+      enabled: true
+      size: "10Gi"
+      accessModes:
+        - ReadWriteMany
 
 # Will be added in future realease, for now keep "enabled:false"
 postgresql-ha:
@@ -141,3 +146,9 @@ loki-stack:
 
 grafana:
   enabled: false
+
+reloader:
+  enabled: true
+  namespace: default
+  reloader:
+    watchGlobally: false
