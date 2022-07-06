@@ -188,11 +188,11 @@ data:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '{{ .Values.postgresql.postgresqlDatabase }}',
-            'USER': '{{ .Values.postgresql.postgresqlUsername }}',
+            'NAME': '{{ .Values.postgresql.global.postgresql.auth.database }}',
+            'USER': '{{ .Values.postgresql.global.postgresql.auth.username }}',
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
             'HOST': '{{ .Values.postgresql.fullnameOverride }}',
-            'PORT': '{{ .Values.postgresql.service.port }}',
+            'PORT': '{{ .Values.postgresql.primary.service.ports.postgresql }}',
         }
     }
 
@@ -269,7 +269,7 @@ data:
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
     #PROMETHEUS_SVC = 'http://{{ .Release.Name }}-prometheus-server'
     REGISTRY_SVC = '{{ .Release.Name }}-docker-registry'
-    STORAGECLASS = {{ .Values.storageClassName | default "microk8s-hostpath" | quote }}
+    STORAGECLASS = {{ include "stackn.studio.storageclass" . | quote }}
     
     # Local dependecies Models
     PROJECTS_MODEL = 'projects.Project'
@@ -282,11 +282,11 @@ data:
     APPS_STATUS_SUCCESS = ['Running', 'Succeeded', 'Success']
     APPS_STATUS_WARNING = ['Pending', 'Installed',
                         'Waiting', 'Installing', 'Created']
-    
+
     DOMAIN = {{ .Values.domain | quote }}
-    AUTH_DOMAIN = {{ .Values.auth_domain | quote }}
+    AUTH_DOMAIN = '{{ .Release.Name }}-studio.default.svc.cluster.local'
     AUTH_PROTOCOL = 'http'
-    STUDIO_URL = 'http://{{ .Values.domain }}:8080'
+    STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
     # To enable sticky sessions for k8s ingress
     SESSION_COOKIE_DOMAIN = {{ .Values.session_cookie_domain | quote }}
     

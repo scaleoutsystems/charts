@@ -73,8 +73,8 @@ Return STACKn studio superuser email
 Return STACKn studio postgres password
 */}}
 {{- define "stackn.studio.postgres.password" -}}
-{{- if .Values.postgresql.postgresqlPassword -}}
-    {{- .Values.postgresql.postgresqlPassword -}}
+{{- if .Values.postgresql.global.postgresql.auth.password -}}
+    {{- .Values.postgresql.global.postgresql.auth.password -}}
 {{- else -}}
     {{- randAlphaNum 10 -}}
 {{- end -}}
@@ -84,13 +84,49 @@ Return STACKn studio postgres password
 Return STACKn studio postgresql-postgres password
 */}}
 {{- define "stackn.studio.postgresql-postgres.password" -}}
-{{- if .Values.postgresql.postgresqlPostgresPassword -}}
-    {{- .Values.postgresql.postgresqlPostgresPassword -}}
+{{- if .Values.postgresql.global.postgresql.auth.postgresPassword -}}
+    {{- .Values.postgresql.global.postgresql.auth.postgresPassword -}}
 {{- else -}}
     {{- randAlphaNum 10 -}}
 {{- end -}}
 {{- end -}}
 
+{{/*
+Return postgres secret
+*/}}
+{{- define "stackn.postgres.secretName" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- include "postgresql.secretName" .Subcharts.postgresql -}}
+{{- else -}}
+    {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return STACKn studio storageClass
+*/}}
+{{- define "stackn.studio.storageclass" -}}
+{{- if .Values.global.studio.storageClass }}
+    {{- .Values.global.studio.storageClass -}}
+{{- else if .Values.studio.storage.storageClass -}}
+    {{- .Values.studio.storage.storageClass -}}
+{{- else -}}
+    {{- .Values.global.postgresql.storageClass -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return STACKn studio media storageClass
+*/}}
+{{- define "stackn.studio.media.storageclass" -}}
+{{- if .Values.global.studio.storageClass }}
+    {{- .Values.global.studio.storageClass -}}
+{{- else if .Values.studio.media.storage.storageClass -}}
+    {{- .Values.studio.media.storage.storageClass -}}
+{{- else -}}
+    {{- .Values.global.postgresql.storageClass -}}
+{{- end -}}
+{{- end -}}
 
 
 {{/*
@@ -112,16 +148,5 @@ Return STACKn rabbit username
     {{- .Values.rabbit.username -}}
 {{- else -}}
     admin
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return STACKn oidc client secret
-*/}}
-{{- define "stackn.oidc.clientsecret" -}}
-{{- if .Values.oidc.client_secret }}
-    {{- .Values.oidc.client_secret -}}
-{{- else -}}
-    a-client-secret
 {{- end -}}
 {{- end -}}
