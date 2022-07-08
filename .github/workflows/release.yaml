@@ -1,9 +1,9 @@
 name: Release Helm charts
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
+
 
 jobs:
   sync-branch:
