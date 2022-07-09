@@ -3,7 +3,7 @@ entries:
   grafana:
   - apiVersion: v2
     appVersion: 7.5.5
-    created: "2021-10-28T08:24:01.408171697Z"
+    created: "2022-07-09T17:39:13.605563613Z"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 1c589b26d765b297d0f432be4b3b1f0bd7bc67747f77f85ff982f30c3a202464
     home: https://grafana.net
@@ -112,6 +112,40 @@ entries:
   - annotations:
       category: Database
     apiVersion: v2
+    appVersion: 14.4.0
+    created: "2022-07-09T17:39:13.610221368Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    description: PostgreSQL (Postgres) is an open source object-relational database
+      known for reliability and data integrity. ACID-compliant, it supports foreign
+      keys, joins, views, triggers and stored procedures.
+    digest: 06bc3c309a31bfc5b1cd74e01a7f3b2a0eca4af26e90de0dae5752fc5f8a3366
+    home: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+    icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    - sql
+    - replication
+    - cluster
+    maintainers:
+    - name: Bitnami
+      url: https://github.com/bitnami/charts
+    - email: cedric@desaintmartin.fr
+      name: desaintmartin
+    name: postgresql
+    sources:
+    - https://github.com/bitnami/bitnami-docker-postgresql
+    - https://www.postgresql.org/
+    urls:
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/postgresql-11.6.14.tgz
+    version: 11.6.14
+  - annotations:
+      category: Database
+    apiVersion: v2
     appVersion: 11.11.0
     created: "2021-10-28T08:24:01.434821636Z"
     dependencies:
@@ -143,6 +177,41 @@ entries:
     - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/postgresql-10.4.2.tgz
     version: 10.4.2
   postgresql-ha:
+  - annotations:
+      category: Database
+    apiVersion: v2
+    appVersion: 14.4.0
+    created: "2022-07-09T17:39:13.615087531Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    description: This PostgreSQL cluster solution includes the PostgreSQL replication
+      manager, an open-source tool for managing replication and failover on PostgreSQL
+      clusters.
+    digest: 7305ad32427281e231c03a30a1653d6693496af41dda77fc195f138fb3ddf521
+    home: https://github.com/bitnami/charts/tree/master/bitnami/postgresql-ha
+    icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+    keywords:
+    - postgresql
+    - repmgr
+    - pgpool
+    - postgres
+    - database
+    - sql
+    - replication
+    - cluster
+    - high availability
+    maintainers:
+    - name: Bitnami
+      url: https://github.com/bitnami/charts
+    name: postgresql-ha
+    sources:
+    - https://github.com/bitnami/bitnami-docker-postgresql
+    - https://www.postgresql.org/
+    urls:
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/charts/postgresql-ha-9.2.0.tgz
+    version: 9.2.0
   - annotations:
       category: Database
     apiVersion: v2
@@ -180,7 +249,7 @@ entries:
   prometheus:
   - apiVersion: v2
     appVersion: 2.26.0
-    created: "2021-10-28T08:24:01.44744686Z"
+    created: "2022-07-09T17:39:13.620108198Z"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -215,7 +284,7 @@ entries:
   reloader:
   - apiVersion: v1
     appVersion: v0.0.86
-    created: "2021-10-28T08:24:01.448282355Z"
+    created: "2022-07-09T17:39:13.62076722Z"
     description: Reloader chart that runs on kubernetes
     digest: b5a53e687286b7b4b0e4228a72781c3415633cef47a2afa954182be7d01a325a
     home: https://github.com/stakater/Reloader
@@ -248,8 +317,43 @@ entries:
     version: v0.0.86
   stackn:
   - apiVersion: v1
+    appVersion: 0.6.0-beta.1
+    created: "2022-07-09T17:39:13.602979727Z"
+    dependencies:
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 13.8.0
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.8.4
+    - condition: reloader.enabled
+      name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: v0.0.86
+    - condition: postgresql-ha.enabled
+      name: postgresql-ha
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.2.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.6.14
+    description: A Helm chart for deploying STACKn by Scaleout
+    digest: 6a8067e92ae24c398bb86efe3a1ce225526b1f0329c0a4e567d21317106fafe1
+    maintainers:
+    - email: morgan@scaleoutsystems.com
+      name: Morgan Ekmefjord
+    - email: fredrik@scaleoutsystems.com
+      name: Fredrik Wrede
+    name: stackn
+    urls:
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-0.2.0-beta.1.tgz
+    version: 0.2.0-beta.1
+  - apiVersion: v1
     appVersion: 0.4.0
-    created: "2021-10-28T08:24:01.405288714Z"
+    created: "2022-07-09T17:39:13.573024429Z"
     dependencies:
     - name: keycloak
       repository: https://codecentric.github.io/helm-charts
@@ -291,4 +395,4 @@ entries:
     urls:
     - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-0.1.0.tgz
     version: 0.1.0
-generated: "2021-10-28T08:24:01.3578567Z"
+generated: "2022-07-09T17:39:13.533820622Z"
