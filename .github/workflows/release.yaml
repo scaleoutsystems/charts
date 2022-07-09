@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Merge master -> gh-pages
+      - name: Merge base branch -> gh-pages
         uses: devmasx/merge-branch@v1.3.1
         with:
           type: now
