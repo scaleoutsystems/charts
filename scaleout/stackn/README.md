@@ -1,36 +1,45 @@
 STACKn
 ======
+[<img src="https://github.com/scaleoutsystems/charts/actions/workflows/release.yaml/badge.svg">](https://github.com/scaleoutsystems/charts/actions/workflows/release.yaml)
+[<img src="https://github.com/scaleoutsystems/charts/actions/workflows/code-checks.yaml/badge.svg">](https://github.com/scaleoutsystems/charts/actions/workflows/code-checks.yaml)
 
 ## Description
 
 A Helm chart for deploying STACKn by Scaleout
 
-Current chart version is 0.1.0
+Current chart version is 0.2.0-beta.1
 
 ## Chart Requirements
 
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 10.4.2 |
-| https://charts.bitnami.com/bitnami | postgresql-ha | 7.3.0 |
-| https://codecentric.github.io/helm-charts | keycloak | 10.1.0 |
-| https://grafana.github.io/helm-charts | grafana | 6.8.4 |
-| https://grafana.github.io/helm-charts | loki-stack | 2.3.1 |
-| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 |
-| https://stakater.github.io/stakater-charts | reloader | v0.0.86 |
+| Repository | Name | Version | Optional |
+|------------|------|---------|----------|
+| https://charts.bitnami.com/bitnami | postgresql | 11.6.14 | No
+| https://charts.bitnami.com/bitnami | postgresql-ha | 9.2.0 | Yes
+| https://grafana.github.io/helm-charts | grafana | 6.8.4 | Yes
+| https://prometheus-community.github.io/helm-charts | prometheus | 13.8.0 | Yes
+| https://stakater.github.io/stakater-charts | reloader | v0.0.86 | No
 
 ## Configuration
 
-You will need to change some of the default values:
+By default STACKn has been configured with a dns wildcard domain for localhost. To change this replace all occurences of studio.127.0.0.1.nip.io in values.yaml.
 
-`<your-domain.com>` should be replaced with your actual domain name everywhere.
+STACKn requires access to manipulate and create recourses in the k8s cluster. Thus, it needs the cluster config as a secret in ./templates/chart-controller-secret.yaml.
 
-`cluster_config` should be updated with the config file for your cluster. You need to have admin access to the namespace in which STACKn is to be deployed.
+By default no StorageClassName is set and needs to provided in the values.yaml or by using `--set` argument.
 
-You might have to update `storageClassName`, `storageClass`, and `namespace`, depending on your cluster setup.
+### Quick deployment
 
-## Deploy locally without SSL certificates
-For local testing/development set `oidc.verify = false`, this will enable insecure options in STACKn without certificates.
+```bash
+# Generate k8s cluster config file - NOTE: we assume a k8s cluster is already installed and configured
+cluster_config=$(cat ~/.kube/config  | base64 | tr -d '\n')
+
+# Deploy STACKn from this repository
+helm install --set kubeconfig=$cluster_config --set global.postgresql.storageClass=<your-storage-class> stackn .
+```
+
+All resources will by default be created in the Namescape "default".
+STACKn studio will be avaliable at http://studio.127.0.0.1.nip.io
+
 ## Deploy an SSL certificate
 
 For production you need a domain name with a wildcard SSL certificate. If your domain is your-domain.com, you will need a certificate for *.your-domain.com and *.studio.your-domain.com. Assuming that your certificate is fullchain.pem and your private key privkey.pem, you can create a secret `prod-ingress` containing the certificate with the command:
@@ -39,19 +48,27 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 ```
 
 ## Global values
+Minimal requirement: `global.postgresql.storageClass`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.existingSecret | string | `""` |  |
-| global.keycloak.adminPassword | string | `""` |  |
-| global.keycloak.adminUser | string | `""` |  |
-| global.keycloak.clientSecret | string | `"a-client-secret"` | Overwrite this value for production |
-| global.storageClass | string | `"microk8s-hostpath"` |  |
-| global.studio.superUser | string | `""` |  |
-| global.studio.superuserEmail | string | `""` |  |
-| global.studio.superuserPassword | string | `""` |  |
+| global.studio.existingSecret | string | `""` | Use existing secret. See basic-secrets.yaml. |
+| global.studio.storageClass | string | `""` | StorageClassName for PVC. Overrides `studio.storage.storageClass`. If `studio.storage.storageClass` is unset (default) will inherent from `global.postgresql.storageClass`  |
+| global.studio.superUser | string | `admin` | Django superUser. Obs will always be `admin` until fixed. |
+| global.studio.superuserEmail | string | `'admin@test.com'` | Django superUser email. Obs will always be `admin@test.com` until fixed. |
+| global.studio.superuserPassword | string | `""` | Django superUser password. If left empty, will generate. |
+| global.postgresql.auth.username | string | `stackn` | Postgres user will be created |
+| global.postgresql.auth.password | string | `""` | Postgres password for user above. If empty, will be generated and stored in secret `stackn-studio-postgres` |
+| global.postgresql.auth.database | string | `stackn` | Postgres database will be created |
+| global.postgresql.auth.postgresPassword | string | `""` | Postgres password for postgres user If empty, will be generated and stored in secret `stackn-studio-postgres` |
+| global.postgresql.auth.existingSecret | string | `""` | will not create secret `stackn-studio-postgres`. Instead use existing secret for postgres|
+| global.postgresql.storageClass | string | `""` | StorageClassName for PVC |
+
+
 
 ## Values
+
+Minimal requirement: `kubeconfig`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -64,7 +81,7 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | chartcontroller.enabled | bool | `false` |  |
 | chartcontroller.image.pullPolicy | string | `"Always"` |  |
 | chartcontroller.image.repository | string | `"registry.<your-domain.com>/chart-controller:develop"` |  |
-| cluster_config | string | `""` | Config file for your cluster. Should allow admin access for your namespace. |
+| kubeconfig | string | `""` | Encoded (base64) kubernetes config  |
 | docker-registry.enabled | bool | `false` |  |
 | docker-registry.ingress.enabled | bool | `true` |  |
 | docker-registry.ingress.hosts[0] | string | `"registry.<your-domain.com>"` |  |
@@ -74,9 +91,10 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | docker-registry.persistence.enabled | bool | `true` |  |
 | docker-registry.persistence.size | string | `"2Gi"` |  |
 | docker-registry.persistence.storageClass | string | `"microk8s-hostpath"` |  |
-| domain | string | `"studio.<your-domain.com>"` |  |
+| domain | string | `studio.<your-domain.com>` |  |
+| auth_domain | string | `"stackn-studio.default.svc.cluster.local"` |  |
+| session_cookie_domain | string | `.<your-domain.com>` |  |
 | existingSecret | string | `""` |  |
-| fedn.enabled | bool | `false` |  |
 | fixtures | string | `""` |  |
 | grafana."grafana.ini".server.domain | string | `"grafana.<your-domain.com>"` |  |
 | grafana."grafana.ini".server.root_url | string | `"%(protocol)s://%(domain)s/"` |  |
@@ -99,40 +117,7 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | ingress.image.repository | string | `"scaleoutsystems/ingress:develop"` |  |
 | ingress.tls[0].hosts[0] | string | `"studio.<your-domain.com>"` |  |
 | ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| keycloak.args[0] | string | `"-Dkeycloak.profile.feature.token_exchange=enabled"` |  |
-| keycloak.extraEnv | string | `""` |  |
-| keycloak.extraVolumeMounts | string | `"- name: realm-secret\n  mountPath: \"/realm/\"\n  readOnly: true\n"` |  |
-| keycloak.extraVolumes | string | `"- name: realm-secret\n  secret:\n    secretName: realm-secret\n"` |  |
-| keycloak.ingress.enabled | bool | `true` |  |
-| keycloak.ingress.rules[0].host | string | `"keycloak.<your-domain.com>"` |  |
-| keycloak.ingress.rules[0].paths[0] | string | `"/"` |  |
-| keycloak.ingress.tls[0].hosts[0] | string | `"keycloak.<your-domain.com>"` |  |
-| keycloak.ingress.tls[0].secretName | string | `"prod-ingress"` |  |
-| keycloak.postgresql.enabled | bool | `true` |  |
-| keycloak.postgresql.persistence.accessModes[0] | string | `"ReadWriteMany"` |  |
-| keycloak.postgresql.persistence.enabled | bool | `true` |  |
-| keycloak.postgresql.persistence.size | string | `"10Gi"` |  |
-| keycloak.postgresql.persistence.storageClass | string | `"microk8s-hostpath"` |  |
-| keycloak.postgresql.postgresqlDatabase | string | `"keycloak"` |  |
-| keycloak.postgresql.postgresqlPassword | string | `""` |  |
-| keycloak.postgresql.postgresqlUsername | string | `"keycloak"` |  |
-| keycloak.rbac.create | bool | `true` |  |
-| keycloak.rbac.rules[0].apiGroups[0] | string | `""` |  |
-| keycloak.rbac.rules[0].resources[0] | string | `"pods"` |  |
-| keycloak.rbac.rules[0].verbs[0] | string | `"get"` |  |
-| keycloak.rbac.rules[0].verbs[1] | string | `"list"` |  |
-| keycloak.replicas | int | `1` |  |
-| labs.ingress.secretName | string | `"prod-ingress"` |  |
-| loki-stack.enabled | bool | `false` |  |
 | namespace | string | `"default"` |  |
-| oidc.client_id | string | `"studio"` |  |
-| oidc.client_secret | string | `""` |  |
-| oidc.enabled | bool | `true` |  |
-| oidc.host | string | `"https://keycloak.<your-domain.com>"` |  |
-| oidc.id_token_expiry_seconds | int | `180` |  |
-| oidc.realm | string | `"STACKn"` |  |
-| oidc.sign_algo | string | `"RS256"` |  |
-| oidc.verify_ssl | bool | `true` |  |
 | postgresql-ha.enabled | bool | `false` |  |
 | postgresql.enabled | bool | `true` |  |
 | postgresql.existingSecret | string | `""` |  |
@@ -159,8 +144,11 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | service.type | string | `"ClusterIP"` |  |
 | storageClassName | string | `"microk8s-hostpath"` |  |
 | studio.debug | bool | `true` |  |
+| studio.init | bool | `true` |  |
+| studio.kubeconfig_file | string | `/app/chartcontroller/kubeconfig/config` |  |
+| studio.kubeconfig_dir | string | `/app/chartcontroller/kubeconfig/` |  |
 | studio.image.pullPolicy | string | `"Always"` |  |
-| studio.image.repository | string | `"scaleoutsystems/studio:develop"` |  |
+| studio.image.repository | string | `"ghcr.io/scaleoutsystems/stackn/studio:develop"` |  |
 | studio.media.storage.accessModes | string | `"ReadWriteMany"` |  |
 | studio.media.storage.size | string | `"5Gi"` |  |
 | studio.media.storage.storageClassName | string | `"microk8s-hostpath"` |  |
@@ -170,7 +158,7 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | studio.resources.requests.cpu | string | `"400m"` |  |
 | studio.resources.requests.memory | string | `"2Gi"` |  |
 | studio.servicename | string | `"studio"` |  |
-| studio.static.image | string | `"scaleoutsystems/ingress:develop"` |  |
+| studio.static.image | string | `"ghcr.io/scaleoutsystems/stackn/ingress:develop"` |  |
 | studio.static.replicas | int | `1` |  |
 | studio.static.resources.limits.cpu | int | `1` |  |
 | studio.static.resources.limits.memory | string | `"512Mi"` |  |
@@ -188,4 +176,3 @@ kubectl create secret tls prod-ingress --cert fullchain.pem --key privkey.pem
 | ---- | ------ | --- |
 | Morgan Ekmefjord | morgan@scaleoutsystems.com |  |
 | Fredrik Wrede | fredrik@scaleoutsystems.com |  |
-| Matteo Carone | matteo@scaleoutsystems.com |  |

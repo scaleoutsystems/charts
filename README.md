@@ -1,6 +1,8 @@
-
+## Info
 
 This repository contains Helm charts maintained by Scaleout Systems AB. The repo index is hosted by GitHub pages.
+
+**Note:** The main branch is now the new default branch. For getting the latest version of these charts  please clone the main branch and not the master.
 
 ## Getting started
 To be able to deploy Helm chrats from this repository you first need to add this repository as a source of charts.
