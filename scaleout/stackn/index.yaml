@@ -3,7 +3,7 @@ entries:
   grafana:
   - apiVersion: v2
     appVersion: 7.5.5
-    created: "2022-07-09T17:39:13.605563613Z"
+    created: "2022-07-09T18:02:39.845482204Z"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 1c589b26d765b297d0f432be4b3b1f0bd7bc67747f77f85ff982f30c3a202464
     home: https://grafana.net
@@ -113,7 +113,7 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: 14.4.0
-    created: "2022-07-09T17:39:13.610221368Z"
+    created: "2022-07-09T18:02:39.851173075Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -181,7 +181,7 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: 14.4.0
-    created: "2022-07-09T17:39:13.615087531Z"
+    created: "2022-07-09T18:02:39.856488642Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -249,7 +249,7 @@ entries:
   prometheus:
   - apiVersion: v2
     appVersion: 2.26.0
-    created: "2022-07-09T17:39:13.620108198Z"
+    created: "2022-07-09T18:02:39.864156738Z"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -284,7 +284,7 @@ entries:
   reloader:
   - apiVersion: v1
     appVersion: v0.0.86
-    created: "2022-07-09T17:39:13.62076722Z"
+    created: "2022-07-09T18:02:39.864908847Z"
     description: Reloader chart that runs on kubernetes
     digest: b5a53e687286b7b4b0e4228a72781c3415633cef47a2afa954182be7d01a325a
     home: https://github.com/stakater/Reloader
@@ -318,7 +318,7 @@ entries:
   stackn:
   - apiVersion: v1
     appVersion: 0.6.0-beta.1
-    created: "2022-07-09T17:39:13.602979727Z"
+    created: "2022-07-09T18:02:39.842910372Z"
     dependencies:
     - condition: prometheus.enabled
       name: prometheus
@@ -341,7 +341,7 @@ entries:
       repository: https://charts.bitnami.com/bitnami
       version: 11.6.14
     description: A Helm chart for deploying STACKn by Scaleout
-    digest: 6a8067e92ae24c398bb86efe3a1ce225526b1f0329c0a4e567d21317106fafe1
+    digest: 8901739d9e454ab4b30a4e1ef0d1799d12964e6a9ca2277af021ca40d6832308
     maintainers:
     - email: morgan@scaleoutsystems.com
       name: Morgan Ekmefjord
@@ -353,7 +353,7 @@ entries:
     version: 0.2.0-beta.1
   - apiVersion: v1
     appVersion: 0.4.0
-    created: "2022-07-09T17:39:13.573024429Z"
+    created: "2022-07-09T18:02:39.811164074Z"
     dependencies:
     - name: keycloak
       repository: https://codecentric.github.io/helm-charts
@@ -395,4 +395,4 @@ entries:
     urls:
     - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-0.1.0.tgz
     version: 0.1.0
-generated: "2022-07-09T17:39:13.533820622Z"
+generated: "2022-07-09T18:02:39.768183535Z"
