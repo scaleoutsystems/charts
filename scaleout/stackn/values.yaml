@@ -6,44 +6,101 @@
 #   Name: storageClassName, and/or set anchor &śtorage_class
 #   Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
 #   Default: microk8s-hostpath, use nfs-client for docker-for-desktop
-# - replace <your-domain.com>, search and replace 
-# - cluster_config , kubernetes cluster
-
-#NOTES
-# - For local development/testing consider setting "oidc.verify_ssl" to false 
 
 #Set global values to overide default
 global:
   studio:
-    superUser: ""
+    superUser: "" ##these are currently not handled by stackn: default: admin
     superuserPassword: ""
-    superuserEmail: ""
-  keycloak:
-    adminUser: ""
-    adminPassword: ""
-    clientSecret: a-client-secret #Override in production
-  existingSecret: ""
-  storageClass: &storage_class microk8s-hostpath
+    superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
+    existingSecret: ""
+    storageClass: ""
+  postgresql:
+      auth:
+        username: stackn
+        password: ""
+        postgresPassword: ""
+        database: stackn
+        existingSecret: ""
+      storageClass:
 
-  
+
+namespace: default
+existingSecret: ""
+
+studio:
+  servicename: studio
+  replicas: 1
+  debug: true
+  init: true
+  kubeconfig_file: /app/chartcontroller/kubeconfig/config
+  kubeconfig_dir: /app/chartcontroller/kubeconfig/
+  static:
+    replicas: 1
+    image: ghcr.io/scaleoutsystems/stackn/ingress:v0.6.0
+    pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 1
+        memory: "512Mi"
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+  image: #tell which image to deploy for studio
+    repository: ghcr.io/scaleoutsystems/stackn/studio:v0.6.0 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "4Gi"
+    requests:
+      cpu: "400m"
+      memory: "2Gi"
+  storage:
+    storageClass: ""
+  media:
+    storage:
+      storageClass: ""
+      size: "5Gi"
+      accessModes: ReadWriteMany
+    mount_path: /app/media/
+  superUser: admin
+  superuserPassword: ""
+  superuserEmail: admin@test.com
+
+#kubernetes config
+kubeconfig: ""
+
+# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
+domain: studio.127.0.0.1.nip.io
+session_cookie_domain: .127.0.0.1.nip.io
+ingress:
+  enabled: true
+  annotations: {}
+  hosts:
+    - host: studio.127.0.0.1.nip.io
+  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
+  tls:
+    - secretName: prod-ingress
+      hosts:
+        - studio.127.0.0.1.nip.io
+
 ### A Postgres database for STACKn ###
 # Here we use https://charts.bitnami.com/bitnami postgresql chart 
-
 
 # Postgres deploy with a single-pod database:
 postgresql:
   enabled: true
-  postgresqlUsername: stackn
-  postgresqlPassword: ""
-  postgresqlDatabase: stackn
-  existingSecret: ""
   fullnameOverride: stackn-studio-postgres
-  persistence:
-    enabled: true
-    size: 20Gi
-    storageClass: *storage_class
-    accessModes:
-    - ReadWriteMany
+  primary:
+    service:
+      ports: 
+        postgresql: 5432
+    persistence:
+      enabled: true
+      size: "10Gi"
+      accessModes:
+        - ReadWriteMany
 
 # Will be added in future realease, for now keep "enabled:false"
 postgresql-ha:
@@ -58,77 +115,15 @@ imagePullSecrets:
 ## to create a regcred
 ## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
 
-#Set stoargeClass
-storageClassName: *storage_class
-namespace: default
-existingSecret: ""
-
-studio:
-  servicename: studio
-  replicas: 1
-  debug: true
-  static:
-    replicas: 1
-    image: scaleoutsystems/ingress:develop #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
-    resources:
-      limits:
-        cpu: 1
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 256Mi
-  image: #tell which image to deploy for studio
-    repository: scaleoutsystems/studio:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
-    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 4Gi
-    requests:
-      cpu: 400m
-      memory: 2Gi
-  storage:
-    StorageClassName: *storage_class
-    size: 2Gi
-  media:
-    storage:
-      storageClassName: *storage_class
-      size: 5Gi
-      accessModes: ReadWriteMany
-  superUser: admin
-  superuserPassword: ""
-  superuserEmail: admin@test.com
-
 celeryWorkers:
   replicas: 2
   resources:
     requests:
-      cpu: 100m
-      memory: 1Gi
+      cpu: "100m"
+      memory: "1Gi"
     limits:
-      cpu: 1000m
-      memory: 8Gi
-
-# Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
-domain: studio.<your-domain.com> 
-ingress:
-  enabled: true
-  image: #tell which image to deploy for studio
-    repository: scaleoutsystems/ingress:develop #This image can be built from Dockerfile.nginx inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
-    pullPolicy: Always
-  annotations: {}
-  hosts:
-    - host: studio.<your-domain.com>
-
-  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
-  tls:
-    - secretName: prod-ingress
-      hosts:
-        - studio.<your-domain.com>
-
-service:
-  type: ClusterIP #override if you want to use NodePort instead to access cluster services
-
+      cpu: "1000m"
+      memory: "8Gi"
 
 # default credentials for rabbitmq. override in production!
 rabbit:
@@ -137,404 +132,20 @@ rabbit:
 
 chartcontroller:
   enabled: false
-  image:
-    repository: scaleoutsystems/chart-controller:master
-    pullPolicy: Always
-  branch: master
-  resources:
-    limits:
-      cpu: 200m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 512Mi
   #addSecret -- if true create chart-controller-secret from cluster_config, if false it must be added manually
   addSecret: true
 
-
-
-### Cluster config ###
-# kubectl config view --raw
-cluster_config: |-
-  apiVersion: v1
-  clusters:
-  - cluster:
-      certificate-authority-data: 
-      server: <your-server-here>
-    name: <name-of-cluster>
-  contexts:
-  - context:
-      cluster: <name-of-cluster>
-      user: admin
-    name: <name-of-context>
-  current-context:
-  kind: Config
-  preferences: {}
-  users:
-  - name: admin
-    user:
-      token: <user-token-here>
-
-# Django fixtures for defining:
-# - app categories
-# - object types (to categorize “objects”, often model objects). We might for instance want a few different 
-#   categories such as “models”, “tensorflow models”, and “FEDn Compute Packages”). An object is a pointer to a file stored in S3.
-# - Periodic Celery tasks. These are controlled from the Django database. By default, we have three tasks: One that syncs MLflow 
-#   models to STACKn objects, one that checks app statuses, and one that checks resource usage.
-fixtures: |-
-  [{
-    "model": "apps.appcategories",
-    "pk": "compute",
-    "fields": {
-      "name": "Compute"
-    }
-  },
-  {
-    "model": "apps.appcategories",
-    "pk": "fedn",
-    "fields": {
-      "name": "FEDn"
-    }
-  },
-  {
-    "model": "apps.appcategories",
-    "pk": "develop",
-    "fields": {
-      "name": "Develop"
-    }
-  },
-  {
-  "model": "apps.appcategories",
-  "pk": "serve",
-  "fields": {
-    "name": "Serve"
-    }
-  },
-  {
-  "model": "apps.appcategories",
-  "pk": "store",
-  "fields": {
-    "name": "Store"
-    }
-  },
-  {
-    "model": "django_celery_beat.intervalschedule",
-    "pk": 1,
-    "fields": {
-      "every": 3,
-      "period": "seconds"
-    }
-  },
-  {
-    "model": "django_celery_beat.intervalschedule",
-    "pk": 2,
-    "fields": {
-      "every": 15,
-      "period": "seconds"
-    }
-  },
-  {
-    "model": "django_celery_beat.periodictask",
-    "pk": 1,
-    "fields": {
-      "name": "celery.backend_cleanup",
-      "task": "celery.backend_cleanup",
-      "interval": null,
-      "crontab": 1,
-      "solar": null,
-      "clocked": null,
-      "args": "[]",
-      "kwargs": "{}",
-      "queue": null,
-      "exchange": null,
-      "routing_key": null,
-      "headers": "{}",
-      "priority": null,
-      "expires": null,
-      "expire_seconds": 43200,
-      "one_off": false,
-      "start_time": null,
-      "enabled": true,
-      "last_run_at": null,
-      "total_run_count": 0,
-      "date_changed": "2021-02-26T13:49:34.038Z",
-      "description": ""
-    }
-  },
-  {
-    "model": "django_celery_beat.periodictask",
-    "pk": 2,
-    "fields": {
-      "name": "check_resource_usage",
-      "task": "apps.tasks.get_resource_usage",
-      "interval": 2,
-      "crontab": null,
-      "solar": null,
-      "clocked": null,
-      "args": "[]",
-      "kwargs": "{}",
-      "queue": null,
-      "exchange": null,
-      "routing_key": null,
-      "headers": "{}",
-      "priority": null,
-      "expires": null,
-      "expire_seconds": null,
-      "one_off": false,
-      "start_time": null,
-      "enabled": true,
-      "last_run_at": "2021-02-26T14:03:34.731Z",
-      "total_run_count": 45,
-      "date_changed": "2021-02-26T14:03:40.178Z",
-      "description": ""
-    }
-  },
-  {
-    "model": "django_celery_beat.periodictask",
-    "pk": 3,
-    "fields": {
-      "name": "check_app_status",
-      "task": "apps.tasks.check_status",
-      "interval": 1,
-      "crontab": null,
-      "solar": null,
-      "clocked": null,
-      "args": "[]",
-      "kwargs": "{}",
-      "queue": null,
-      "exchange": null,
-      "routing_key": null,
-      "headers": "{}",
-      "priority": null,
-      "expires": null,
-      "expire_seconds": null,
-      "one_off": false,
-      "start_time": null,
-      "enabled": true,
-      "last_run_at": "2021-02-26T14:03:37.169Z",
-      "total_run_count": 174,
-      "date_changed": "2021-02-26T14:03:40.168Z",
-      "description": ""
-    }
-  },
-  {
-  "model": "models.objecttype",
-  "pk": 1,
-  "fields": {
-    "name": "Model",
-    "slug": "model",
-    "apps": []
-    }
-  },
-  {
-  "model": "models.objecttype",
-  "pk": 2,
-  "fields": {
-    "name": "FEDn Client",
-    "slug": "fedn-client",
-    "apps": []
-    }
-  },
-  {
-  "model": "models.objecttype",
-  "pk": 3,
-  "fields": {
-    "name": "MLFlow Model",
-    "slug": "mlflow-model",
-    "apps": []
-    }
-  }
-  ]
-
 docker-registry:
-    enabled: false
-    ingress:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/proxy-body-size: "5500m"
-        hosts:
-            - registry.<your-domain.com>
-        tls:
-            - secretName: prod-ingress
-              hosts:
-                  - registry.<your-domain.com>
-
-    persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
-      size: 2Gi
-      storageClass: *storage_class
-
-argo:
-  installCRD: false
   enabled: false
-  ui:
-    ingress:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/proxy-body-size: 1000m
-        hosts:
-            - workflow.<your-domain.com>
-        tls:
-            - secretName: prod-ingress
-              hosts:
-                  - workflow.<your-domain.com>
-
-argo-events:
-  enabled: false
-  installCRD: false
-  namespace: argo-events
-  singleNamespace: false
-
-
-openfaas:
-    enabled: false
-    functionNamespace: stack-fn
-    exposeServices: false
-    async: true
-    rbac: false
-    psp: false
-    securityContext: true
-    basic_auth: false
-    operator:
-        create: true
-    ingress:
-      enabled: false
-      hosts:
-        - host: serve.<your-domain.com>
-          serviceName: gateway
-          servicePort: 8080
-          path: /
-      tls:
-        - secretName: prod-ingress
-          hosts:
-            - serve.<your-domain.com>
-
-keycloak:
-  replicas: 1
-  ingress:
-    enabled: true
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
-    rules:
-      - host: "keycloak.<your-domain.com>"
-        paths: 
-          - /
-    tls:
-      - secretName: prod-ingress
-        hosts:
-          - keycloak.<your-domain.com>
-
-  extraVolumes: |
-    - name: realm-secret
-      secret:
-        secretName: realm-secret
-
-  extraVolumeMounts: |
-    - name: realm-secret
-      mountPath: "/realm/"
-      readOnly: true
-
-  extraEnv: |
-    - name: KEYCLOAK_IMPORT
-      value: /realm/realm.json
-    - name: KEYCLOAK_USER
-      value: '{{ include "stackn.keycloak.admin.user" .}}'
-    - name: KEYCLOAK_PASSWORD
-      valueFrom:
-            secretKeyRef:
-              name: '{{ include "stackn.secretName" . }}'
-              key: keycloak-admin-password
-    - name: PROXY_ADDRESS_FORWARDING
-      value: "true"
-
-  rbac:
-    create: true
-    rules:
-      - apiGroups:
-          - ""
-        resources:
-          - pods
-        verbs:
-          - get
-          - list
-
-  postgresql:
-    enabled: true
-    postgresqlUsername: keycloak
-    postgresqlPassword: ""
-    postgresqlDatabase: keycloak
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClass: *storage_class
-      accessModes:
-      - ReadWriteMany
-  
-  args:
-    - "-Dkeycloak.profile.feature.token_exchange=enabled"
-
-oidc:
-    enabled: true
-    realm: STACKn
-    client_id: studio
-    client_secret: ""
-    host: https://keycloak.<your-domain.com>
-    sign_algo: RS256
-    id_token_expiry_seconds: 180
-    verify_ssl: true #setting this to false should only be used for local development, will require flag --insecure for stackn cli  
 
 prometheus:
-  enabled: false
-  server:
-    ingress:
-      enabled: true
-      hosts:
-        - prometheus.<your-domain.com>
-      tls:
-        - secretName: prod-ingress
-          hosts:
-            - prometheus.<your-domain.com>
-    persistentVolume:
-      storageClass: *storage_class
-      size: 2Gi
-
-loki-stack:
   enabled: false
 
 grafana:
   enabled: false
-  grafana.ini:
-    server:
-      domain: grafana.<your-domain.com>
-      root_url: "%(protocol)s://%(domain)s/"
-      serve_from_sub_path: true
-  ingress:
-    enabled: true
-    hosts:
-      - "grafana.<your-domain.com>"
-    path: "/"
-
-    tls:
-        - secretName: prod-ingress
-          hosts:
-            - grafana.<your-domain.com>
-
-  persistence:
-    enabled: true
-    type: pvc
-    size: 2Gi
-    storageClassName: *storage_class
 
 reloader:
   enabled: true
   namespace: default
   reloader:
     watchGlobally: false
-
-fedn:
-  enabled: false
-
-labs:
-  ingress:
-    secretName: prod-ingress

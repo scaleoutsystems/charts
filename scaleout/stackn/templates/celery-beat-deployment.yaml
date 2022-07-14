@@ -29,33 +29,51 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ include "stackn.postgres.host" . }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ include "stackn.postgres.port" . }}; do echo waiting for database; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 5; done;']
           resources:
             limits:
-              cpu: 100m
-              memory: 512Mi
+              cpu: "100m"
+              memory: "512Mi"
             requests:
-              cpu: 100m
-              memory: 512Mi
+              cpu: "100m"
+              memory: "512Mi"
+        - name: wait-for-studio
+          image: busybox
+          command: ['sh', '-c', "until nslookup {{ .Release.Name }}-{{ .Values.studio.servicename }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for {{ .Release.Name }}-{{ .Values.studio.servicename }} service; sleep 30; done"]
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
       containers:
       - args:
         - sh
         - ./scripts/run_beat.sh
         env:
+        - name: BASE_PATH
+          value: "/app"
+        - name: KUBECONFIG
+          value: {{ .Values.studio.kubeconfig_file | quote }}
         - name: GET_HOSTS_FROM
           value: dns
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.global.postgresql.auth.database }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.global.postgresql.auth.database }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
-              key: postgresql-password
+              key: password
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
         image: {{ .Values.studio.image.repository }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-celery-beat
         resources:
           limits:
