@@ -12,13 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Merge master -> gh-pages
+      - name: Merge base branch -> gh-pages
         uses: devmasx/merge-branch@v1.3.1
         with:
           type: now
-          from_branch: main
+          from_branch: ${{ github.base_ref }}
           target_branch: gh-pages
-          github_token: ${{ secrets.CR_TOKEN }}
+          github_token: ${{ github.token }}
   
   chart-releaser:
     runs-on: ubuntu-20.04
