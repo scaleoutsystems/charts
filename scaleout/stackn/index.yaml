@@ -3,7 +3,7 @@ entries:
   grafana:
   - apiVersion: v2
     appVersion: 7.5.5
-    created: "2022-07-11T11:44:01.602525513Z"
+    created: "2022-07-14T14:23:52.382432316Z"
     description: The leading tool for querying and visualizing time series and metrics.
     digest: 1c589b26d765b297d0f432be4b3b1f0bd7bc67747f77f85ff982f30c3a202464
     home: https://grafana.net
@@ -113,7 +113,7 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: 14.4.0
-    created: "2022-07-11T11:44:01.60869109Z"
+    created: "2022-07-14T14:23:52.387673471Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -181,7 +181,7 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: 14.4.0
-    created: "2022-07-11T11:44:01.615991681Z"
+    created: "2022-07-14T14:23:52.392516223Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -249,7 +249,7 @@ entries:
   prometheus:
   - apiVersion: v2
     appVersion: 2.26.0
-    created: "2022-07-11T11:44:01.621801054Z"
+    created: "2022-07-14T14:23:52.397200473Z"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -284,7 +284,7 @@ entries:
   reloader:
   - apiVersion: v1
     appVersion: v0.0.86
-    created: "2022-07-11T11:44:01.622648664Z"
+    created: "2022-07-14T14:23:52.397834179Z"
     description: Reloader chart that runs on kubernetes
     digest: b5a53e687286b7b4b0e4228a72781c3415633cef47a2afa954182be7d01a325a
     home: https://github.com/stakater/Reloader
@@ -317,8 +317,43 @@ entries:
     version: v0.0.86
   stackn:
   - apiVersion: v1
+    appVersion: 0.6.0
+    created: "2022-07-14T14:23:52.380282093Z"
+    dependencies:
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 13.8.0
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.8.4
+    - condition: reloader.enabled
+      name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: v0.0.86
+    - condition: postgresql-ha.enabled
+      name: postgresql-ha
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.2.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.6.14
+    description: A Helm chart for deploying STACKn by Scaleout
+    digest: ec21926f6ef18145777c938a608db38991ba3a7fef6d3196af0a07ce7c1f1f79
+    maintainers:
+    - email: morgan@scaleoutsystems.com
+      name: Morgan Ekmefjord
+    - email: fredrik@scaleoutsystems.com
+      name: Fredrik Wrede
+    name: stackn
+    urls:
+    - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v1
     appVersion: 0.6.0-beta.1
-    created: "2022-07-11T11:44:01.599698377Z"
+    created: "2022-07-14T14:23:52.361998899Z"
     dependencies:
     - condition: prometheus.enabled
       name: prometheus
@@ -353,7 +388,7 @@ entries:
     version: 0.2.0-beta.2
   - apiVersion: v1
     appVersion: 0.6.0-beta.1
-    created: "2022-07-11T11:44:01.573432549Z"
+    created: "2022-07-14T14:23:52.343114798Z"
     dependencies:
     - condition: prometheus.enabled
       name: prometheus
@@ -388,7 +423,7 @@ entries:
     version: 0.2.0-beta.1
   - apiVersion: v1
     appVersion: 0.4.0
-    created: "2022-07-11T11:44:01.544429386Z"
+    created: "2022-07-14T14:23:52.316854619Z"
     dependencies:
     - name: keycloak
       repository: https://codecentric.github.io/helm-charts
@@ -430,4 +465,4 @@ entries:
     urls:
     - https://scaleoutsystems.github.io/charts/scaleout/stackn/stackn-0.1.0.tgz
     version: 0.1.0
-generated: "2022-07-11T11:44:01.49680029Z"
+generated: "2022-07-14T14:23:52.272236545Z"
