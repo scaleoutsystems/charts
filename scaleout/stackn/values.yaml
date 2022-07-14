@@ -37,7 +37,7 @@ studio:
   kubeconfig_dir: /app/chartcontroller/kubeconfig/
   static:
     replicas: 1
-    image: ghcr.io/scaleoutsystems/stackn/ingress:v0.6.0-beta.1
+    image: ghcr.io/scaleoutsystems/stackn/ingress:v0.6.0
     pullPolicy: IfNotPresent
     resources:
       limits:
@@ -47,7 +47,7 @@ studio:
         cpu: "100m"
         memory: "256Mi"
   image: #tell which image to deploy for studio
-    repository: ghcr.io/scaleoutsystems/stackn/studio:v0.6.0-beta.1 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: ghcr.io/scaleoutsystems/stackn/studio:v0.6.0 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
