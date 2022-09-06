@@ -25,7 +25,7 @@ Get the STACKn password secret.
 {{- else if .Values.existingSecret -}}
     {{- printf "%s" (tpl .Values.existingSecret $) -}}
 {{- else -}}
-    stackn
+    {{- include "common.names.fullname" . -}}
 {{- end -}}
 {{- end -}}
 
