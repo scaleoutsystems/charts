@@ -7,7 +7,7 @@ STACKn
 
 A Helm chart for deploying STACKn by Scaleout
 
-Current chart version is 0.2.1-beta
+Current chart version is 0.2.1
 
 ## Chart Requirements
 
