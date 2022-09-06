@@ -96,11 +96,7 @@ Return postgres secret
 */}}
 {{- define "stackn.postgres.secretName" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- if include "postgresql.secretName" .Subcharts.postgresql -}}
-        {{- include "postgresql.secretName" .Subcharts.postgresql -}}
-    {{- else -}}
     {{- .Values.postgresql.fullnameOverride -}}
-    {{- end -}}
 {{- else -}}
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
