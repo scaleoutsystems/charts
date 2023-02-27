@@ -1,19 +1,20 @@
+{{- if .Values.celeryFlower.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
     reloader.stakater.com/auto: "true"
   labels:
-    io.kompose.service: {{ .Release.Name }}-celery-worker
-    name: {{ .Release.Name }}-celery-worker
-  name: {{ .Release.Name }}-celery-worker
+    io.kompose.service: {{ .Release.Name }}-celery-flower
+    name: {{ .Release.Name }}-celery-flower
+  name: {{ .Release.Name }}-celery-flower
 spec:
-  replicas: {{ .Values.celeryWorkers.replicas | default 2 }}
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-celery-worker
+      name: {{ .Release.Name }}-celery-flower
   template:
     metadata:
       annotations:
@@ -21,34 +22,13 @@ spec:
         kompose.version: 1.20.0 ()
       creationTimestamp: null
       labels:
-        io.kompose.service: {{ .Release.Name }}-celery-worker
-        name: {{ .Release.Name }}-celery-worker
+        io.kompose.service: {{ .Release.Name }}-celery-flower
+        name: {{ .Release.Name }}-celery-flower
     spec:
-      initContainers:
-        - name: wait-for-db
-          image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 5; done;']
-          resources:
-            limits:
-              cpu: "100m"
-              memory: "512Mi"
-            requests:
-              cpu: "100m"
-              memory: "512Mi"
-        - name: wait-for-studio
-          image: busybox:1.28.4
-          command: ['sh', '-c', "until nslookup {{ .Release.Name }}-{{ .Values.studio.servicename }}; do echo waiting for {{ .Release.Name }}-{{ .Values.studio.servicename }} service; sleep 5; done"]
-          resources:
-            limits:
-              cpu: "100m"
-              memory: "512Mi"
-            requests:
-              cpu: "100m"
-              memory: "512Mi"
       containers:
       - args:
-        - sh
-        - ./scripts/run_worker.sh
+          - sh
+          - ./scripts/run_flower.sh
         env:
         - name: BASE_PATH
           value: "/app"
@@ -64,8 +44,14 @@ spec:
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
+              name: {{ template "stackn.secretName" . }}
               key: rabbit-password
+        - name: RABBITMQ_HOST
+          value: {{ .Release.Name }}-rabbit
+        - name: RABBITMQ_USER
+          value: {{ include "stackn.rabbit.username" . }}
+        - name: REDIS_HOST
+          value: {{ .Release.Name }}-redis
         {{- if .Values.chartcontroller.addSecret }}
         - name: KUBECONFIG
           value: {{ .Values.studio.kubeconfig_file | quote }}
@@ -89,8 +75,6 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-          - name: mediavol
-            mountPath: {{ .Values.studio.media.mount_path }}
       imagePullSecrets:
         - name: ghcrsecret
       restartPolicy: Always
@@ -106,8 +90,6 @@ spec:
           items:
           - key: settings.py
             path: settings.py
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-studio-media
 
 status: {}
+{{- end }}

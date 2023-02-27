@@ -25,7 +25,7 @@ Get the STACKn password secret.
 {{- else if .Values.existingSecret -}}
     {{- printf "%s" (tpl .Values.existingSecret $) -}}
 {{- else -}}
-    {{- include "common.names.fullname" . -}}
+    {{ include "common.names.fullname" . }}
 {{- end -}}
 {{- end -}}
 
@@ -96,7 +96,7 @@ Return postgres secret
 */}}
 {{- define "stackn.postgres.secretName" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- .Values.postgresql.fullnameOverride -}}
+    {{- include "postgresql.secretName" .Subcharts.postgresql -}}
 {{- else -}}
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}

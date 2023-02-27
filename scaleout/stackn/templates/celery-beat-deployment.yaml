@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    reloader.stakater.com/auto: "true"
     kompose.cmd: kompose convert
     kompose.version: 1.20.0 ()
   creationTimestamp: null
@@ -29,7 +30,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 5; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 5; done;']
           resources:
             limits:
               cpu: "100m"
@@ -38,8 +39,8 @@ spec:
               cpu: "100m"
               memory: "512Mi"
         - name: wait-for-studio
-          image: busybox
-          command: ['sh', '-c', "until nslookup {{ .Release.Name }}-{{ .Values.studio.servicename }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for {{ .Release.Name }}-{{ .Values.studio.servicename }} service; sleep 30; done"]
+          image: busybox:1.28.4
+          command: ['sh', '-c', "until nslookup {{ .Release.Name }}-{{ .Values.studio.servicename }}; do echo waiting for {{ .Release.Name }}-{{ .Values.studio.servicename }} service; sleep 30; done"]
           resources:
             limits:
               cpu: "100m"
@@ -54,14 +55,12 @@ spec:
         env:
         - name: BASE_PATH
           value: "/app"
-        - name: KUBECONFIG
-          value: {{ .Values.studio.kubeconfig_file | quote }}
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_DB
           value: {{ .Values.postgresql.global.postgresql.auth.database }}
         - name: POSTGRES_USER
-          value: {{ .Values.postgresql.global.postgresql.auth.database }}
+          value: {{ .Values.postgresql.global.postgresql.auth.user }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -86,10 +85,8 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-    {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        - name: ghcrsecret
       restartPolicy: Always
       volumes:
       - name: {{ .Release.Name}}-settings-configmap
