@@ -17,10 +17,10 @@ global:
     storageClass: ""
   postgresql:
       auth:
-        username: stackn
+        username: studio
         password: ""
         postgresPassword: ""
-        database: stackn
+        database: studio
         existingSecret: ""
       storageClass:
 
@@ -33,11 +33,13 @@ studio:
   replicas: 1
   debug: true
   init: true
-  kubeconfig_file: /app/chartcontroller/kubeconfig/config
-  kubeconfig_dir: /app/chartcontroller/kubeconfig/
+  inactive_users: False
+  csrf_trusted_origins: 
+  kubeconfig_file: /app/kubeconfig/config
+  kubeconfig_dir: /app/kubeconfig/
   static:
     replicas: 1
-    image: ghcr.io/scaleoutsystems/stackn/ingress:v0.6.0
+    image: ghcr.io/scaleoutsystems/stackn/studio:develop
     pullPolicy: IfNotPresent
     resources:
       limits:
@@ -47,7 +49,7 @@ studio:
         cpu: "100m"
         memory: "256Mi"
   image: #tell which image to deploy for studio
-    repository: ghcr.io/scaleoutsystems/stackn/studio:v0.6.0 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: ghcr.io/scaleoutsystems/stackn/ingress:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -67,9 +69,16 @@ studio:
   superUser: admin
   superuserPassword: ""
   superuserEmail: admin@test.com
+  version: studio
 
 #kubernetes config
 kubeconfig: ""
+
+#storage access mode
+accessmode: ReadWriteMany
+
+#the cluster domain name (default usually cluster.local)
+cluster_domain: cluster.local
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 domain: studio.127.0.0.1.nip.io
@@ -91,7 +100,13 @@ ingress:
 # Postgres deploy with a single-pod database:
 postgresql:
   enabled: true
-  fullnameOverride: stackn-studio-postgres
+  fullnameOverride: studio-postgres
+  commonAnnotations: {"reloader.stakater.com/auto": "true"}
+  auth:
+    username:
+    password:
+    postgresPassword:
+    database: studio
   primary:
     service:
       ports: 
@@ -101,6 +116,7 @@ postgresql:
       size: "10Gi"
       accessModes:
         - ReadWriteMany
+      storageClass:
 
 # Will be added in future realease, for now keep "enabled:false"
 postgresql-ha:
@@ -125,15 +141,19 @@ celeryWorkers:
       cpu: "1000m"
       memory: "8Gi"
 
+celeryFlower:
+  enabled: true
+
 # default credentials for rabbitmq. override in production!
 rabbit:
+  image: rabbitmq:3-management
   username: admin
   password: ""
 
 chartcontroller:
   enabled: false
   #addSecret -- if true create chart-controller-secret from cluster_config, if false it must be added manually
-  addSecret: true
+  addSecret: false
 
 docker-registry:
   enabled: false
