@@ -20,10 +20,22 @@ spec:
         io.kompose.service: {{ .Release.Name }}-studio
         name: {{ .Release.Name }}-studio
     spec:
+      securityContext:
+        fsGroup: 1000
       initContainers:
+        - name: volume-permissions
+          image: busybox
+          command: ['sh', '-c', 'chown -R 1000 /app/media && chgrp -R 1000 /app/media']
+          volumeMounts:
+          - mountPath: {{ .Values.studio.media.mount_path }}
+            name: mediavol
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
           resources:
             limits:
               cpu: "100m"
@@ -36,12 +48,18 @@ spec:
         - sh
         - scripts/run_web.sh
         env:
-        {{ if .Values.studio.debug }}
         - name: DEBUG
+        {{ if .Values.studio.debug }}
           value: "true"
+        {{ else }}
+          value: "false"
         {{ end }}
         - name: INIT
           value: {{ .Values.studio.init | quote }}
+        - name: STUDIO_STORAGECLASS
+          value: {{ include "stackn.studio.storageclass" . }}
+        - name: STUDIO_ACCESSMODE
+          value: {{ .Values.accessmode }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
@@ -58,20 +76,26 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: password
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.global.postgresql.auth.user }}
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: rabbit-password
+        {{- if .Values.chartcontroller.addSecret }}
         - name: KUBECONFIG
           value: {{ .Values.studio.kubeconfig_file | quote }}
+        {{- end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         volumeMounts:
+          {{- if .Values.chartcontroller.addSecret }}
           - name: kubeconfig
             mountPath: {{ .Values.studio.kubeconfig_dir | quote }}
             readOnly: true
+          {{- end }}
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
@@ -85,15 +109,17 @@ spec:
             cpu: {{ .Values.studio.resources.requests.cpu }}
             memory: {{ .Values.studio.resources.requests.memory }}
 
-    {{- with .Values.imagePullSecrets }}
+    
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        - name: ghcrsecret
+    
       restartPolicy: Always
       volumes:
+      {{- if .Values.chartcontroller.addSecret }}
       - name: kubeconfig
         secret:
           secretName: {{ .Release.Name }}-chart-controller-secret
+      {{- end }}
       - name: {{ .Release.Name}}-settings-configmap
         configMap:
           name: {{ .Release.Name}}-settings-configmap
