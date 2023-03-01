@@ -221,11 +221,11 @@ data:
     # Redis settings
     REDIS_PORT = 6379
     REDIS_DB = 0
-    REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis')
+    REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis-master') #TODO: fetch service dns from bitnami/redis instead
    
     # Celery settings
-    CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ .Release.Name }}-rabbit:5672//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
-    CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
+    CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ include "common.names.fullname" .Subcharts.rabbitmq }}:{{ .Values.rabbitmq.containerPorts.amqp }}//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
+    CELERY_RESULT_BACKEND = 'redis://:%s@%s:%d/%d' % (os.environ.get("REDIS_PASSWORD"),REDIS_HOST, REDIS_PORT, REDIS_DB)
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'
     CELERY_ACCEPT_CONTENT = ['json']

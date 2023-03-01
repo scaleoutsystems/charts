@@ -51,6 +51,11 @@ spec:
       - args:
         - sh
         - ./scripts/run_worker.sh
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+        {{- end }}
         env:
         - name: BASE_PATH
           value: "/app"
@@ -63,11 +68,16 @@ spec:
               key: password
         - name: POSTGRES_USER
           value: {{ .Values.postgresql.global.postgresql.auth.user }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.redis.secretName" . }}
+              key: {{ include "stackn.redis.secretPasswordKey" . }}
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: rabbit-password
+              name: {{ include "stackn.rabbit.secretName" . }}
+              key: rabbitmq-password
         {{- if .Values.chartcontroller.addSecret }}
         - name: KUBECONFIG
           value: {{ .Values.studio.kubeconfig_file | quote }}

@@ -82,7 +82,24 @@ studio:
   superuserPassword: ""
   superuserEmail: admin@test.com
   version: studio
-
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  readinessProbe:
+    enabled: true
+    tcpSocket:
+      port: 8080
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  livenessProbe:
+    enabled: true
+    tcpSocket:
+      port: 8080
+    initialDelaySeconds: 20
+    periodSeconds: 20
+  
 #kubernetes config
 kubeconfig: ""
 
@@ -129,7 +146,21 @@ postgresql:
       accessModes:
         - ReadWriteMany
       storageClass:
-    podLabels: {"app": "stackn-studio"}
+    podLabels: {"app":"stackn-studio"}
+
+redis:
+  enabled: true
+  master:
+    podLabels: {"app":"stackn-studio"}
+  replica:
+    replicaCount: 1
+    podLabels: {"app":"stackn-studio"}
+
+rabbitmq:
+  enabled: true
+  podLabels: {"app":"stackn-studio"}
+
+
 
 # Will be added in future realease, for now keep "enabled:false"
 postgresql-ha:
