@@ -105,7 +105,9 @@ data:
     # permission denied error is introduced
     # when django tries to apply a new migration to corsheaders package. This is because
     # the web server is started as stackn user but the migrations folder in corsheader is root
-    #DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+    # solution for now: setting AutoField as default (below)
+    # then setting BigAutoField on app level (ex /projects/apps.py)
+    DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
     # Django guardian 403 templates
     GUARDIAN_RENDER_403 = True
