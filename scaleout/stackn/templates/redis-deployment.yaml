@@ -9,6 +9,7 @@ metadata:
   labels:
     io.kompose.service: {{ .Release.Name }}-redis
     name: {{ .Release.Name }}-redis
+    app: stackn-studio
   name: {{ .Release.Name }}-redis
 spec:
   replicas: 1
@@ -25,6 +26,7 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-redis
         name: {{ .Release.Name }}-redis
+        app: stackn-studio
     spec:
       containers:
       - image: redis

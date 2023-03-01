@@ -28,6 +28,18 @@ global:
 namespace: default
 existingSecret: ""
 
+networkPolicy:
+  enable: false
+  kubernetes:
+    cidr: # To get kubernetes api server endpoints run: $ kubectl get endpoints kubernetes
+    port: 6443
+  internal_cidr: # in-cluster IpBlock cidr, used in allow-internet-[egress|ingress] policy, e.g:
+    - 10.0.0.0/8
+    - 192.168.0.0/16
+    - 172.0.0.0/20
+  ingress_controller_namespace: kube-system
+
+
 studio:
   servicename: studio
   replicas: 1
@@ -117,6 +129,7 @@ postgresql:
       accessModes:
         - ReadWriteMany
       storageClass:
+    podLabels: {"app": "stackn-studio"}
 
 # Will be added in future realease, for now keep "enabled:false"
 postgresql-ha:
