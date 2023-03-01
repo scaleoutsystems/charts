@@ -132,3 +132,6 @@ dmypy.json
 static/open-iconic/
 
 repos/
+
+#Other
+values-local.yaml
