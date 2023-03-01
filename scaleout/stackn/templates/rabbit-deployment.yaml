@@ -9,6 +9,7 @@ metadata:
   labels:
     io.kompose.service: {{ .Release.Name }}-rabbit
     name: {{ .Release.Name }}-rabbit
+    app: stackn-studio
   name: {{ .Release.Name }}-rabbit
 spec:
   replicas: 1
@@ -25,6 +26,7 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-rabbit
         name: {{ .Release.Name }}-rabbit
+        app: stackn-studio
     spec:
       containers:
       - env:

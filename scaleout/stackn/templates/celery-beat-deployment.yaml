@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    reloader.stakater.com/auto: "true"
     kompose.cmd: kompose convert
     kompose.version: 1.20.0 ()
   creationTimestamp: null
@@ -26,6 +25,7 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-celery-beat
         name: {{ .Release.Name }}-celery-beat
+        app: stackn-studio
     spec:
       initContainers:
         - name: wait-for-db
