@@ -4,6 +4,7 @@ metadata:
   annotations:
     kompose.cmd: kompose convert
     kompose.version: 1.20.0 ()
+    reloader.stakater.com/auto: "true"
   creationTimestamp: null
   labels:
     io.kompose.service: {{ .Release.Name }}-celery-beat
@@ -25,7 +26,6 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-celery-beat
         name: {{ .Release.Name }}-celery-beat
-        app: stackn-studio
     spec:
       initContainers:
         - name: wait-for-db
@@ -52,6 +52,11 @@ spec:
       - args:
         - sh
         - ./scripts/run_beat.sh
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+        {{- end }}
         env:
         - name: BASE_PATH
           value: "/app"
@@ -66,11 +71,16 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: password
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.redis.secretName" . }}
+              key: {{ include "stackn.redis.secretPasswordKey" . }}
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: rabbit-password
+              name: {{ include "stackn.rabbit.secretName" . }}
+              key: rabbitmq-password
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-celery-beat

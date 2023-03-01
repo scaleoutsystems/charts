@@ -24,7 +24,7 @@ spec:
         allow-api-access: "true"
     spec:
       securityContext:
-        fsGroup: 1000
+        fsGroup: {{ .Values.studio.securityContext.fsGroup }}
       initContainers:
         - name: volume-permissions
           image: busybox
@@ -81,11 +81,16 @@ spec:
               key: password
         - name: POSTGRES_USER
           value: {{ .Values.postgresql.global.postgresql.auth.user }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.redis.secretName" . }}
+              key: {{ include "stackn.redis.secretPasswordKey" . }}
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: rabbit-password
+              name: {{ include "stackn.rabbit.secretName" . }}
+              key: rabbitmq-password
         {{- if .Values.chartcontroller.addSecret }}
         - name: KUBECONFIG
           value: {{ .Values.studio.kubeconfig_file | quote }}
@@ -111,8 +116,25 @@ spec:
           requests:
             cpu: {{ .Values.studio.resources.requests.cpu }}
             memory: {{ .Values.studio.resources.requests.memory }}
-
-    
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+        {{- end }}
+        {{- if .Values.studio.readinessProbe.enabled }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.studio.readinessProbe.tcpSocket.port }}
+          initialDelaySeconds: {{ .Values.studio.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.studio.readinessProbe.periodSeconds }}
+        {{- end }}
+        {{- if .Values.studio.livenessProbe.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.studio.livenessProbe.tcpSocket.port }}
+          initialDelaySeconds: {{ .Values.studio.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.studio.livenessProbe.periodSeconds }}
+        {{- end }}
       imagePullSecrets:
         - name: ghcrsecret
     

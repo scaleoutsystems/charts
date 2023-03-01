@@ -40,8 +40,18 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
   
+  - name: redis
+    version: 17.7.4
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+  
+  - name: rabbitmq
+    version: 11.9.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: rabbitmq.enabled
+    
   - name: common
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 2.x.x
+    version: 2.0.4

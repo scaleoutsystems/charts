@@ -103,6 +103,21 @@ Return postgres secret
 {{- end -}}
 
 {{/*
+Return redis secret
+*/}}
+{{- define "stackn.redis.secretName" -}}
+{{- include "redis.secretName" .Subcharts.redis -}}
+{{- end -}}
+
+
+{{/*
+Return redis secret password key
+*/}}
+{{- define "stackn.redis.secretPasswordKey" -}}
+{{- include "redis.secretPasswordKey" .Subcharts.redis -}}
+{{- end -}}
+
+{{/*
 Return STACKn studio storageClass
 */}}
 {{- define "stackn.studio.storageclass" -}}
@@ -144,9 +159,14 @@ Return STACKn rabbit password
 Return STACKn rabbit username
 */}}
 {{- define "stackn.rabbit.username" -}}
-{{- if .Values.rabbit.username -}}
-    {{- .Values.rabbit.username -}}
-{{- else -}}
-    admin
+{{- .Values.rabbitmq.auth.username -}}
 {{- end -}}
+
+{{/*
+Return STACKn rabbit secret
+*/}}
+{{- define "stackn.rabbit.secretName" -}}
+{{- include "rabbitmq.secretPasswordName" .Subcharts.rabbitmq -}}
 {{- end -}}
+
+
