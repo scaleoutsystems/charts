@@ -24,12 +24,16 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-celery-flower
         name: {{ .Release.Name }}-celery-flower
-        app: stackn-studio
     spec:
       containers:
       - args:
           - sh
           - ./scripts/run_flower.sh
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+        {{- end }}
         env:
         - name: BASE_PATH
           value: "/app"
