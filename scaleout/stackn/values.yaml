@@ -150,6 +150,7 @@ postgresql:
 
 redis:
   enabled: true
+  commonAnnotations: {"reloader.stakater.com/auto": "true"}
   master:
     podLabels: {"app":"stackn-studio"}
   replica:
@@ -158,7 +159,10 @@ redis:
 
 rabbitmq:
   enabled: true
-  podLabels: {"app":"stackn-studio"}
+  commonAnnotations: {"reloader.stakater.com/auto": "true"}
+  podLabels: {"app":"stackn-studio","allow-api-access": "true"}
+  persistence:
+    enabled: false
 
 
 
