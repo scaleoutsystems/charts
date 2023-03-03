@@ -23,6 +23,7 @@ spec:
         app: stackn-studio
         allow-api-access: "true"
     spec:
+      automountServiceAccountToken: false
       securityContext:
         fsGroup: {{ .Values.studio.securityContext.fsGroup }}
       initContainers:

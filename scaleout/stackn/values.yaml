@@ -27,6 +27,14 @@ global:
 
 namespace: default
 existingSecret: ""
+serviceAccount:
+  create: true
+  automountServiceAccountToken: true
+rbac:
+  create: true
+
+commonLabels: {}
+commonAnnotations: {}
 
 networkPolicy:
   enable: false
