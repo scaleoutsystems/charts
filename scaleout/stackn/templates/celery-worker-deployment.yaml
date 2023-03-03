@@ -26,6 +26,7 @@ spec:
         app: stackn-studio
         allow-api-access: "true"
     spec:
+      serviceAccountName: {{ include "common.names.fullname" .}}
       initContainers:
         - name: wait-for-db
           image: postgres
