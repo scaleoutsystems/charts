@@ -25,6 +25,7 @@ spec:
         type: app
         pod: nginx-static
     spec:
+      automountServiceAccountToken: false
       volumes:
       - name: rp-conf
         configMap:
