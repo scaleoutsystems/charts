@@ -121,6 +121,11 @@ spec:
         securityContext:
           runAsUser: {{ .Values.studio.securityContext.runAsUser }}
           runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+          allowPrivilegeEscalation: {{ .Values.studio.securityContext.allowPrivilegeEscalation }}
+          privileged: {{ .Values.studio.securityContext.privileged }}
+          capabilities:
+            drop:
+              - all
         {{- end }}
         {{- if .Values.studio.readinessProbe.enabled }}
         readinessProbe:
