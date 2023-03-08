@@ -81,7 +81,57 @@ spec:
     - podSelector:
         matchLabels:
           app: stackn-studio
-
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-studio-web
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  podSelector:
+    matchLabels:
+      networking/allow-egress-to-studio-web: "true"
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          web: studio-web
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-from-project-to-studio-web
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      web: studio-web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: lab
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-from-celery-worker-to-project
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: {{ .Release.Name }}-celery-worker
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mlflow
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
