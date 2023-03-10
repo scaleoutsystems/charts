@@ -280,3 +280,11 @@ data:
     EMAIL_FILE_PATH =  os.path.join(BASE_DIR, 'sent_emails')
     
     VERSION = {{ .Values.studio.version | quote  }}
+
+    MIGRATION_MODULES = {
+        'apps': 'studio.migrations.apps',
+        'models': 'studio.migrations.models',
+        'monitor': 'studio.migrations.monitor',
+        'portal': 'studio.migrations.portal',
+        'projects': 'studio.migrations.projects'
+    }
