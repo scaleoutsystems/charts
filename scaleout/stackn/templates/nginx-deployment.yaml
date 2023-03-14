@@ -37,6 +37,14 @@ spec:
       - name: static
         image: {{ .Values.studio.static.image }}
         imagePullPolicy: {{ .Values.studio.static.pullPolicy }}
+        # securityContext:
+        #   runAsUser: 101
+        #   runAsGroup: 101
+        #   allowPrivilegeEscalation: false
+        #   privileged: false
+        #   capabilities:
+        #     drop:
+        #       - all
         volumeMounts:
         - name: rp-conf
           mountPath: /etc/nginx/nginx.conf
