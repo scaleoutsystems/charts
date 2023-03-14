@@ -48,7 +48,7 @@ data:
     if DEBUG:
         ALLOWED_HOSTS = ['*']
     else:
-        ALLOWED_HOSTS = ['{{ .Values.domain }}']
+        ALLOWED_HOSTS = ['{{ .Values.domain }}', '{{ .Release.Name }}-{{ .Values.studio.servicename }}']
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -206,12 +206,12 @@ data:
     USE_TZ = True
 
     # Media Files for Studio apps
-    MEDIA_URL = {{ .Values.studio.media.mount_path | quote }}
-    MEDIA_ROOT = {{ .Values.studio.media.mount_path | quote }}
+    #MEDIA_URL = {{ .Values.studio.media.mount_path | quote }}
+    #MEDIA_ROOT = {{ .Values.studio.media.mount_path | quote }}
 
     #From studio
-    #MEDIA_URL = '/media/'
-    #MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
     # Related to user registration and authetication workflow
     LOGIN_REDIRECT_URL = '/projects'
