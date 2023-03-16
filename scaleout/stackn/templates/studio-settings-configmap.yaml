@@ -80,6 +80,16 @@ data:
         "customtags",
     ]
 
+    {{ if .Values.studio.custom_apps.enabled }}
+    CUSTOM_APPS = [{{- range .Values.studio.custom_apps.apps }}{{. | quote }},{{- end }}]
+    INSTALLED_APPS = INSTALLED_APPS + CUSTOM_APPS
+    {{ end }}
+
+    {{ if .Values.studio.auth_user_model.override }}
+    AUTH_USER_MODEL = {{ .Values.studio.auth_user_model.model | quote }}
+    {{ end }}
+
+
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -288,3 +298,10 @@ data:
         'portal': 'studio.migrations.portal',
         'projects': 'studio.migrations.projects'
     }
+
+    {{ if .Values.studio.custom_migrations.enabled }}
+    {{- range $key, $value := .Values.studio.custom_migrations.apps }}
+    MIGRATION_MODULES[{{$key | quote }}] = {{$value | quote }}
+    {{- end }}
+    {{- end }}
+    

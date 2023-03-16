@@ -54,6 +54,19 @@ studio:
   debug: true
   init: true
   inactive_users: False
+  custom_apps:
+    enabled: false
+    apps:
+    - "control"
+    - "user"
+  custom_migrations:
+    enabled: false
+    apps:
+      user: "studio.migrations.user"
+      control: "studio.migrations.control"
+  auth_user_model:
+    override: false
+    model: "user.User"
   csrf_trusted_origins: 
   kubeconfig_file: /app/kubeconfig/config
   kubeconfig_dir: /app/kubeconfig/
