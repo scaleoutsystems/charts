@@ -67,6 +67,8 @@ spec:
           value: "/app"
         - name: GET_HOSTS_FROM
           value: dns
+        - name: DEBUG
+          value: "false"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
