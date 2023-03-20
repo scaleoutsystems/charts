@@ -136,6 +136,23 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: allow-egress-from-studio-web-to-project
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      web: studio-web
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: fedn-reducer
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: allow-ingress-from-studio
   namespace: {{ .Values.namespace | default "default" }}
 spec:

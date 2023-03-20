@@ -55,10 +55,9 @@ studio:
   init: true
   inactive_users: False
   custom_apps:
-    enabled: false
+    enabled: true
     apps:
-    - "control"
-    - "user"
+    - "common"
   custom_migrations:
     enabled: false
     apps:

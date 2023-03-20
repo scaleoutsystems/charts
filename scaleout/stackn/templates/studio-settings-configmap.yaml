@@ -69,8 +69,6 @@ data:
         'django_filters',
         'tagulous',
         'guardian',
-        'crispy_forms',
-        'common',
         "portal",
         "projects",
         "models",
