@@ -184,7 +184,7 @@ rabbitmq:
   commonAnnotations: {"reloader.stakater.com/auto": "true"}
   podLabels: {"app":"stackn-studio","allow-api-access": "true"}
   persistence:
-    enabled: false
+    enabled: true
 
 
 
@@ -235,7 +235,8 @@ grafana:
   enabled: false
 
 reloader:
-  enabled: true
+  enabled: false
   namespace: default
   reloader:
     watchGlobally: false
+  fullnameOverride: stackn-studio
