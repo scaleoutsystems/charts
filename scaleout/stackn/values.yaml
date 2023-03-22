@@ -239,4 +239,3 @@ reloader:
   namespace: default
   reloader:
     watchGlobally: false
-  fullnameOverride: stackn-studio
