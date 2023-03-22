@@ -103,7 +103,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-ingress-from-project-to-studio-web
-  namespace: default
+  namespace: {{ .Values.namespace | default "default" }}
 spec:
   podSelector:
     matchLabels:
@@ -120,7 +120,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-from-celery-worker-to-project
-  namespace: default
+  namespace: {{ .Values.namespace | default "default" }}
 spec:
   podSelector:
     matchLabels:
@@ -137,7 +137,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-from-studio-web-to-project
-  namespace: default
+  namespace: {{ .Values.namespace | default "default" }}
 spec:
   podSelector:
     matchLabels:
