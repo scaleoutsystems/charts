@@ -10,24 +10,12 @@ spec:
   policyTypes:
   - Ingress
 ---
-
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: default-deny-egress
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels: {}
-  policyTypes:
-  - Egress
----
 #Requires that kube-system namespace has label name: kube-system. To create label:
 # $ kubectl label namespace kube-system name=kube-system
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-dns-access
+  name: default-deny-egress
   namespace: {{ .Values.namespace | default "default" }}
 spec:
   podSelector:
@@ -41,6 +29,8 @@ spec:
           name: kube-system
     ports:
     - protocol: UDP
+      port: 53
+    - protocol: TCP
       port: 53
 ---
 # Certain services (such as celery-workers) need to allow egress to k8s api-server
