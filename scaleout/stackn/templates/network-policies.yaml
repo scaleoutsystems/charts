@@ -85,6 +85,40 @@ spec:
     - protocol: TCP
       port: {{ .Values.networkPolicy.kubernetes.port }}
 ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-reloader
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Release.Name }}-reloader
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: {{ .Release.Name }}-reloader
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-from-reloader
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Release.Name }}-reloader
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .Release.Name }}-reloader
+---
 {{- end }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
