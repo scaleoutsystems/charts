@@ -65,6 +65,27 @@ spec:
     - protocol: TCP
       port: {{ .Values.networkPolicy.kubernetes.port }}
 ---
+{{- if .Values.reloader.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: reloader-allow-api-access
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  podSelector:
+    matchLabels: 
+      app: {{ .Release.Name }}-reloader
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: {{ .Values.networkPolicy.kubernetes.cidr }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.networkPolicy.kubernetes.port }}
+---
+{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
