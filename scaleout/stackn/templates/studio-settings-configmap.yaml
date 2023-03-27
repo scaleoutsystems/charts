@@ -45,7 +45,7 @@ data:
     if DEBUG:
         ALLOWED_HOSTS = ['*']
     else:
-        ALLOWED_HOSTS = ['{{ .Values.domain }}', '{{ .Release.Name }}-{{ .Values.studio.servicename }}']
+        ALLOWED_HOSTS = ['{{ .Values.domain }}', '{{ .Release.Name }}-{{ .Values.studio.servicename }}', '{{ .Release.Name }}-studio.{{ .Values.namespace | default "default" }}.svc.{{ .Values.cluster_domain | default "cluster.local"}}']
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
