@@ -109,8 +109,6 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-          - name: mediavol
-            mountPath: {{ .Values.studio.media.mount_path }}
       imagePullSecrets:
         - name: ghcrsecret
       restartPolicy: Always
@@ -126,8 +124,4 @@ spec:
           items:
           - key: settings.py
             path: settings.py
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-studio-media
-
 status: {}
