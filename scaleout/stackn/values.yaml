@@ -69,6 +69,7 @@ studio:
   csrf_trusted_origins: 
   kubeconfig_file: /app/kubeconfig/config
   kubeconfig_dir: /app/kubeconfig/
+  kube_api_request_timeout: 1
   static:
     replicas: 1
     image: ghcr.io/scaleoutsystems/stackn/studio:develop

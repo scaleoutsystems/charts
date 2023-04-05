@@ -246,6 +246,7 @@ data:
     EXTERNAL_KUBECONF = True
     KUBECONFIG = {{ .Values.studio.kubeconfig_file | quote }}
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
+    KUBE_API_REQUEST_TIMEOUT = {{ .Values.studio.kube_api_request_timeout }}
     STORAGECLASS = {{ include "stackn.studio.storageclass" . | quote }}
     
     # App dependencies
