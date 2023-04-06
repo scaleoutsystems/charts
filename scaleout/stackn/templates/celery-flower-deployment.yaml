@@ -67,6 +67,11 @@ spec:
         - name: KUBECONFIG
           value: {{ .Values.studio.kubeconfig_file | quote }}
         {{- end }}
+        - name: DJANGO_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: django-secret-key
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-celery-worker
