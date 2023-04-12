@@ -22,6 +22,7 @@ spec:
         web: studio-web
         app: stackn-studio
         allow-api-access: "true"
+        networking/allow-internet-egress: "true"
     spec:
       automountServiceAccountToken: false
       securityContext:
