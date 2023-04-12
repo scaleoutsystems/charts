@@ -122,6 +122,20 @@ studio:
       port: 8080
     initialDelaySeconds: 20
     periodSeconds: 20
+  djangoSecret: ''
+  emailService:
+    enabled: false
+    host: ''
+    port: 587
+    hostUser: ''
+    hostPassword: ''
+    smtpEmailFrom: ''
+    domainName: ''
+    apiKey: ''
+    notifyOnAccountRegisterList:
+      - ''
+
+
   
 #kubernetes config
 kubeconfig: ""
