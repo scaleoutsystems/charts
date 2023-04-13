@@ -131,6 +131,7 @@ studio:
     hostPassword: ''
     smtpEmailFrom: ''
     domainName: ''
+    apiEndpoint: ''
     apiKey: ''
     notifyOnAccountRegisterList:
       - ''
