@@ -10,7 +10,7 @@ metadata:
 spec:
   replicas: {{ .Values.studio.replicas }}
   strategy:
-    type: Recreate
+    type: {{ .Values.studio.strategy.type }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-studio
