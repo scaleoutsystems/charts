@@ -331,4 +331,6 @@ data:
     }
 
     PROJECTS_PER_USER_LIMIT = 3
+
+    STUDIO_ACCESSMODE = os.environ.get("STUDIO_ACCESSMODE", "")
     
