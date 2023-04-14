@@ -13,6 +13,8 @@ spec:
       app: stackn-studio
       type: app
       pod: nginx-static
+  strategy:
+      type: {{ .Values.studio.static.strategy.type }}
   template:
     metadata:
       annotations:
