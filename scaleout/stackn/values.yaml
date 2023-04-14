@@ -51,6 +51,8 @@ networkPolicy:
 studio:
   servicename: studio
   replicas: 1
+  strategy:
+    type: RollingUpdate
   debug: true
   init: true
   inactive_users: False
