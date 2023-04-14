@@ -72,6 +72,8 @@ studio:
   kube_api_request_timeout: 1
   static:
     replicas: 1
+    strategy:
+      type: Recreate
     image: ghcr.io/scaleoutsystems/stackn/studio:develop
     pullPolicy: IfNotPresent
     resources:
