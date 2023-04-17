@@ -296,6 +296,7 @@ data:
     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
     EMAIL_FILE_PATH =  os.path.join(BASE_DIR, 'sent_emails')
     {{ end }}
+    EMAIL_TEMPLATE_PROTOCOL = "https"
 
     VERSION = {{ .Values.studio.version | quote  }}
 
