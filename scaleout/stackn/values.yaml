@@ -55,6 +55,7 @@ studio:
     type: RollingUpdate
   debug: true
   init: true
+  enable_project_extra_settings: false
   inactive_users: False
   custom_apps:
     enabled: true
