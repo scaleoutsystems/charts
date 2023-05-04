@@ -338,4 +338,7 @@ data:
     ENABLE_PROJECT_EXTRA_SETTINGS = True
     {{ else }}
     ENABLE_PROJECT_EXTRA_SETTINGS = False
-    {{ end }} 
+    {{ end }}
+    {{ if .Values.studio.disabledAppInstanceFields.enabled }}
+    DISABLED_APP_INSTANCE_FIELDS = [{{- range .Values.studio.disabledAppInstanceFields.fields }}{{. | quote }},{{- end }}]
+    {{- end }}
