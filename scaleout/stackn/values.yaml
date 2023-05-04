@@ -140,6 +140,10 @@ studio:
     apiKey: ''
     notifyOnAccountRegisterList:
       - ''
+  disabledAppInstanceFields:
+    enabled: false
+    fields:
+      - ''
 
 
   
