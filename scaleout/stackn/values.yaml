@@ -15,6 +15,7 @@ global:
     superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
     existingSecret: ""
     storageClass: ""
+    eventListenerUserPassword: ""
   postgresql:
       auth:
         username: studio
@@ -107,6 +108,8 @@ studio:
   superUser: admin
   superuserPassword: ""
   superuserEmail: admin@test.com
+  eventListenerUsername: ""
+  eventListenerUserPassword: ""
   version: studio
   securityContext:
     enabled: true
