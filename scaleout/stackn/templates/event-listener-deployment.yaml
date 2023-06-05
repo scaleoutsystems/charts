@@ -22,7 +22,7 @@ spec:
       serviceAccountName: studio
       containers:
       - image: {{ .Values.eventListener.image.repository }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: studio-event-listener
         resources:
           limits:
@@ -48,6 +48,8 @@ spec:
         - name: TOKEN_ENDPOINT
           value: {{ .Values.eventListener.tokenEndpoint | quote }}
       restartPolicy: Always
+      securityContext:
+        fsGroup: {{ .Values.studio.securityContext.fsGroup }}
       initContainers:
         - name: wait-for-studio
           image: busybox:1.28.4
