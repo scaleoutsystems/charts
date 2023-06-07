@@ -31,6 +31,16 @@ spec:
           requests:
             cpu: 50m
             memory: 20Mi
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+          allowPrivilegeEscalation: {{ .Values.studio.securityContext.allowPrivilegeEscalation }}
+          privileged: {{ .Values.studio.securityContext.privileged }}
+          capabilities:
+            drop:
+              - all
+        {{- end }}
         env:
         - name: EVENT_LISTENER_USERNAME
           value: {{ .Values.studio.eventListenerUsername | quote }}
