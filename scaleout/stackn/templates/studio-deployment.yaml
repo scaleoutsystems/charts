@@ -186,7 +186,7 @@ spec:
           items:
           - key: settings.py
             path: settings.py
-      {{ if .Values.studio.debug }}
+      {{ if .Values.studio.media.storage.mountStudio }}
       - name: mediavol
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
