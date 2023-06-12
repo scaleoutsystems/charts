@@ -104,6 +104,7 @@ studio:
       size: "5Gi"
       accessModes: ReadWriteMany
       claimName: studio-media
+      mountStudio: false
     mount_path: /app/media/
   superUser: admin
   superuserPassword: ""
