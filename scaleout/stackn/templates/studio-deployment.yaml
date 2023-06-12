@@ -135,7 +135,7 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-          {{ if .Values.studio.debug }}
+          {{ if .Values.studio.media.storage.mountStudio }}
           - name: mediavol
             mountPath: {{ .Values.studio.media.mount_path }}
           {{ end }}
