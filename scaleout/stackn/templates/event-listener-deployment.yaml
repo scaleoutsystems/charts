@@ -20,6 +20,8 @@ spec:
     spec:
       automountServiceAccountToken: true
       serviceAccountName: studio
+      imagePullSecrets:
+        - name: ghcrsecret
       containers:
       - image: {{ .Values.eventListener.image.repository }}
         imagePullPolicy: IfNotPresent
@@ -55,6 +57,8 @@ spec:
           value: {{ .Values.eventListener.studioServicePort | quote }}
         - name: APP_STATUS_ENDPOINT
           value: {{ .Values.eventListener.appStatusEndpoint | quote }}
+        - name: APP_STATUSES_ENDPOINT
+          value: {{ .Values.eventListener.appStatusesEndpoint | quote }}
         - name: TOKEN_ENDPOINT
           value: {{ .Values.eventListener.tokenEndpoint | quote }}
       restartPolicy: Always
