@@ -220,6 +220,7 @@ eventListener:
   studioServiceName: "studio-studio"
   studioServicePort: "8080"
   appStatusEndpoint: "api/app/status"
+  appStatusesEndpoint: "api/app/statuses"
   tokenEndpoint: "api/token-auth/"
   image: #tell which image to deploy for studio
     repository: ""  #sha-da2cfdc #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
