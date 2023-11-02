@@ -342,3 +342,4 @@ data:
     {{ if .Values.studio.disabledAppInstanceFields.enabled }}
     DISABLED_APP_INSTANCE_FIELDS = [{{- range .Values.studio.disabledAppInstanceFields.fields }}{{. | quote }},{{- end }}]
     {{- end }}
+    FEDN_LOCAL_CONTROLLER = os.environ.get("FEDN_LOCAL_CONTROLLER", None)
