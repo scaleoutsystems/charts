@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: http://studio-studio.default.svc.cluster.local:8080/auth/
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($http_grpc_server) { grpc_pass grpc://$http_grpc_server.default.svc.cluster.local:80; }
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-set-headers: X-Forwarded-Proto:$scheme
+  labels:
+    io.kompose.service: {{ .Release.Name }}-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - {{ .Values.grpc_domain }}
+      secretName: prod-ingress
+  rules:
+    - host: {{ .Values.grpc_domain }}
+      http:
+        paths:
+        - path: /
+          backend:
+            service:
+              name: {{ $.Release.Name }}-studio
+              port:
+                number: 8080
+          pathType: Prefix
