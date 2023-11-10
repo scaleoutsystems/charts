@@ -1,136 +1,137 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into STACKn templates.
 
-# REQUIREMENT: 
-# - set a storage class with ability to serve ReadWriteMany
-#   Name: storageClassName, and/or set anchor &śtorage_class
-#   Description: Set a storage class for the resources that are reused for multi-mount-points in cluster. To reduce wasteful copying we allow to use the same dataset volume to be mounted multiple times.
-#   Default: microk8s-hostpath, use nfs-client for docker-for-desktop
+# NOTES: 
+# - set a storage class everywhere you can see storageClass: ""
+# - if you want to use an existing secret, set the name of the secret everywhere you see existingSecret: ""
+#   furthermore, the Bitnami subcharts (postgresql, redis, rabbitmq) also usually have a existingSecret value
+# - Bitnami subcharts (postgresql, redis, rabbitmq) also usually have existingStorage values
+# - if NetworkPolicy is enabled, set the kubernetes api server endpoints and port
+# - Please set all values named password, the chart do have features to generate passwords, 
+#   but this is not always working as expected during upgrades.
+# - Please do not change values with "Do not change unless you know what you are doing."
 
 #Set global values to overide default
 global:
   studio:
-    superUser: "" ##these are currently not handled by stackn: default: admin
-    superuserPassword: ""
-    superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
-    existingSecret: ""
-    storageClass: ""
-  postgresql:
+    superUser: "" # these are currently not handled by stackn: default: admin
+    superuserPassword: "" # password for Django superuser
+    superuserEmail: ""  # these are currently not handled by stackn: default: admin@test.com
+    existingSecret: "" # name of existing secret containing superuserPassword and superuserEmail (optional)
+    storageClass: "" # storage class for persistent storage
+  postgresql: # global postgresql chart values
       auth:
-        username: studio
-        password: ""
-        postgresPassword: ""
-        database: studio
-        existingSecret: ""
+        username: studio # username for postgresql
+        password: "" # password for postgresql
+        postgresPassword: "" # password for postgresql
+        database: studio # database name for postgresql
+        existingSecret: "" # name of existing secret containing postgresPassword (optional)
       storageClass:
 
 
-namespace: default
-existingSecret: ""
-serviceAccount:
-  create: true
-  automountServiceAccountToken: true
-rbac:
-  create: true
+namespace: default # namespace to deploy stackn in
+existingSecret: "" # name of existing secret, should replace basic-secrets.yaml
+serviceAccount: # service account for stackn
+  create: true # create service account
+  automountServiceAccountToken: true # automount service account token
+rbac: # rbac for stackn
+  create: true # create rbac
 
-commonLabels: {}
-commonAnnotations: {}
+commonLabels: {} # common labels for stackn
+commonAnnotations: {} # common annotations for stackn
 
-networkPolicy:
-  enable: false
-  kubernetes:
+networkPolicy: # network policy for stackn
+  enable: false # enable network policy
+  kubernetes: 
     cidr: # To get kubernetes api server endpoints run: $ kubectl get endpoints kubernetes
-    port: 6443 
+    port: 6443  # port for kubernetes api server
   internal_cidr: # in-cluster IpBlock cidr, used in allow-internet-[egress|ingress] policy, e.g:
     - 10.0.0.0/8
     - 192.168.0.0/16
     - 172.0.0.0/20
-  ingress_controller_namespace: kube-system
+  ingress_controller_namespace: kube-system # namespace for ingress controller
 
 
-studio:
-  servicename: studio
-  replicas: 1
-  strategy:
-    type: RollingUpdate
-  debug: true
-  init: true
-  enable_project_extra_settings: false
-  inactive_users: False
-  custom_apps:
+studio: # studio values
+  servicename: studio # name of studio service
+  replicas: 1 # number of studio replicas
+  strategy: # strategy for studio
+    type: RollingUpdate # type of strategy
+  debug: true # debug mode for studio Django server
+  init: true # init studio script (deprecated)
+  enable_project_extra_settings: false # enable project extra settings. Do not change unless you know what you are doing.
+  inactive_users: False # inactive users by default. When set to True, users will be inactive by default and need to be activated by an admin.
+  custom_apps: # custom apps for studio. Do not change unless you know what you are doing.
     enabled: true
     apps:
     - "common"
-  custom_migrations:
+  custom_migrations: # custom migrations for studio. Do not change unless you know what you are doing.
     enabled: false
     apps:
       user: "studio.migrations.user"
       control: "studio.migrations.control"
-  auth_user_model:
+  auth_user_model: # auth user model for studio. Do not change unless you know what you are doing.
     override: false
     model: "user.User"
-  csrf_trusted_origins: 
-  kubeconfig_file: /app/kubeconfig/config
-  kubeconfig_dir: /app/kubeconfig/
-  kube_api_request_timeout: 1
-  static:
-    replicas: 1
-    strategy:
-      type: Recreate
-    image: ghcr.io/scaleoutsystems/stackn/studio:develop
-    pullPolicy: IfNotPresent
-    resources:
-      limits:
-        cpu: 1
-        memory: "512Mi"
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
+  csrf_trusted_origins: # csrf trusted origins for studio. Add extra trusted origins for CSRF protection.
+  kube_api_request_timeout: 1 # timeout for kubernetes api requests, such as request to create/delete resources
+  static: # static values for studio, ngnix server for serving static files and media files
+    replicas: 1 # number of static replicas
+    strategy: # strategy for static
+      type: Recreate # type of strategy
+    image: ghcr.io/scaleoutsystems/stackn/studio:develop # image for static
+    pullPolicy: IfNotPresent # pull policy for static
+    resources: # resources for static
+      limits: # limits for static
+        cpu: 1 # cpu limit for static
+        memory: "512Mi" # memory limit for static
+      requests: # requests for static
+        cpu: "100m" # cpu request for static
+        memory: "256Mi" # memory request for static
   image: #tell which image to deploy for studio
     repository: ghcr.io/scaleoutsystems/stackn/ingress:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
-  resources:
-    limits:
-      cpu: "1000m"
-      memory: "4Gi"
-    requests:
-      cpu: "400m"
-      memory: "2Gi"
-  storage:
-    storageClass: ""
-  media:
-    storage:
-      storageClass: ""
-      size: "5Gi"
-      accessModes: ReadWriteMany
-      claimName: studio-media
-      mountStudio: false
-    mount_path: /app/media/
-  superUser: admin
-  superuserPassword: ""
-  superuserEmail: admin@test.com
-  version: studio
-  securityContext:
-    enabled: true
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
+  resources: # resources for studio
+    limits: # limits for studio
+      cpu: "1000m" # cpu limit for studio
+      memory: "1Gi" # memory limit for studio
+    requests: # requests for studio
+      cpu: "20m" # cpu request for studio
+      memory: "100Mi" # memory request for studio
+  storage: # storage for studio
+    storageClass: "" # storage class for studio
+  media: # media for studio
+    storage: # storage for media
+      storageClass: "" # storage class for media
+      size: "5Gi" # size for media
+      accessModes: ReadWriteMany # access modes for media
+      claimName: studio-media # claim name for media
+    mount_path: /app/media/ # mount path for media
+  superUser: admin # super user in Django admin for studio
+  superuserPassword: "" # password for Django superuser
+  superuserEmail: admin@test.com # email for Django superuser
+  version: studio # version for studio, this will show in the studio UI
+  securityContext: # security context for studio. Do not change unless you know what you are doing.
+    enabled: true 
+    runAsUser: 1000 
+    runAsGroup: 1000 
+    fsGroup: 1000 
     allowPrivilegeEscalation: false
-    privileged: false
-  readinessProbe:
+    privileged: false 
+  readinessProbe: # readiness probe for studio. Do not change unless you know what you are doing.
     enabled: true
     tcpSocket:
       port: 8080
     initialDelaySeconds: 20
     periodSeconds: 10
-  livenessProbe:
+  livenessProbe: # liveness probe for studio. Do not change unless you know what you are doing.
     enabled: true
     tcpSocket:
       port: 8080
     initialDelaySeconds: 20
     periodSeconds: 20
-  djangoSecret: ''
-  emailService:
+  djangoSecret: '' # django secret for studio (optional, will be generated if not set)
+  emailService: # email service for studio. Please concact Scaleout if you want to use this feature.
     enabled: false
     host: ''
     port: 587
@@ -142,41 +143,56 @@ studio:
     apiKey: ''
     notifyOnAccountRegisterList:
       - ''
-  disabledAppInstanceFields:
+  disabledAppInstanceFields: # disabled app instance fields for studio. Do not change unless you know what you are doing.
     enabled: false
     fields:
       - ''
+ # Celery workers for studio 
+celeryWorkers:
+  replicas: 3 # number of celery workers, recommended to have at least 3
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "250Mi"
+    limits:
+      cpu: "1200m"
+      memory: "2Gi"
 
+# Celery task UI for studio
+celeryFlower:
+  enabled: false
 
-  
-#kubernetes config
-kubeconfig: ""
+# Pull secrets for studio, used to pull images from private repositories such as Harbor
+# To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
+imagePullSecrets:
+  name: ghcrsecret
 
-#storage access mode
+#Genreal storage access mode
 accessmode: ReadWriteMany
 
-#the cluster domain name (default usually cluster.local)
+# the cluster domain name (default cluster.local)
 cluster_domain: cluster.local
 
 # Enable ingress if you want your to access the studio solution from a kubernetes host/localhost.
 domain: studio.127.0.0.1.nip.io
-grpc_domain: grpc.studio.127.0.0.1.nip.io
-session_cookie_domain: .127.0.0.1.nip.io
+grpc_domain: grpc.studio.127.0.0.1.nip.io # domain for grpc servers (combiners in FL)
+session_cookie_domain: .127.0.0.1.nip.io # domain for session cookie, should be .domain
 ingress:
   enabled: true
   annotations: {}
   hosts:
     - host: studio.127.0.0.1.nip.io
-  # setup TLS if you have a platform certificate or use 'tls-acme' if you have certbot deployed and want to generate a certificate.
   tls:
-    - secretName: prod-ingress
+    - secretName: prod-ingress # name of the secret containing the TLS certificate. Please contact Scaleout for details.
       hosts:
         - studio.127.0.0.1.nip.io
 
 ### A Postgres database for STACKn ###
-# Here we use https://charts.bitnami.com/bitnami postgresql chart 
+# Here we use https://charts.bitnami.com/bitnami postgresql chart
+# Please see the documentation for this Bitnami chart for more details on values:
+# https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+# Please also observe the version we are using in requirements.yaml
 
-# Postgres deploy with a single-pod database:
 postgresql:
   enabled: true
   fullnameOverride: studio-postgres
@@ -196,16 +212,48 @@ postgresql:
       accessModes:
         - ReadWriteMany
       storageClass:
-    podLabels: {"app":"stackn-studio"}
+    podLabels: {"app":"stackn-studio"} # Do not change unless you know what you are doing.
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
+## Redis chart for stateful caching ##
+# Please see the documentation for this Bitnami chart for more details on values:
+# https://github.com/bitnami/charts/tree/main/bitnami/redis
+# Please also observe the version we are using in requirements.yaml
 
 redis:
   enabled: true
-  commonAnnotations: {"reloader.stakater.com/auto": "true"}
+  commonAnnotations: {"reloader.stakater.com/auto": "true"} # Required for reloader to work
   master:
-    podLabels: {"app":"stackn-studio"}
+    podLabels: {"app":"stackn-studio"} # Do not change unless you know what you are doing.
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
   replica:
     replicaCount: 1
     podLabels: {"app":"stackn-studio"}
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
+
+## RabbitMQ chart for messaging queue ##
+# Please see the documentation for this Bitnami chart for more details on values:
+# https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq
+# Please also observe the version we are using in requirements.yaml
 
 rabbitmq:
   enabled: true
@@ -213,6 +261,13 @@ rabbitmq:
   podLabels: {"app":"stackn-studio","allow-api-access": "true"}
   persistence:
     enabled: true
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
 
 
 
@@ -220,48 +275,30 @@ rabbitmq:
 postgresql-ha:
   enabled: false
 
-### DEPLOY SECRETS WITH private helm chart 'secrets' from platform/secrets
-## Name: imagePullSecret
-## Description: Secret to pull images from our private repository.
-imagePullSecrets:
-  - name: regcred
-
-## to create a regcred
-## kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
-
-celeryWorkers:
-  replicas: 2
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "1Gi"
-    limits:
-      cpu: "1000m"
-      memory: "8Gi"
-
-celeryFlower:
-  enabled: true
-
-# default credentials for rabbitmq. override in production!
+# default credentials for rabbitmq. Deprecated. Using Bitnamis chart for rabbitmq. Will be removed in future release.
 rabbit:
   image: rabbitmq:3-management
   username: admin
   password: ""
 
+# Deprecated. Will be removed in future release.
 chartcontroller:
   enabled: false
-  #addSecret -- if true create chart-controller-secret from cluster_config, if false it must be added manually
   addSecret: false
 
+# Deprecated. Will be removed in future release.
 docker-registry:
   enabled: false
 
+# Deprecated. Will be removed in future release. Should be deployed seperatly in a different namespace.
 prometheus:
   enabled: false
 
+# Deprecated. Will be removed in future release. Should be deployed seperatly in a different namespace.
 grafana:
   enabled: false
 
+# Enable reloader for (see reloader.stakater.com) auto reload of deployments when configmaps change
 reloader:
   enabled: true
   namespace: default
