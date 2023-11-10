@@ -171,8 +171,7 @@ spec:
           periodSeconds: {{ .Values.studio.livenessProbe.periodSeconds }}
         {{- end }}
       imagePullSecrets:
-        - name: ghcrsecret
-    
+        - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
       volumes:
       {{- if .Values.chartcontroller.addSecret }}

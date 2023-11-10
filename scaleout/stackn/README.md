@@ -7,7 +7,7 @@ STACKn
 
 A Helm chart for deploying STACKn by Scaleout
 
-Current chart version is 0.3.0
+Current chart version is 0.4.1
 
 ## Chart Requirements
 
@@ -57,10 +57,6 @@ This secret should be in the same namespace as studio deployment.
 If networkPolicy.enable = true, you have to make sure the correct kubernetes endpoint IP is provided in networkPolicy.kubernetes.cidr, and the correct port networkPolicy.kubernetes.port. This is to enable access of some services to the kubernetes API server through a created Service Account. To get your cluster's kubernetes endpoint run:
 ```
 kubectl get endpoints kubernetes
-```
-To allow for within-cluster DNS, the kube-system namespace need the label:
-```
-kubectl label namespace kube-system name=kube-system
 ```
 
 Further, for ingress resources you need to set  networkPolicy.ingress_controller_namespace. If value can vary depending on your cluster configuration, but for NGINX ingress controller it's usually "ingress-nginx".
