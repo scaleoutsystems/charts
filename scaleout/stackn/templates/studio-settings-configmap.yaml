@@ -242,7 +242,7 @@ data:
     # Other Helm/k8s deployment settings
     CHART_FOLDER = "/app/charts/apps"
     EXTERNAL_KUBECONF = True
-    KUBECONFIG = {{ .Values.studio.kubeconfig_file | quote }}
+    KUBECONFIG = "/app/kubeconfig/config" # Deprecated, uses ServiceAccount instead
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
     KUBE_API_REQUEST_TIMEOUT = {{ .Values.studio.kube_api_request_timeout }}
     STORAGECLASS = {{ include "stackn.studio.storageclass" . | quote }}
