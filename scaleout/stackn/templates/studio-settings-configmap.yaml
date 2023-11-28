@@ -70,7 +70,7 @@ data:
         "monitor",
         "apps",
         "api",
-        "customtags",
+        "system",
     ]
 
     {{ if .Values.studio.custom_apps.enabled }}
@@ -306,7 +306,8 @@ data:
         'models': 'studio.migrations.models',
         'monitor': 'studio.migrations.monitor',
         'portal': 'studio.migrations.portal',
-        'projects': 'studio.migrations.projects'
+        'projects': 'studio.migrations.projects',
+        'system': 'studio.migrations.system'
     }
 
     {{ if .Values.studio.custom_migrations.enabled }}
