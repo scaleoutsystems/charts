@@ -26,6 +26,53 @@ data:
         'guardian.backends.ObjectPermissionBackend',
     ]
 
+    # JWT settings
+    # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+    # To generate a new key pair with RS256 algorithm:
+    # ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
+    # openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+    ENABLE_JWT = os.environ.get("ENABLE_JWT", False)
+    if ENABLE_JWT:
+        SIMPLE_JWT = {
+            "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+            "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+            "ROTATE_REFRESH_TOKENS": False,
+            "BLACKLIST_AFTER_ROTATION": False,
+            "UPDATE_LAST_LOGIN": False,
+
+            "ALGORITHM": {{ .Values.studio.jwt_auth.algorithm | quote }},
+            "SIGNING_KEY": os.environ.get("SIGNING_KEY", ""),
+            "VERIFYING_KEY": os.environ.get("VERIFYING_KEY", ""), 
+            "AUDIENCE": None,
+            "ISSUER": None,
+            "JSON_ENCODER": None,
+            "JWK_URL": None,
+            "LEEWAY": 0,
+            "AUTH_HEADER_TYPES": ("Bearer",),
+            "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+            "USER_ID_FIELD": "id",
+            "USER_ID_CLAIM": "user_id",
+            "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+            "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+            "TOKEN_TYPE_CLAIM": "token_type",
+            "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+            "JTI_CLAIM": "jti",
+
+            "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+            "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+            "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+            "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+            "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+            "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+            "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+            "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+            "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+        }
+
+
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
