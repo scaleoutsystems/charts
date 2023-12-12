@@ -73,6 +73,11 @@ studio: # studio values
   auth_user_model: # auth user model for studio. Do not change unless you know what you are doing.
     override: false
     model: "user.User"
+  jwt_auth: # Use JWT authentication for REST and client authentication. Needs exsiting secret with private key.
+    enabled: false
+    algorithm: RS256
+    public_key: "" # If algorithm is RS256, set RSA public key here 
+    existingSecret: "" # name of existing secret containing private key, need "private_key" key
   csrf_trusted_origins: # csrf trusted origins for studio. Add extra trusted origins for CSRF protection.
   kube_api_request_timeout: 1 # timeout for kubernetes api requests, such as request to create/delete resources
   static: # static values for studio, ngnix server for serving static files and media files

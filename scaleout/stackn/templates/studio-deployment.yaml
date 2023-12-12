@@ -69,6 +69,21 @@ spec:
           value: {{ include "stackn.studio.storageclass" . }}
         - name: STUDIO_ACCESSMODE
           value: {{ .Values.accessmode }}
+        {{ if .Values.studio.jwt_auth.enabled }}
+        - name: ENABLE_JWT
+          value: true
+        {{ end }}
+        {{ if .Values.studio.jwt_auth.existingSecret }}
+        - name: SIGNING_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ Values.studio.jwt_auth.existingSecret }}
+              key: private_key
+        {{ end }}
+        {{ if .Values.studio.jwt_auth.public_key }}
+        - name: VERIFYING_KEY
+          value: {{ .Values.studio.jwt_auth.public_key | quote }}
+        {{ end }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
