@@ -77,7 +77,7 @@ spec:
         - name: SIGNING_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ Values.studio.jwt_auth.existingSecret }}
+              name: {{ .Values.studio.jwt_auth.existingSecret }}
               key: private_key
         {{ end }}
         {{ if .Values.studio.jwt_auth.public_key }}
