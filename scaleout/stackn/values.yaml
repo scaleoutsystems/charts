@@ -152,6 +152,11 @@ studio: # studio values
     enabled: false
     fields:
       - ''
+  discord:
+    alert_on_new_user: false
+    alert_webhook_url: ''
+    alert_on_new_user_message: ''
+    
  # Celery workers for studio 
 celeryWorkers:
   replicas: 3 # number of celery workers, recommended to have at least 3
