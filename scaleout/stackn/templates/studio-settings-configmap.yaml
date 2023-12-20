@@ -392,3 +392,7 @@ data:
     DISABLED_APP_INSTANCE_FIELDS = [{{- range .Values.studio.disabledAppInstanceFields.fields }}{{. | quote }},{{- end }}]
     {{- end }}
     FEDN_LOCAL_CONTROLLER = os.environ.get("FEDN_LOCAL_CONTROLLER", None)
+
+    DISCORD_ALERT_ON_NEW_USER = {{ if .Values.studio.discord.alert_on_new_user }}True{{ else }}False{{ end }}
+    DISCORD_ALTERT_WEBHOOK_URL = {{ .Values.studio.discord.alert_webhook_url | quote }}
+    DISCORD_ALERT_ON_NEW_USER_MESSAGE = {{ .Values.studio.discord.alert_on_new_user_message | quote }}
