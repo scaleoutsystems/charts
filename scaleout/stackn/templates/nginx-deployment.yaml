@@ -34,7 +34,7 @@ spec:
           name: {{ .Release.Name }}-static-config
       - name: mediavol
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-studio-media
+          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
       containers:
       - name: static
         image: {{ .Values.studio.static.image }}
@@ -61,5 +61,5 @@ spec:
             cpu: {{ .Values.studio.static.resources.requests.cpu }}
             memory: {{ .Values.studio.static.resources.requests.memory }}
       imagePullSecrets:
-        - name: ghcrsecret
+        - name: {{ .Values.imagePullSecrets.name }}
 

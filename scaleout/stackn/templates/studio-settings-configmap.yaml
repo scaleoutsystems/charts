@@ -26,6 +26,53 @@ data:
         'guardian.backends.ObjectPermissionBackend',
     ]
 
+    # JWT settings
+    # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+    # To generate a new key pair with RS256 algorithm:
+    # ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
+    # openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+    ENABLE_JWT = os.environ.get("ENABLE_JWT", False)
+    if ENABLE_JWT:
+        SIMPLE_JWT = {
+            "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+            "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+            "ROTATE_REFRESH_TOKENS": False,
+            "BLACKLIST_AFTER_ROTATION": False,
+            "UPDATE_LAST_LOGIN": False,
+
+            "ALGORITHM": {{ .Values.studio.jwt_auth.algorithm | quote }},
+            "SIGNING_KEY": os.environ.get("SIGNING_KEY", ""),
+            "VERIFYING_KEY": os.environ.get("VERIFYING_KEY", ""), 
+            "AUDIENCE": None,
+            "ISSUER": None,
+            "JSON_ENCODER": None,
+            "JWK_URL": None,
+            "LEEWAY": 0,
+            "AUTH_HEADER_TYPES": ("Bearer",),
+            "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+            "USER_ID_FIELD": "id",
+            "USER_ID_CLAIM": "user_id",
+            "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+            "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+            "TOKEN_TYPE_CLAIM": "token_type",
+            "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+            "JTI_CLAIM": "jti",
+
+            "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+            "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+            "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+            "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+            "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+            "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+            "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+            "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+            "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+        }
+
+
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -70,7 +117,7 @@ data:
         "monitor",
         "apps",
         "api",
-        "customtags",
+        "system",
     ]
 
     {{ if .Values.studio.custom_apps.enabled }}
@@ -242,7 +289,7 @@ data:
     # Other Helm/k8s deployment settings
     CHART_FOLDER = "/app/charts/apps"
     EXTERNAL_KUBECONF = True
-    KUBECONFIG = {{ .Values.studio.kubeconfig_file | quote }}
+    KUBECONFIG = "/app/kubeconfig/config" # Deprecated, uses ServiceAccount instead
     NAMESPACE = {{ .Values.namespace | default "default" | quote }}
     KUBE_API_REQUEST_TIMEOUT = {{ .Values.studio.kube_api_request_timeout }}
     STORAGECLASS = {{ include "stackn.studio.storageclass" . | quote }}
@@ -272,6 +319,7 @@ data:
                         'Waiting', 'Installing', 'Created', 'ContainerCreating']
 
     DOMAIN = {{ .Values.domain | quote }}
+    GRPC_DOMAIN = {{ .Values.grpc_domain | quote }}
     AUTH_DOMAIN = '{{ .Release.Name }}-studio.{{ .Values.namespace | default "default" }}.svc.{{ .Values.cluster_domain | default "cluster.local"}}'
     AUTH_PROTOCOL = 'http'
     STUDIO_URL = 'http://{{ .Release.Name }}-studio:8080'
@@ -305,7 +353,8 @@ data:
         'models': 'studio.migrations.models',
         'monitor': 'studio.migrations.monitor',
         'portal': 'studio.migrations.portal',
-        'projects': 'studio.migrations.projects'
+        'projects': 'studio.migrations.projects',
+        'system': 'studio.migrations.system'
     }
 
     {{ if .Values.studio.custom_migrations.enabled }}
@@ -317,7 +366,7 @@ data:
     # Defines how many apps a user is allowed to create within one project
     APPS_PER_PROJECT_LIMIT = {
         "vscode": 1,
-        "volumeK8s": 1,
+        "volumeK8s": 5,
         "pytorch-serve": 1,
         "tensorflow-serve": 1,
         "mlflow-serve": 1,
@@ -325,7 +374,7 @@ data:
         "minio": 1,
         "jupyter-lab": 1,
         "mongo-express": 1,
-        "reducer": 2,
+        "reducer": 1,
         "docker-registry": 1,
         "combiner": 2,
         "mongodb": 1,
@@ -342,3 +391,8 @@ data:
     {{ if .Values.studio.disabledAppInstanceFields.enabled }}
     DISABLED_APP_INSTANCE_FIELDS = [{{- range .Values.studio.disabledAppInstanceFields.fields }}{{. | quote }},{{- end }}]
     {{- end }}
+    FEDN_LOCAL_CONTROLLER = os.environ.get("FEDN_LOCAL_CONTROLLER", None)
+
+    DISCORD_ALERT_ON_NEW_USER = {{ if .Values.studio.discord.alert_on_new_user }}True{{ else }}False{{ end }}
+    DISCORD_ALTERT_WEBHOOK_URL = {{ .Values.studio.discord.alert_webhook_url | quote }}
+    DISCORD_ALERT_ON_NEW_USER_MESSAGE = {{ .Values.studio.discord.alert_on_new_user_message | quote }}

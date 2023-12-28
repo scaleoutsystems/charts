@@ -69,6 +69,21 @@ spec:
           value: {{ include "stackn.studio.storageclass" . }}
         - name: STUDIO_ACCESSMODE
           value: {{ .Values.accessmode }}
+        {{ if .Values.studio.jwt_auth.enabled }}
+        - name: ENABLE_JWT
+          value: true
+        {{ end }}
+        {{ if .Values.studio.jwt_auth.existingSecret }}
+        - name: SIGNING_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.jwt_auth.existingSecret }}
+              key: private_key
+        {{ end }}
+        {{ if .Values.studio.jwt_auth.public_key }}
+        - name: VERIFYING_KEY
+          value: {{ .Values.studio.jwt_auth.public_key | quote }}
+        {{ end }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
@@ -113,6 +128,7 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: django-secret-key
+        {{ if .Values.studio.emailService.enabled }}
         - name: EMAIL_HOST_USER
           valueFrom:
             secretKeyRef:
@@ -128,6 +144,7 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: email-api-key
+        {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
@@ -140,7 +157,7 @@ spec:
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
-          {{ if .Values.studio.debug }}
+          {{ if .Values.studio.media.storage.mountStudio }}
           - name: mediavol
             mountPath: {{ .Values.studio.media.mount_path }}
           {{ end }}
@@ -176,8 +193,7 @@ spec:
           periodSeconds: {{ .Values.studio.livenessProbe.periodSeconds }}
         {{- end }}
       imagePullSecrets:
-        - name: ghcrsecret
-    
+        - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
       volumes:
       {{- if .Values.chartcontroller.addSecret }}
@@ -191,8 +207,8 @@ spec:
           items:
           - key: settings.py
             path: settings.py
-      {{ if .Values.studio.debug }}
+      {{ if .Values.studio.media.storage.mountStudio }}
       - name: mediavol
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-studio-media
+          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
       {{ end }}
