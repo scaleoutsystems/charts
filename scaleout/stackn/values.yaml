@@ -14,12 +14,13 @@
 #Set global values to overide default
 global:
   studio:
-    superUser: "" # these are currently not handled by stackn: default: admin
-    superuserPassword: "" # password for Django superuser
-    superuserEmail: ""  # these are currently not handled by stackn: default: admin@test.com
-    existingSecret: "" # name of existing secret containing superuserPassword and superuserEmail (optional)
-    storageClass: "" # storage class for persistent storage
-  postgresql: # global postgresql chart values
+    superUser: "" ##these are currently not handled by stackn: default: admin
+    superuserPassword: ""
+    superuserEmail: ""  ##these are currently not handled by stackn: default: admin@test.com
+    existingSecret: ""
+    storageClass: ""
+    eventListenerUserPassword: ""
+  postgresql:
       auth:
         username: studio # username for postgresql
         password: "" # password for postgresql
@@ -96,31 +97,32 @@ studio: # studio values
   image: #tell which image to deploy for studio
     repository: ghcr.io/scaleoutsystems/stackn/ingress:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
-  resources: # resources for studio
-    limits: # limits for studio
-      cpu: "1000m" # cpu limit for studio
-      memory: "1Gi" # memory limit for studio
-    requests: # requests for studio
-      cpu: "20m" # cpu request for studio
-      memory: "100Mi" # memory request for studio
-  storage: # storage for studio
-    storageClass: "" # storage class for studio
-  media: # media for studio
-    storage: # storage for media
-      storageClass: "" # storage class for media
-      size: "5Gi" # size for media
-      accessModes: ReadWriteMany # access modes for media
-      claimName: studio-media # claim name for media
-    mount_path: /app/media/ # mount path for media
-  superUser: admin # super user in Django admin for studio
-  superuserPassword: "" # password for Django superuser
-  superuserEmail: admin@test.com # email for Django superuser
-  version: studio # version for studio, this will show in the studio UI
-  securityContext: # security context for studio. Do not change unless you know what you are doing.
-    enabled: true 
-    runAsUser: 1000 
-    runAsGroup: 1000 
-    fsGroup: 1000 
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "4Gi"
+    requests:
+      cpu: "20m"
+      memory: "2Gi"
+  storage:
+    storageClass: ""
+  media:
+    storage:
+      storageClass: ""
+      size: "5Gi"
+      accessModes: ReadWriteMany
+    mount_path: /app/media/
+  superUser: admin
+  superuserPassword: ""
+  superuserEmail: admin@test.com
+  eventListenerUsername: ""
+  eventListenerUserPassword: ""
+  version: studio
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
     allowPrivilegeEscalation: false
     privileged: false 
   readinessProbe: # readiness probe for studio. Do not change unless you know what you are doing.
@@ -279,6 +281,17 @@ rabbitmq:
       cpu: "1000m"
       memory: "1Gi"
 
+
+
+eventListener:
+  studioServiceName: "studio-studio"
+  studioServicePort: "8080"
+  appStatusEndpoint: "api/app/status"
+  appStatusesEndpoint: "api/app/statuses"
+  tokenEndpoint: "api/token-auth/"
+  image: #tell which image to deploy for studio
+    repository: ""  #sha-da2cfdc #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 
 # Will be added in future realease, for now keep "enabled:false"

@@ -93,6 +93,13 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: studio-superuser-password
+        - name: EVENT_LISTENER_USERNAME
+          value: {{ .Values.studio.eventListenerUsername | quote }}
+        - name: EVENT_LISTENER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-event-listener-user-password
         - name: GET_HOSTS_FROM
           value: dns
         - name: POSTGRES_PASSWORD
