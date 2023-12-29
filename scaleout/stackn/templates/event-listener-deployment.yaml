@@ -24,7 +24,7 @@ spec:
         - name: ghcrsecret
       containers:
       - image: {{ .Values.eventListener.image.repository }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.eventListener.image.pullPolicy }}
         name: studio-event-listener
         resources:
           limits:
