@@ -316,7 +316,7 @@ data:
     # App statuses
     APPS_STATUS_SUCCESS = ['Running', 'Succeeded', 'Success']
     APPS_STATUS_WARNING = ['Pending', 'Installed',
-                        'Waiting', 'Installing', 'Created']
+                        'Waiting', 'Installing', 'Created', 'ContainerCreating']
 
     DOMAIN = {{ .Values.domain | quote }}
     GRPC_DOMAIN = {{ .Values.grpc_domain | quote }}

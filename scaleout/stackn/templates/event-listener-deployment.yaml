@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: studio-event-listener
+  name: studio-event-listener
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: studio-event-listener
+  template:
+    metadata:
+      labels:
+        name: studio-event-listener
+        app: stackn-studio
+        allow-api-access: "true"
+    spec:
+      automountServiceAccountToken: true
+      serviceAccountName: studio
+      imagePullSecrets:
+        - name: ghcrsecret
+      containers:
+      - image: {{ .Values.eventListener.image.repository }}
+        imagePullPolicy: {{ .Values.eventListener.image.pullPolicy }}
+        name: studio-event-listener
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 20Mi
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+          allowPrivilegeEscalation: {{ .Values.studio.securityContext.allowPrivilegeEscalation }}
+          privileged: {{ .Values.studio.securityContext.privileged }}
+          capabilities:
+            drop:
+              - all
+        {{- end }}
+        env:
+        - name: EVENT_LISTENER_USERNAME
+          value: {{ .Values.studio.eventListenerUsername | quote }}
+        - name: EVENT_LISTENER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-event-listener-user-password
+        - name: STUDIO_SERVICE_NAME
+          value: {{ .Values.eventListener.studioServiceName | quote }}
+        - name: STUDIO_SERVICE_PORT
+          value: {{ .Values.eventListener.studioServicePort | quote }}
+        - name: APP_STATUS_ENDPOINT
+          value: {{ .Values.eventListener.appStatusEndpoint | quote }}
+        - name: APP_STATUSES_ENDPOINT
+          value: {{ .Values.eventListener.appStatusesEndpoint | quote }}
+        - name: TOKEN_ENDPOINT
+          value: {{ .Values.eventListener.tokenEndpoint | quote }}
+      restartPolicy: Always
+      securityContext:
+        fsGroup: {{ .Values.studio.securityContext.fsGroup }}
+      initContainers:
+        - name: wait-for-studio
+          image: busybox:1.28.4
+          command: ['sh', '-c', "until nslookup {{ .Release.Name }}-{{ .Values.studio.servicename }}; do echo waiting for {{ .Release.Name }}-{{ .Values.studio.servicename }} service; sleep 30; done"]
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
