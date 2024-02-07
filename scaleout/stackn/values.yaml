@@ -158,22 +158,12 @@ studio: # studio values
     alert_on_new_user: false
     alert_webhook_url: ''
     alert_on_new_user_message: ''
-    
- # Celery workers for studio 
-celeryWorkers:
-  replicas: 3 # number of celery workers, recommended to have at least 3
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "250Mi"
-    limits:
-      cpu: "1200m"
-      memory: "2Gi"
 
-# Celery task UI for studio
-celeryFlower:
-  enabled: false
-
+  argocd:
+    enabled: true
+    url: ''
+    token: ''
+ 
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
 # To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
 imagePullSecrets:
@@ -262,27 +252,6 @@ redis:
         memory: "1Gi"
 
 
-## RabbitMQ chart for messaging queue ##
-# Please see the documentation for this Bitnami chart for more details on values:
-# https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq
-# Please also observe the version we are using in requirements.yaml
-
-rabbitmq:
-  enabled: true
-  commonAnnotations: {"reloader.stakater.com/auto": "true"}
-  podLabels: {"app":"stackn-studio","allow-api-access": "true"}
-  persistence:
-    enabled: true
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "256Mi"
-    limits:
-      cpu: "1000m"
-      memory: "1Gi"
-
-
-
 eventListener:
   studioServiceName: "studio-studio"
   studioServicePort: "8080"
@@ -298,28 +267,6 @@ eventListener:
 postgresql-ha:
   enabled: false
 
-# default credentials for rabbitmq. Deprecated. Using Bitnamis chart for rabbitmq. Will be removed in future release.
-rabbit:
-  image: rabbitmq:3-management
-  username: admin
-  password: ""
-
-# Deprecated. Will be removed in future release.
-chartcontroller:
-  enabled: false
-  addSecret: false
-
-# Deprecated. Will be removed in future release.
-docker-registry:
-  enabled: false
-
-# Deprecated. Will be removed in future release. Should be deployed seperatly in a different namespace.
-prometheus:
-  enabled: false
-
-# Deprecated. Will be removed in future release. Should be deployed seperatly in a different namespace.
-grafana:
-  enabled: false
 
 # Enable reloader for (see reloader.stakater.com) auto reload of deployments when configmaps change
 reloader:
