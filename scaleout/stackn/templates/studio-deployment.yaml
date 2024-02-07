@@ -145,6 +145,14 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: email-api-key
         {{ end }}
+        {{ if .Values.studio.argocd.enabled }}
+        - name: ARGO_CD_ENABLED
+          value: true
+        - name: ARGO_CD_API_URL
+          value: {{ Values.studio.argocd.url }}
+        - name: ARGO_CD_TOKEN
+          value: {{ Values.studio.argocd.token }}
+        {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
