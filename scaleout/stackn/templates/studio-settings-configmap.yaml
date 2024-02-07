@@ -396,3 +396,8 @@ data:
     DISCORD_ALERT_ON_NEW_USER = {{ if .Values.studio.discord.alert_on_new_user }}True{{ else }}False{{ end }}
     DISCORD_ALTERT_WEBHOOK_URL = {{ .Values.studio.discord.alert_webhook_url | quote }}
     DISCORD_ALERT_ON_NEW_USER_MESSAGE = {{ .Values.studio.discord.alert_on_new_user_message | quote }}
+
+    # Argo CD API URL and Token
+    ARGO_CD_ENABLED = os.environ.get("ARGO_CD_ENABLED", False)
+    ARGO_CD_API_URL = os.environ.get("ARGO_CD_API_URL", None)
+    ARGO_CD_TOKEN = os.environ.get("ARGO_CD_TOKEN", None)
