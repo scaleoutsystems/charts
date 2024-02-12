@@ -114,15 +114,6 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.redis.secretName" . }}
               key: {{ include "stackn.redis.secretPasswordKey" . }}
-        - name: RABBITMQ_DEFAULT_PASS
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "stackn.rabbit.secretName" . }}
-              key: rabbitmq-password
-        {{- if .Values.chartcontroller.addSecret }}
-        - name: KUBECONFIG
-          value: {{ .Values.studio.kubeconfig_file | quote }}
-        {{- end }}
         - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
@@ -147,21 +138,16 @@ spec:
         {{ end }}
         {{ if .Values.studio.argocd.enabled }}
         - name: ARGO_CD_ENABLED
-          value: true
+          value: "true"
         - name: ARGO_CD_API_URL
-          value: {{ Values.studio.argocd.url }}
+          value: {{ .Values.studio.argocd.url | default "" }}
         - name: ARGO_CD_TOKEN
-          value: {{ Values.studio.argocd.token }}
+          value: {{ .Values.studio.argocd.token | default "" }}
         {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         volumeMounts:
-          {{- if .Values.chartcontroller.addSecret }}
-          - name: kubeconfig
-            mountPath: {{ .Values.studio.kubeconfig_dir | quote }}
-            readOnly: true
-          {{- end }}
           - mountPath: /app/studio/settings.py
             subPath: settings.py
             name: {{ .Release.Name}}-settings-configmap
@@ -204,11 +190,6 @@ spec:
         - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
       volumes:
-      {{- if .Values.chartcontroller.addSecret }}
-      - name: kubeconfig
-        secret:
-          secretName: {{ .Release.Name }}-chart-controller-secret
-      {{- end }}
       - name: {{ .Release.Name}}-settings-configmap
         configMap:
           name: {{ .Release.Name}}-settings-configmap
