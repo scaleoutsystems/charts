@@ -140,7 +140,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
-              key: argo-cd-token
+              key: studio-argocd-token
         {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
