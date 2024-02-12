@@ -106,9 +106,10 @@ data:
         'rest_framework',
         'django.contrib.staticfiles',
         'corsheaders',
+        'django_extensions',    # for executing runscript among others
+        'django_filters',
         'guardian',
         "projects",
-        "models",
         "apps",
         "api",
         "system",
@@ -263,7 +264,7 @@ data:
     LOGOUT_URL = 'logout'
     INACTIVE_USERS = {{ if .Values.studio.inactive_users }}True{{ else }}False{{ end }}
 
-    # For Model Objects creation (check models/models.py, pre_save_model() )
+    # Specific to Studio stack:
     VERSION_BACKEND = 'studio.version.Version'
 
     # Other Helm/k8s deployment settings
