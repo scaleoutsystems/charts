@@ -290,9 +290,6 @@ data:
     PROJECTLOG_MODEL = "projects.ProjectLog"
     ENVIRONMENT_MODEL = "projects.Environment"
     RELEASENAME_MODEL = "projects.ReleaseName"
-    # Portal
-    PUBLISHEDMODEL_MODEL = "portal.PublishedModel"
-    PUBLICMODELOBJECT_MODEL = "portal.PublicModelObject"
 
     # App statuses
     APPS_STATUS_SUCCESS = ['Running', 'Succeeded', 'Success']
@@ -331,9 +328,6 @@ data:
 
     MIGRATION_MODULES = {
         'apps': 'studio.migrations.apps',
-        'models': 'studio.migrations.models',
-        'monitor': 'studio.migrations.monitor',
-        'portal': 'studio.migrations.portal',
         'projects': 'studio.migrations.projects',
         'system': 'studio.migrations.system'
     }
@@ -382,3 +376,4 @@ data:
     ARGO_CD_ENABLED = os.environ.get("ARGO_CD_ENABLED", False)
     ARGO_CD_API_URL = os.environ.get("ARGO_CD_API_URL", None)
     ARGO_CD_TOKEN = os.environ.get("ARGO_CD_TOKEN", None)
+    S3HOST = os.environ.get("S3HOST", "minio-fedn")
