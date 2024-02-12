@@ -106,15 +106,9 @@ data:
         'rest_framework',
         'django.contrib.staticfiles',
         'corsheaders',
-        'django_celery_beat',
-        'django_extensions',    # for executing runscript among others
-        'django_filters',
-        'tagulous',
         'guardian',
-        "portal",
         "projects",
         "models",
-        "monitor",
         "apps",
         "api",
         "system",
@@ -269,20 +263,6 @@ data:
     LOGOUT_URL = 'logout'
     INACTIVE_USERS = {{ if .Values.studio.inactive_users }}True{{ else }}False{{ end }}
 
-    # Specific to Studio stack:
-    # Redis settings
-    REDIS_PORT = 6379
-    REDIS_DB = 0
-    REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', '{{ .Release.Name }}-redis-master') #TODO: fetch service dns from bitnami/redis instead
-   
-    # Celery settings
-    CELERY_BROKER_URL = 'amqp://{{ include "stackn.rabbit.username" . }}:{}@{{ include "common.names.fullname" .Subcharts.rabbitmq }}:{{ .Values.rabbitmq.containerPorts.amqp }}//'.format(os.environ.get("RABBITMQ_DEFAULT_PASS"))
-    CELERY_RESULT_BACKEND = 'redis://:%s@%s:%d/%d' % (os.environ.get("REDIS_PASSWORD"),REDIS_HOST, REDIS_PORT, REDIS_DB)
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_RESULT_SERIALIZER = 'json'
-    CELERY_ACCEPT_CONTENT = ['json']
-    CELERY_TIMEZONE = "UTC"
-    CELERY_ENABLE_UTC = True
     # For Model Objects creation (check models/models.py, pre_save_model() )
     VERSION_BACKEND = 'studio.version.Version'
 
