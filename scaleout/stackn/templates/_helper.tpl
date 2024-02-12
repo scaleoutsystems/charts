@@ -103,21 +103,6 @@ Return postgres secret
 {{- end -}}
 
 {{/*
-Return redis secret
-*/}}
-{{- define "stackn.redis.secretName" -}}
-{{- include "redis.secretName" .Subcharts.redis -}}
-{{- end -}}
-
-
-{{/*
-Return redis secret password key
-*/}}
-{{- define "stackn.redis.secretPasswordKey" -}}
-{{- include "redis.secretPasswordKey" .Subcharts.redis -}}
-{{- end -}}
-
-{{/*
 Return STACKn studio storageClass
 */}}
 {{- define "stackn.studio.storageclass" -}}
@@ -142,31 +127,3 @@ Return STACKn studio media storageClass
     {{- .Values.global.postgresql.storageClass -}}
 {{- end -}}
 {{- end -}}
-
-
-{{/*
-Return STACKn rabbit password
-*/}}
-{{- define "stackn.rabbit.password" -}}
-{{- if .Values.rabbit.password -}}
-    {{- .Values.rabbit.password -}}
-{{- else -}}
-    {{- randAlphaNum 10 -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return STACKn rabbit username
-*/}}
-{{- define "stackn.rabbit.username" -}}
-{{- .Values.rabbitmq.auth.username -}}
-{{- end -}}
-
-{{/*
-Return STACKn rabbit secret
-*/}}
-{{- define "stackn.rabbit.secretName" -}}
-{{- include "rabbitmq.secretPasswordName" .Subcharts.rabbitmq -}}
-{{- end -}}
-
-
