@@ -137,7 +137,10 @@ spec:
         - name: ARGO_CD_API_URL
           value: {{ .Values.studio.argocd.url | default "" }}
         - name: ARGO_CD_TOKEN
-          value: {{ .Values.studio.argocd.token | default "" }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-argocd-token
         {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
