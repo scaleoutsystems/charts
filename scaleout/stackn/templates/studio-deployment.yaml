@@ -109,11 +109,6 @@ spec:
               key: password
         - name: POSTGRES_USER
           value: {{ .Values.postgresql.global.postgresql.auth.user }}
-        - name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "stackn.redis.secretName" . }}
-              key: {{ include "stackn.redis.secretPasswordKey" . }}
         - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
