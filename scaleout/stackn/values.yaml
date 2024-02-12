@@ -4,8 +4,8 @@
 # NOTES: 
 # - set a storage class everywhere you can see storageClass: ""
 # - if you want to use an existing secret, set the name of the secret everywhere you see existingSecret: ""
-#   furthermore, the Bitnami subcharts (postgresql, redis, rabbitmq) also usually have a existingSecret value
-# - Bitnami subcharts (postgresql, redis, rabbitmq) also usually have existingStorage values
+#   furthermore, the Bitnami subcharts (postgresql) also usually have a existingSecret value
+# - Bitnami subcharts (postgresql) also usually have existingStorage values
 # - if NetworkPolicy is enabled, set the kubernetes api server endpoints and port
 # - Please set all values named password, the chart do have features to generate passwords, 
 #   but this is not always working as expected during upgrades.
@@ -222,35 +222,6 @@ postgresql:
       limits:
         cpu: "1000m"
         memory: "1Gi"
-
-## Redis chart for stateful caching ##
-# Please see the documentation for this Bitnami chart for more details on values:
-# https://github.com/bitnami/charts/tree/main/bitnami/redis
-# Please also observe the version we are using in requirements.yaml
-
-redis:
-  enabled: true
-  commonAnnotations: {"reloader.stakater.com/auto": "true"} # Required for reloader to work
-  master:
-    podLabels: {"app":"stackn-studio"} # Do not change unless you know what you are doing.
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "1000m"
-        memory: "1Gi"
-  replica:
-    replicaCount: 1
-    podLabels: {"app":"stackn-studio"}
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "1000m"
-        memory: "1Gi"
-
 
 eventListener:
   studioServiceName: "studio-studio"
