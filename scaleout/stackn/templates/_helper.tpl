@@ -102,6 +102,7 @@ Return postgres secret
 {{- end -}}
 {{- end -}}
 
+
 {{/*
 Return STACKn studio storageClass
 */}}
