@@ -25,3 +25,5 @@ stackn-*.tgz
 .vscode/
 modules/
 examples/
+# Values file
+.values-*
