@@ -227,14 +227,26 @@ postgresql:
         cpu: "1000m"
         memory: "1Gi"
 
+## MongoDB chart for FEDn statestore
+# Please see the documentation for this Bitnami chart for more details on values:
+# https://github.com/bitnami/charts/tree/main/bitnami/mongodb
+# Please also observe the version we are using in requirements.yaml
+
+mongodb:
+  enabled: true
+  commonAnnotations: {"reloader.stakater.com/auto": "true"}
+  podLabels: {"app":"stackn-studio","allow-api-access": "true"}
+
+
+
 eventListener:
   studioServiceName: "studio-studio"
   studioServicePort: "8080"
   appStatusEndpoint: "api/app/status"
   appStatusesEndpoint: "api/app/statuses"
   tokenEndpoint: "api/token-auth/"
-  image: #tell which image to deploy for studio
-    repository: ""  #sha-da2cfdc #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+  image: 
+    repository: ghcr.io/scaleoutsystems/studio-kube-controller:main
     pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
 
 
