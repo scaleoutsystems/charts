@@ -21,8 +21,3 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     version: 14.4.6
     condition: mongodb.enabled
-
-  # - name: minio-operator
-  #   version: 4.3.7
-  #   repository: https://operator.min.io
-  #   condition: minio.enabled
