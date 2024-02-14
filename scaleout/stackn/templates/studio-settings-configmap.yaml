@@ -377,3 +377,5 @@ data:
     ARGO_CD_API_URL = os.environ.get("ARGO_CD_API_URL", None)
     ARGO_CD_TOKEN = os.environ.get("ARGO_CD_TOKEN", None)
     S3HOST = os.environ.get("S3HOST", "minio-fedn")
+    S3PORT = os.environ.get("S3PORT", "9000")
+    S3SECRET_NAME = os.environ.get("S3SECRET_NAME", "minio-fedn")

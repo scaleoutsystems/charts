@@ -131,6 +131,13 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: email-api-key
         {{ end }}
+        - name: S3HOST
+          value: {{ .Values.minio.host }}
+        - name: S3PORT
+          value: {{ .Values.minio.port }}
+        - name: S3SECRET_NAME
+          value: {{ .Values.minio.secretName }}
+
         {{ if .Values.studio.argocd.enabled }}
         - name: ARGO_CD_ENABLED
           value: "true"
