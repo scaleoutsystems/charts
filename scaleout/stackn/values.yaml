@@ -261,8 +261,3 @@ reloader:
   namespace: default
   reloader:
     watchGlobally: false
-
-minio:
-  enabled: true
-  host: ""
-  secretName: minio-fedn
