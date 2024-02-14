@@ -257,6 +257,3 @@ reloader:
   namespace: default
   reloader:
     watchGlobally: false
-
-minio:
-  enabled: true
