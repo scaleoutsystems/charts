@@ -142,6 +142,8 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: studio-argocd-token
         {{ end }}
+        - name: S3HOST
+          value: {{ .Values.minio.host }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
