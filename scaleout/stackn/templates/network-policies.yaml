@@ -1,286 +1,286 @@
-{{- if .Values.networkPolicy.enable }}
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: default-deny-ingress
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels: {}
-  policyTypes:
-  - Ingress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: default-deny-egress
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels: {}
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
----
-# Certain services (such as celery-workers) need to allow egress to k8s api-server
-# To get the IP and port (usually 6443) of the api-server:
-# $ kubectl get endpoints kubernetes 
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: {{ .Release.Name }}-allow-api-access
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels: 
-      allow-api-access: "true"
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - ipBlock:
-        cidr: {{ .Values.networkPolicy.kubernetes.cidr }}
-    ports:
-    - protocol: TCP
-      port: {{ .Values.networkPolicy.kubernetes.port }}
----
-{{- if .Values.reloader.enabled }}
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: reloader-allow-api-access
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels: 
-      app: {{ .Release.Name }}-reloader
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - ipBlock:
-        cidr: {{ .Values.networkPolicy.kubernetes.cidr }}
-    ports:
-    - protocol: TCP
-      port: {{ .Values.networkPolicy.kubernetes.port }}
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-to-reloader
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      app: {{ .Release.Name }}-reloader
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: {{ .Release.Name }}-reloader
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-ingress-from-reloader
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      app: {{ .Release.Name }}-reloader
-  policyTypes:
-    - Ingress
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              app: {{ .Release.Name }}-reloader
----
-{{- end }}
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-to-studio
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      app: stackn-studio
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: stackn-studio
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-to-studio-web
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      networking/allow-egress-to-studio-web: "true"
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          web: studio-web
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-ingress-from-project-to-studio-web
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      web: studio-web
-  policyTypes:
-    - Ingress
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              app: lab
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-from-celery-worker-to-project
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      name: {{ .Release.Name }}-celery-worker
-  policyTypes:
-    - Egress
-  egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              app: mlflow
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-from-studio-web-to-project
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      web: studio-web
-  policyTypes:
-    - Egress
-  egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              app: fedn-api-server
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-from-studio-web-to-minio
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      web: studio-web
-  policyTypes:
-    - Egress
-  egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              app: minio
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-ingress-from-studio
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      app: stackn-studio
-  policyTypes:
-    - Ingress
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              app: stackn-studio
----
-# To limit this egress rule for internal IPs, set 
-# .Values.networkPolicy.internal_cidr 
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-internet-egress
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      networking/allow-internet-egress: "true"
-  policyTypes:
-    - Egress
-  egress: 
-  - to:
-    - ipBlock:
-        cidr: 0.0.0.0/0
-        except:
-        {{- range $cidr := .Values.networkPolicy.internal_cidr }}
-        - {{ $cidr }}
-        {{- end }}
+# {{- if .Values.networkPolicy.enable }}
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: default-deny-ingress
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels: {}
+#   policyTypes:
+#   - Ingress
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: default-deny-egress
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels: {}
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - namespaceSelector:
+#         matchLabels:
+#           kubernetes.io/metadata.name: kube-system
+#     ports:
+#     - protocol: UDP
+#       port: 53
+#     - protocol: TCP
+#       port: 53
+# ---
+# # Certain services (such as celery-workers) need to allow egress to k8s api-server
+# # To get the IP and port (usually 6443) of the api-server:
+# # $ kubectl get endpoints kubernetes 
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: {{ .Release.Name }}-allow-api-access
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels: 
+#       allow-api-access: "true"
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - ipBlock:
+#         cidr: {{ .Values.networkPolicy.kubernetes.cidr }}
+#     ports:
+#     - protocol: TCP
+#       port: {{ .Values.networkPolicy.kubernetes.port }}
+# ---
+# {{- if .Values.reloader.enabled }}
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: reloader-allow-api-access
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels: 
+#       app: {{ .Release.Name }}-reloader
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - ipBlock:
+#         cidr: {{ .Values.networkPolicy.kubernetes.cidr }}
+#     ports:
+#     - protocol: TCP
+#       port: {{ .Values.networkPolicy.kubernetes.port }}
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-egress-to-reloader
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: {{ .Release.Name }}-reloader
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - podSelector:
+#         matchLabels:
+#           app: {{ .Release.Name }}-reloader
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-ingress-from-reloader
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: {{ .Release.Name }}-reloader
+#   policyTypes:
+#     - Ingress
+#   ingress:
+#     - from:
+#         - podSelector:
+#             matchLabels:
+#               app: {{ .Release.Name }}-reloader
+# ---
+# {{- end }}
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-egress-to-studio
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: stackn-studio
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - podSelector:
+#         matchLabels:
+#           app: stackn-studio
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-egress-to-studio-web
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       networking/allow-egress-to-studio-web: "true"
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - podSelector:
+#         matchLabels:
+#           web: studio-web
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-ingress-from-project-to-studio-web
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       web: studio-web
+#   policyTypes:
+#     - Ingress
+#   ingress:
+#     - from:
+#         - podSelector:
+#             matchLabels:
+#               app: lab
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-egress-from-celery-worker-to-project
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       name: {{ .Release.Name }}-celery-worker
+#   policyTypes:
+#     - Egress
+#   egress:
+#     - to:
+#         - podSelector:
+#             matchLabels:
+#               app: mlflow
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-egress-from-studio-web-to-project
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       web: studio-web
+#   policyTypes:
+#     - Egress
+#   egress:
+#     - to:
+#         - podSelector:
+#             matchLabels:
+#               app: fedn-api-server
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-egress-from-studio-web-to-minio
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       web: studio-web
+#   policyTypes:
+#     - Egress
+#   egress:
+#     - to:
+#         - podSelector:
+#             matchLabels:
+#               app: minio
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-ingress-from-studio
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: stackn-studio
+#   policyTypes:
+#     - Ingress
+#   ingress:
+#     - from:
+#         - podSelector:
+#             matchLabels:
+#               app: stackn-studio
+# ---
+# # To limit this egress rule for internal IPs, set 
+# # .Values.networkPolicy.internal_cidr 
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-internet-egress
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       networking/allow-internet-egress: "true"
+#   policyTypes:
+#     - Egress
+#   egress: 
+#   - to:
+#     - ipBlock:
+#         cidr: 0.0.0.0/0
+#         except:
+#         {{- range $cidr := .Values.networkPolicy.internal_cidr }}
+#         - {{ $cidr }}
+#         {{- end }}
 
----
-#This rule might not be needed, but is here for utility. Currently no resources use this rule.
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-internet-ingress
-  namespace: {{ .Values.namespace | default "default" }}
-spec:
-  podSelector:
-    matchLabels:
-      networking/allow-internet-ingress: "true"
-  policyTypes:
-    - Ingress
-  ingress: 
-  - from:
-    - ipBlock:
-        cidr: 0.0.0.0/0
-        except:
-        {{- range $cidr := .Values.networkPolicy.internal_cidr }}
-        - {{ $cidr }}
-        {{- end }}
----
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  namespace: {{ .Values.namespace | default "default" }}
-  name: allow-ingress-controller
-spec:
-  podSelector: {}
-  ingress:
-  - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingress_controller_namespace }} # <- This should allow traffic from ingress namespace
-{{- end }}
+# ---
+# #This rule might not be needed, but is here for utility. Currently no resources use this rule.
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-internet-ingress
+#   namespace: {{ .Values.namespace | default "default" }}
+# spec:
+#   podSelector:
+#     matchLabels:
+#       networking/allow-internet-ingress: "true"
+#   policyTypes:
+#     - Ingress
+#   ingress: 
+#   - from:
+#     - ipBlock:
+#         cidr: 0.0.0.0/0
+#         except:
+#         {{- range $cidr := .Values.networkPolicy.internal_cidr }}
+#         - {{ $cidr }}
+#         {{- end }}
+# ---
+# kind: NetworkPolicy
+# apiVersion: networking.k8s.io/v1
+# metadata:
+#   namespace: {{ .Values.namespace | default "default" }}
+#   name: allow-ingress-controller
+# spec:
+#   podSelector: {}
+#   ingress:
+#   - from:
+#       - namespaceSelector:
+#           matchLabels:
+#             kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingress_controller_namespace }} # <- This should allow traffic from ingress namespace
+# {{- end }}
