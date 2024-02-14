@@ -163,6 +163,10 @@ studio: # studio values
     enabled: true
     url: ''
     token: ''
+  
+  project:
+    path: "charts/apps/fedn-project/chart"
+    revision: "feature/SK-626"
  
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
 # To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
@@ -245,3 +249,8 @@ reloader:
   namespace: default
   reloader:
     watchGlobally: false
+
+minio:
+  enabled: true
+  host: ""
+  secretName: minio-fedn

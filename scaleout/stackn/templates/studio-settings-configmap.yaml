@@ -201,7 +201,6 @@ data:
                     'django.contrib.messages.context_processors.messages',
                 ],
                 'libraries': {
-                    'custom_tags': 'models.templatetags.custom_tags',
                 }
             },
         },
@@ -377,3 +376,5 @@ data:
     ARGO_CD_API_URL = os.environ.get("ARGO_CD_API_URL", None)
     ARGO_CD_TOKEN = os.environ.get("ARGO_CD_TOKEN", None)
     S3HOST = os.environ.get("S3HOST", "minio-fedn")
+    CHART_PATH = os.environ.get("CHART_PATH", "{{ .Values.studio.project.path }}")
+    CHART_REVISION = os.environ.get("CHART_REVISION", "{{ .Values.studio.project.revision }}")
