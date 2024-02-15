@@ -134,7 +134,7 @@ spec:
         - name: S3HOST
           value: {{ .Values.minio.host }}
         - name: S3PORT
-          value: {{ .Values.minio.port }}
+          value: "{{ .Values.minio.port }}"
         - name: S3SECRET_NAME
           value: {{ .Values.minio.secretName }}
 
@@ -149,8 +149,6 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: studio-argocd-token
         {{ end }}
-        - name: S3HOST
-          value: {{ .Values.minio.host }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
