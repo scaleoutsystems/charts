@@ -382,4 +382,8 @@ data:
     S3SECRET_KEY = os.environ.get("S3SECRET_KEY", "")
     CHART_PATH = os.environ.get("CHART_PATH", "{{ .Values.studio.project.path }}")
     CHART_REVISION = os.environ.get("CHART_REVISION", "{{ .Values.studio.project.revision }}")
+    MONGO_SERVICE_HOST = os.environ.get("MONGO_SERVICE_HOST", "mongo")
+    MONGO_SERVICE_PORT = os.environ.get("MONGO_SERVICE_PORT", "27017")
+    MONGO_USERNAME = os.environ.get("MONGO_USERNAME", "admin")
+    MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
     
