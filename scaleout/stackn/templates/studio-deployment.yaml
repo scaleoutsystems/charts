@@ -137,7 +137,16 @@ spec:
           value: "{{ .Values.minio.port }}"
         - name: S3SECRET_NAME
           value: {{ .Values.minio.secretName }}
-
+        - name: S3ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.minio.secretName }}
+              key: accessKey
+        - name: S3SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.minio.secretName }}
+              key: secretKey
         {{ if .Values.studio.argocd.enabled }}
         - name: ARGO_CD_ENABLED
           value: "true"
