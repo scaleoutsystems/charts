@@ -158,6 +158,7 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: studio-argocd-token
         {{ end }}
+        {{ if .Values.mongodb.enabled }}
         - name: MONGO_SERVICE_HOST
           value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
         - name: MONGO_SERVICE_PORT
@@ -169,6 +170,7 @@ spec:
             secretKeyRef:
               name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
               key: mongodb-root-password
+        {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
