@@ -31,8 +31,8 @@ data:
     # To generate a new key pair with RS256 algorithm:
     # ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
     # openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
-    ENABLE_JWT = os.environ.get("ENABLE_JWT", False)
-    if ENABLE_JWT:
+    ENABLE_JWT = os.environ.get("ENABLE_JWT", "false")
+    if ENABLE_JWT.lower() == "true":
         SIMPLE_JWT = {
             "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
             "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
