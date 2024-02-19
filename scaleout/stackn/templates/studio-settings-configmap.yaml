@@ -385,5 +385,5 @@ data:
     MONGO_SERVICE_HOST = os.environ.get("MONGO_SERVICE_HOST", "mongo")
     MONGO_SERVICE_PORT = os.environ.get("MONGO_SERVICE_PORT", "27017")
     MONGO_USERNAME = os.environ.get("MONGO_USERNAME", "admin")
-    MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
+    MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD", None)
     
