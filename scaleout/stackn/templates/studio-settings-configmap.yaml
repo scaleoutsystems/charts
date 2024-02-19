@@ -41,7 +41,7 @@ data:
             "UPDATE_LAST_LOGIN": False,
 
             "ALGORITHM": {{ .Values.studio.jwt_auth.algorithm | quote }},
-            "SIGNING_KEY": os.environ.get("SIGNING_KEY", ""),
+            "SIGNING_KEY": os.environ.get("SIGNING_KEY", SECRET_KEY),
             "VERIFYING_KEY": os.environ.get("VERIFYING_KEY", ""), 
             "AUDIENCE": None,
             "ISSUER": None,
