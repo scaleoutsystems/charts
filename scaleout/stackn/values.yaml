@@ -237,7 +237,11 @@ mongodb:
   commonAnnotations: {"reloader.stakater.com/auto": "true"}
   podLabels: {"app":"stackn-studio","allow-api-access": "true"}
 
-
+mongoexpress:
+  enabled: true
+  replicas: 1
+  service:
+    port: 8081
 
 eventListener:
   studioServiceName: "studio-studio"
