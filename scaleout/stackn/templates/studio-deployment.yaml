@@ -162,7 +162,7 @@ spec:
         - name: MONGO_SERVICE_HOST
           value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
         - name: MONGO_SERVICE_PORT
-          value: {{ .Values.mongodb.service.ports.mongodb }}
+          value: {{ .Values.mongodb.service.ports.mongodb | quote }}
         - name: MONGO_USERNAME
           value: {{ .Values.mongodb.auth.rootUser }}
         - name: MONGO_PASSWORD
