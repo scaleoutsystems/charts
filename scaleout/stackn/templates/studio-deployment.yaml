@@ -152,12 +152,24 @@ spec:
           value: "true"
         - name: ARGO_CD_API_URL
           value: {{ .Values.studio.argocd.url | default "" }}
+        - name: ARGO_CD_PROJECT
+          value: {{ .Values.studio.argocd.project | default "default" }}
+        - name: ARGO_CD_APP_NAMESPACE
+          value: {{ .Values.studio.argocd.namespace | default "default" }}
+        - name: ARGO_CD_SERVER
+          value: {{ .Values.studio.argocd.server | default "https://kubernetes.default.svc" }}
         - name: ARGO_CD_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: studio-argocd-token
         {{ end }}
+        - name: CHART_REPO
+          value: {{ .Values.studio.project.repo }}
+        - name: CHART_PATH
+          value: {{ .Values.studio.project.path }}
+        - name: CHART_REVISION
+          value: {{ .Values.studio.project.revision }}
         {{ if .Values.mongodb.enabled }}
         - name: MONGO_SERVICE_HOST
           value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
