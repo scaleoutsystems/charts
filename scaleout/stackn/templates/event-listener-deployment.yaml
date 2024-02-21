@@ -21,7 +21,7 @@ spec:
       automountServiceAccountToken: true
       serviceAccountName: studio
       imagePullSecrets:
-        - name: ghcrsecret
+        - name: {{ .Values.imagePullSecrets.name }}
       containers:
       - image: {{ .Values.eventListener.image.repository }}
         imagePullPolicy: {{ .Values.eventListener.image.pullPolicy }}
