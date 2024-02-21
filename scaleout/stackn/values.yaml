@@ -163,10 +163,14 @@ studio: # studio values
     enabled: true
     url: ''
     token: ''
+    project: "default"
+    namespace: "default"
+    server: "https://kubernetes.default.svc"
   
   project:
-    path: "charts/apps/fedn-project/chart"
-    revision: "feature/SK-626"
+    repo: "harbor.scaleoutsystems.com/chart"
+    path: "fedn"
+    revision: "0.1.0"
  
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
 # To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
