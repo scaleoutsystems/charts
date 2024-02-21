@@ -169,7 +169,7 @@ spec:
         - name: CHART_PATH
           value: {{ .Values.studio.project.path }}
         - name: CHART_REVISION
-          value: {{ .Values.studio.project.revision }}
+          value: {{ .Values.studio.project.revision | quote}}
         {{ if .Values.mongodb.enabled }}
         - name: MONGO_SERVICE_HOST
           value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
