@@ -101,8 +101,6 @@ Return postgres secret
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
 {{- end -}}
-
-
 {{/*
 Return STACKn studio storageClass
 */}}
