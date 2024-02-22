@@ -85,7 +85,7 @@ studio: # studio values
     replicas: 1 # number of static replicas
     strategy: # strategy for static
       type: Recreate # type of strategy
-    image: ghcr.io/scaleoutsystems/stackn/studio:develop # image for static
+    image: harbor.scaleoutsystems.com/studio/studio-nginx:0.10.0-beta.1 # image for static
     pullPolicy: IfNotPresent # pull policy for static
     resources: # resources for static
       limits: # limits for static
@@ -95,7 +95,7 @@ studio: # studio values
         cpu: "100m" # cpu request for static
         memory: "256Mi" # memory request for static
   image: #tell which image to deploy for studio
-    repository: ghcr.io/scaleoutsystems/stackn/ingress:develop #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: harbor.scaleoutsystems.com/studio/studio:0.10.0-beta.1 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -168,9 +168,9 @@ studio: # studio values
     server: "https://kubernetes.default.svc"
   
   project:
-    repo: "harbor.scaleoutsystems.com/chart"
-    path: "fedn"
-    revision: "0.*"
+    repo: "harbor.scaleoutsystems.com"
+    path: "chart/fedn"
+    revision: "*"
  
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
 # To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
@@ -254,8 +254,8 @@ eventListener:
   appStatusesEndpoint: "api/app/statuses"
   tokenEndpoint: "api/token-auth/"
   image: 
-    repository: ghcr.io/scaleoutsystems/studio-kube-controller:main
-    pullPolicy: Always # used to ensure that each time we redeploy always pull the latest image
+    repository: harbor.scaleoutsystems.com/studio/studio-kube-controller:0.10.0-beta.1
+    pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
 
 
 # Will be added in future realease, for now keep "enabled:false"
