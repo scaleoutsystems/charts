@@ -63,12 +63,80 @@ spec:
         {{ else }}
           value: "false"
         {{ end }}
+        - name: DOMAIN
+          value: {{ .Values.domain }}
+        - name: GRPC_DOMAIN
+          value: {{ .Values.grpc_domain | quote }}
+        - name: RELEASE_NAME
+          value: {{ .Release.Name }}
+        - name: SERVICE_NAME
+          value: {{ .Values.studio.servicename }}
+        - name: NAMESPACE
+          value: {{ .Values.namespace | default "default" }}
+        - name: CLUSTER_DOMAIN
+          value: {{ .Values.cluster_domain | default "cluster.local"}}
+        - name: STORAGE_CLASS
+          value: {{ .Values.studio.storageclass }}
         - name: INIT
           value: {{ .Values.studio.init | quote }}
         - name: STUDIO_STORAGECLASS
-          value: {{ include "stackn.studio.storageclass" . }}
+          value: {{ include "stackn.studio.storageclass" . | quote }}
+        - name: CSRF_TRUSTED_ORIGINS
+          value: {{ .Values.studio.csrf_trusted_origins | quote}}
+        - name: KUBE_API_REQUEST_TIMEOUT
+          value: {{ .Values.studio.kube_api_request_timeout | quote }}
+        - name: EMAIL_SERVICE_ENABLED
+          value: {{ .Values.studio.emailService.enabled | quote}}
+        - name: EMAIL_HOST
+          value: {{ .Values.studio.emailService.host | quote}}
+        - name: EMAIL_PORT
+          value: {{ .Values.studio.emailService.port | quote }}
+        - name: EMAIL_DOMAIN_NAME
+          value: {{ .Values.studio.emailService.domainName | quote}}
+        - name: EMAIL_MAILGUN_API
+          value: {{ .Values.studio.emailService.apiEndpoint | quote}}
+        - name: NOTIFY_ON_ACCOUNT_REGISTER_LIST
+          value: "{{ range $index, $elem := .Values.studio.emailService.notifyOnAccountRegisterList }}{{ if $index }},{{ end }}{{ $elem }}{{ end }}"
+        - name: VERSION
+          value: {{ .Values.studio.version | quote  }}
+        - name: DEFAULT_FROM_EMAIL
+          value: {{ .Values.studio.emailService.smtpEmailFrom | quote}}
+        - name: SESSION_COOKIE_DOMAIN
+          value: {{ .Values.session_cookie_domain | quote }}
         - name: STUDIO_ACCESSMODE
           value: {{ .Values.accessmode }}
+        - name: CUSTOM_MIGRATIONS
+          value: "{{- if .Values.studio.custom_migrations.enabled }}{{- range $key, $value := .Values.studio.custom_migrations.apps }}{{ $key }}:{{ $value }},{{- end }}{{- end }}"
+        - name: ENABLE_PROJECT_EXTRA_SETTINGS
+          value: {{ .Values.studio.enable_project_extra_settings | quote }}
+        - name: DISCORD_ALERT_ON_NEW_USER
+        {{ if .Values.studio.discord.alert_on_new_user }}
+          value: "true"
+        {{ else }}
+          value: "false"
+        {{ end }}
+        - name: DISCORD_ALERT_WEBHOOK_URL
+          value: {{ .Values.studio.discord.alert_webhook_url | quote }}
+        - name: DISCORD_ALERT_ON_NEW_USER_MESSAGE
+          value: {{ .Values.studio.discord.alert_on_new_user_message | quote }}
+        - name: INACTIVE_USERS
+        {{ if .Values.studio.inactive_users }}
+          value: "true"
+        {{ else }}
+          value: "false"
+        {{ end }}
+        - name: CUSTOM_APPS
+          value: "{{- if .Values.studio.custom_apps.enabled }}{{- range .Values.studio.custom_apps.apps }}{{ . }},{{- end }}{{- end }}"
+        - name: AUTH_USER_MODEL
+        {{ if .Values.studio.auth_user_model.override }}
+          value: {{ .Values.studio.auth_user_model.model | quote }}
+        {{ else }}
+          value: ""
+        {{ end }}
+        {{ if .Values.studio.disabledAppInstanceFields.enabled }}  
+        - name: DISABLED_APP_INSTANCE_FIELDS
+          value: "{{- range .Values.studio.disabledAppInstanceFields.fields }}{{ . }},{{- end }}"
+        {{- end }}
         {{ if .Values.studio.jwt_auth.enabled }}
         - name: ENABLE_JWT
           value: true
@@ -84,6 +152,8 @@ spec:
         - name: VERIFYING_KEY
           value: {{ .Values.studio.jwt_auth.public_key | quote }}
         {{ end }}
+        - name: JWT_AUTH_ALGORITHM
+          value: {{ .Values.studio.jwt_auth.algorithm | quote }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
@@ -102,13 +172,19 @@ spec:
               key: studio-event-listener-user-password
         - name: GET_HOSTS_FROM
           value: dns
+        - name: POSTGRES_NAME
+          value: {{ .Values.postgresql.auth.database }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.auth.username }}
+        - name: POSTGRES_HOST
+          value: {{ .Values.postgresql.fullnameOverride }}
+        - name: POSTGRES_PORT
+          value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: password
-        - name: POSTGRES_USER
-          value: {{ .Values.postgresql.global.postgresql.auth.user }}
         - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
@@ -187,9 +263,9 @@ spec:
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         volumeMounts:
-          - mountPath: /app/studio/settings.py
-            subPath: settings.py
-            name: {{ .Release.Name}}-settings-configmap
+          # - mountPath: /app/studio/settings.py
+          #   subPath: settings.py
+          #   name: {{ .Release.Name}}-settings-configmap
           {{ if .Values.studio.media.storage.mountStudio }}
           - name: mediavol
             mountPath: {{ .Values.studio.media.mount_path }}
@@ -229,12 +305,12 @@ spec:
         - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
       volumes:
-      - name: {{ .Release.Name}}-settings-configmap
-        configMap:
-          name: {{ .Release.Name}}-settings-configmap
-          items:
-          - key: settings.py
-            path: settings.py
+      # - name: {{ .Release.Name}}-settings-configmap
+      #   configMap:
+      #     name: {{ .Release.Name}}-settings-configmap
+      #     items:
+      #     - key: settings.py
+      #       path: settings.py
       {{ if .Values.studio.media.storage.mountStudio }}
       - name: mediavol
         persistentVolumeClaim:
