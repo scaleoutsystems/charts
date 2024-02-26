@@ -76,7 +76,7 @@ spec:
         - name: CLUSTER_DOMAIN
           value: {{ .Values.cluster_domain | default "cluster.local"}}
         - name: STORAGE_CLASS
-          value: {{ .Values.studio.storageclass }}
+          value: {{ .Values.studio.storage.storageClass }}
         - name: INIT
           value: {{ .Values.studio.init | quote }}
         - name: STUDIO_STORAGECLASS
