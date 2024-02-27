@@ -79,8 +79,6 @@ spec:
           value: {{ .Values.studio.storage.storageClass }}
         - name: INIT
           value: {{ .Values.studio.init | quote }}
-        - name: STUDIO_STORAGECLASS
-          value: {{ include "stackn.studio.storageclass" . | quote }}
         - name: CSRF_TRUSTED_ORIGINS
           value: {{ .Values.studio.csrf_trusted_origins | quote}}
         - name: KUBE_API_REQUEST_TIMEOUT
@@ -258,6 +256,19 @@ spec:
             secretKeyRef:
               name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
               key: mongodb-root-password
+        {{ end }}
+        {{ if .Values.harbor.enabled }}
+        - name: HARBOR_ENABLED
+          value: "true"
+        - name: HARBOR_CREDS
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: harbor-creds
+        - name: HARBOR_HOST
+          value: {{ .Values.studio.project.repo }}
+        - name: HARBOR_PATH
+          value: {{ .Values.studio.project.path }}
         {{ end }}
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}

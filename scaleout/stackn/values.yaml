@@ -274,3 +274,8 @@ minio:
   enabled: true
   host: ""
   secretName: minio-fedn
+
+harbor:
+  enabled: true
+  username: ""
+  password: ""
