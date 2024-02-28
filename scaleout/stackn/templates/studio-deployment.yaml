@@ -65,6 +65,10 @@ spec:
         {{ end }}
         - name: DOMAIN
           value: {{ .Values.domain }}
+        - name: AUTH_DOMAIN
+          value: {{ .Release.Name }}-studio.{{ .Values.namespace | default "default"}}.svc.{{ .Values.cluster_domain | default "cluster.local"}}
+        - name: STUDIO_URL
+          value: http://{{ .Release.Name }}-studio:8080
         - name: GRPC_DOMAIN
           value: {{ .Values.grpc_domain | quote }}
         - name: RELEASE_NAME
