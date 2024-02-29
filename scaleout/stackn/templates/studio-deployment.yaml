@@ -320,12 +320,6 @@ spec:
         - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
       volumes:
-      # - name: {{ .Release.Name}}-settings-configmap
-      #   configMap:
-      #     name: {{ .Release.Name}}-settings-configmap
-      #     items:
-      #     - key: settings.py
-      #       path: settings.py
       {{ if .Values.studio.media.storage.mountStudio }}
       - name: mediavol
         persistentVolumeClaim:
