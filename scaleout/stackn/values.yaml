@@ -74,6 +74,8 @@ studio: # studio values
   auth_user_model: # auth user model for studio. Do not change unless you know what you are doing.
     override: false
     model: "user.User"
+  auth: # auth endpoint for studio. Do not change unless you know what you are doing.
+    endpoint: /auth/ # if JWT is enabled, this should be /api/token/verify
   jwt_auth: # Use JWT authentication for REST and client authentication. Needs exsiting secret with private key.
     enabled: false
     algorithm: RS256

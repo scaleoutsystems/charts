@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-grpc-ingress
   annotations:
-    nginx.ingress.kubernetes.io/auth-url: http://studio-studio.default.svc.cluster.local:8080/auth/
+    nginx.ingress.kubernetes.io/auth-url: http://studio-studio.default.svc.cluster.local:8080{{ .Values.studio.auth.endpoint }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($http_grpc_server) { grpc_pass grpc://$http_grpc_server.default.svc.cluster.local:80; }
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
