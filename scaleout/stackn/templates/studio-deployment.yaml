@@ -210,20 +210,20 @@ spec:
               key: email-api-key
         {{ end }}
         - name: S3HOST
-          value: {{ .Values.minio.host }}
+          value: {{ .Values.studio.minio.host }}
         - name: S3PORT
-          value: "{{ .Values.minio.port }}"
+          value: "{{ .Values.studio.minio.port }}"
         - name: S3SECRET_NAME
-          value: {{ .Values.minio.secretName }}
+          value: {{ .Values.studio.minio.secretName }}
         - name: S3ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.minio.secretName }}
+              name: {{ .Values.studio.minio.secretName }}
               key: accessKey
         - name: S3SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.minio.secretName }}
+              name: {{ .Values.studio.minio.secretName }}
               key: secretKey
         {{ if .Values.studio.argocd.enabled }}
         - name: ARGO_CD_ENABLED
@@ -261,7 +261,7 @@ spec:
               name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
               key: mongodb-root-password
         {{ end }}
-        {{ if .Values.harbor.enabled }}
+        {{ if .Values.studio.harbor.enabled }}
         - name: HARBOR_ENABLED
           value: "true"
         - name: HARBOR_CREDS
@@ -278,9 +278,6 @@ spec:
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         volumeMounts:
-          # - mountPath: /app/studio/settings.py
-          #   subPath: settings.py
-          #   name: {{ .Release.Name}}-settings-configmap
           {{ if .Values.studio.media.storage.mountStudio }}
           - name: mediavol
             mountPath: {{ .Values.studio.media.mount_path }}
