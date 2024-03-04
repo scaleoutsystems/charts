@@ -279,11 +279,11 @@ spec:
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
+        {{ if .Values.studio.media.storage.mountStudio }}
         volumeMounts:
-          {{ if .Values.studio.media.storage.mountStudio }}
           - name: mediavol
             mountPath: {{ .Values.studio.media.mount_path }}
-          {{ end }}
+        {{ end }}
         resources:
           limits:
             cpu: {{ .Values.studio.resources.limits.cpu }}
