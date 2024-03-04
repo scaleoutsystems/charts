@@ -42,7 +42,22 @@ spec:
         {{ end }}
         - name: wait-for-db
           image: postgres
+          {{ if .Values.cloudnativepg.enabled }}
+          env:
+          - name: POSTGRES_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.cloudnativepg.clusterName }}-app
+                key: port
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.cloudnativepg.clusterName }}-app
+                key: host
+          command: ['sh', '-c', 'until pg_isready --host=$POSTGRES_HOST --port=$POSTGRES_PORT; do echo waiting for database; sleep 2; done;']
+          {{ else }}
           command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
+          {{ end }}
           resources:
             limits:
               cpu: "100m"
@@ -174,6 +189,33 @@ spec:
               key: studio-event-listener-user-password
         - name: GET_HOSTS_FROM
           value: dns
+        {{ if .Values.cloudnativepg.enabled }}
+        - name: POSTGRES_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.cloudnativepg.clusterName }}-app
+              key: dbname
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.cloudnativepg.clusterName }}-app
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.cloudnativepg.clusterName }}-app
+              key: password
+        - name: POSTGRES_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.cloudnativepg.clusterName }}-app
+              key: port
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.cloudnativepg.clusterName }}-app
+              key: host 
+        {{ else }}
         - name: POSTGRES_NAME
           value: {{ .Values.postgresql.auth.database }}
         - name: POSTGRES_USER
@@ -183,10 +225,12 @@ spec:
         - name: POSTGRES_PORT
           value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
         - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "stackn.postgres.secretName" . }}
-              key: password
+          value: {{ .Values.postgresql.auth.password | quote }}
+        {{ end }}
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: {{ include "stackn.postgres.secretName" . }}
+          #     key: password
         - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
