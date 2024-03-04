@@ -159,6 +159,7 @@ spec:
         - name: JWT_STATELESS_USER_AUTH
           value: "true"
         {{ end }}
+        {{ end }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
