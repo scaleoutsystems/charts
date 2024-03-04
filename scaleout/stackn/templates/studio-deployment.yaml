@@ -318,8 +318,8 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
-      volumes:
       {{ if .Values.studio.media.storage.mountStudio }}
+      volumes:
       - name: mediavol
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
