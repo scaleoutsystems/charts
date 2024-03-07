@@ -42,17 +42,17 @@ spec:
         {{ end }}
         - name: wait-for-db
           image: postgres
-          {{ if .Values.cloudnativepg.enabled }}
+          {{ if .Values.studio.cloudnativepg.enabled }}
           env:
           - name: POSTGRES_PORT
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.cloudnativepg.clusterName }}-app
+                name: {{ .Values.studio.cloudnativepg.clusterName }}-app
                 key: port
           - name: POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.cloudnativepg.clusterName }}-app
+                name: {{ .Values.studio.cloudnativepg.clusterName }}-app
                 key: host
           command: ['sh', '-c', 'until pg_isready --host=$POSTGRES_HOST --port=$POSTGRES_PORT; do echo waiting for database; sleep 2; done;']
           {{ else }}
@@ -191,31 +191,31 @@ spec:
               key: studio-event-listener-user-password
         - name: GET_HOSTS_FROM
           value: dns
-        {{ if .Values.cloudnativepg.enabled }}
+        {{ if .Values.studio.cloudnativepg.enabled }}
         - name: POSTGRES_NAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.cloudnativepg.clusterName }}-app
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
               key: dbname
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.cloudnativepg.clusterName }}-app
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
               key: user
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.cloudnativepg.clusterName }}-app
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
               key: password
         - name: POSTGRES_PORT
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.cloudnativepg.clusterName }}-app
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
               key: port
         - name: POSTGRES_HOST
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.cloudnativepg.clusterName }}-app
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
               key: host 
         {{ else }}
         - name: POSTGRES_NAME
@@ -258,19 +258,17 @@ spec:
         - name: S3HOST
           value: {{ .Values.studio.minio.host }}
         - name: S3PORT
-          value: "{{ .Values.studio.minio.port }}"
-        - name: S3SECRET_NAME
-          value: {{ .Values.studio.minio.secretName }}
+          value: "{{ .Values.studio.minio.port | default 9000 }}"
         - name: S3ACCESS_KEY
           valueFrom:
             secretKeyRef:
               name: {{ .Values.studio.minio.secretName }}
-              key: accessKey
+              key: CONSOLE_ACCESS_KEY
         - name: S3SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: {{ .Values.studio.minio.secretName }}
-              key: secretKey
+              key: CONSOLE_SECRET_KEY
         {{ if .Values.studio.argocd.enabled }}
         - name: ARGO_CD_ENABLED
           value: "true"
