@@ -109,17 +109,13 @@ studio: # studio values
       memory: "2Gi"
   storage:
     storageClass: ""
-  media:
-    storage:
-      storageClass: ""
-      size: "5Gi"
-      accessModes: ReadWriteMany
-    mount_path: /app/media/
   superUser: admin
   superuserPassword: ""
   superuserEmail: admin@test.com
   eventListenerUsername: ""
   eventListenerUserPassword: ""
+  logCollectorUsername: ""
+  logCollectorUserPassword: ""
   version: studio
   securityContext:
     enabled: true

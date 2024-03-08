@@ -33,9 +33,6 @@ spec:
       - name: rp-conf
         configMap:
           name: {{ .Release.Name }}-static-config
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
       containers:
       - name: static
         image: {{ .Values.studio.static.image }}
