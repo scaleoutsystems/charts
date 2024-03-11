@@ -317,14 +317,6 @@ spec:
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
-<<<<<<< HEAD
-=======
-        {{ if .Values.studio.media.storage.mountStudio }}
-        volumeMounts:
-          - name: mediavol
-            mountPath: {{ .Values.studio.media.mount_path }}
-        {{ end }}
->>>>>>> release/v0.10.0
         resources:
           limits:
             cpu: {{ .Values.studio.resources.limits.cpu }}
@@ -358,14 +350,4 @@ spec:
         {{- end }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
-<<<<<<< HEAD
       restartPolicy: Always
-=======
-      restartPolicy: Always
-      {{ if .Values.studio.media.storage.mountStudio }}
-      volumes:
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
-      {{ end }}
->>>>>>> release/v0.10.0
