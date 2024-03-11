@@ -28,18 +28,6 @@ spec:
       securityContext:
         fsGroup: {{ .Values.studio.securityContext.fsGroup }}
       initContainers:
-        {{ if .Values.studio.debug }}
-        - name: volume-permissions
-          image: busybox
-          command: ['sh', '-c', 'chown -R 1000 /app/media && chgrp -R 1000 /app/media']
-          volumeMounts:
-          - mountPath: {{ .Values.studio.media.mount_path }}
-            name: mediavol
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            runAsNonRoot: false
-        {{ end }}
         - name: wait-for-db
           image: postgres
           {{ if .Values.studio.cloudnativepg.enabled }}
@@ -361,9 +349,3 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
-      volumes:
-      {{ if .Values.studio.media.storage.mountStudio }}
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
-      {{ end }}

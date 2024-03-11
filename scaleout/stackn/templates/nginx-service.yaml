@@ -1,4 +1,3 @@
-{{ if not .Values.studio.debug }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -13,4 +12,3 @@ spec:
     pod: nginx-static
 status:
   loadBalancer: {}
-{{ end }}

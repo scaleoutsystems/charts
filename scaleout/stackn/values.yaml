@@ -178,14 +178,28 @@ studio: # studio values
     secretName: minio-fedn-user-0
     port: "9000"
 
+  # Secret should have entries CLUSTER_ACCESS_KEY and CLUSTER_SECRET_KEY
+  minio_backup:
+    enabled: true
+    host: minio-fedn-hl
+    secretName: minio-fedn-user-0
+    port: "9000"
+
   harbor:
     enabled: true
     username: ""
     password: ""
 
+  # If you have installed the CloudnativePG operator, enable this and set the clusterName.
+  # You should also disable postgres below.
   cloudnativepg:
-    enabled: false
+    enabled: false # Set to true if you want to use a CloudnativePG cluster
+    create_new: true # Set to true if you want to create a new postgres cluster.
     clusterName: studio-db
+    spec:
+      instances: 3
+      storage:
+        size: 20Gi
  
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
 # To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
