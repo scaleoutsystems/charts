@@ -184,7 +184,7 @@ studio: # studio values
     password: ""
 
   cloudnativepg:
-    enabled: true
+    enabled: false
     clusterName: studio-db
  
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
@@ -219,7 +219,33 @@ ingress:
 # Please also observe the version we are using in requirements.yaml
 
 postgresql:
-  enabled: false
+  enabled: true
+  fullnameOverride: studio-postgres
+  commonAnnotations: {"reloader.stakater.com/auto": "true"}
+  auth:
+    username:
+    password:
+    postgresPassword:
+    database: studio
+  primary:
+    service:
+      ports: 
+        postgresql: 5432
+    persistence:
+      enabled: true
+      size: "10Gi"
+      accessModes:
+        - ReadWriteMany
+      storageClass:
+    podLabels: {"app":"stackn-studio"} # Do not change unless you know what you are doing.
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
 ## MongoDB chart for FEDn statestore
 # Please see the documentation for this Bitnami chart for more details on values:
 # https://github.com/bitnami/charts/tree/main/bitnami/mongodb

@@ -234,12 +234,11 @@ spec:
         - name: POSTGRES_PORT
           value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
         - name: POSTGRES_PASSWORD
-          value: {{ .Values.postgresql.auth.password | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.postgres.secretName" . }}
+              key: password
         {{ end }}
-          # valueFrom:
-          #   secretKeyRef:
-          #     name: {{ include "stackn.postgres.secretName" . }}
-          #     key: password
         - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
