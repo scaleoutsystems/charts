@@ -144,7 +144,7 @@ spec:
         {{- end }}
         {{ if .Values.studio.jwt_auth.enabled }}
         - name: ENABLE_JWT
-          value: true
+          value: "true"
         {{ if .Values.studio.jwt_auth.existingSecret }}
         - name: SIGNING_KEY
           valueFrom:
@@ -158,8 +158,10 @@ spec:
         {{ end }}
         - name: JWT_AUTH_ALGORITHM
           value: {{ .Values.studio.jwt_auth.algorithm | quote }}
+        {{ if .Values.studio.jwt_auth.statelessUser }}
         - name: JWT_STATELESS_USER_AUTH
-          value: {{ .Values.studio.jwt_auth.statelessUser }}
+          value: "true"
+        {{ end }}
         {{ end }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
@@ -315,6 +317,14 @@ spec:
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
+<<<<<<< HEAD
+=======
+        {{ if .Values.studio.media.storage.mountStudio }}
+        volumeMounts:
+          - name: mediavol
+            mountPath: {{ .Values.studio.media.mount_path }}
+        {{ end }}
+>>>>>>> release/v0.10.0
         resources:
           limits:
             cpu: {{ .Values.studio.resources.limits.cpu }}
@@ -348,4 +358,14 @@ spec:
         {{- end }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
+<<<<<<< HEAD
       restartPolicy: Always
+=======
+      restartPolicy: Always
+      {{ if .Values.studio.media.storage.mountStudio }}
+      volumes:
+      - name: mediavol
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
+      {{ end }}
+>>>>>>> release/v0.10.0
