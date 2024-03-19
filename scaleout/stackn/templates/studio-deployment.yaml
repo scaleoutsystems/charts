@@ -28,18 +28,6 @@ spec:
       securityContext:
         fsGroup: {{ .Values.studio.securityContext.fsGroup }}
       initContainers:
-        {{ if .Values.studio.debug }}
-        - name: volume-permissions
-          image: busybox
-          command: ['sh', '-c', 'chown -R 1000 /app/media && chgrp -R 1000 /app/media']
-          volumeMounts:
-          - mountPath: {{ .Values.studio.media.mount_path }}
-            name: mediavol
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            runAsNonRoot: false
-        {{ end }}
         - name: wait-for-db
           image: postgres
           command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
