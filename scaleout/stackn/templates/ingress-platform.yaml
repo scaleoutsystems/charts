@@ -36,15 +36,9 @@ spec:
         - path: /static/
           backend:
             service:
-            {{ if $.Values.studio.debug }}
-              name: {{ $.Release.Name }}-studio
-              port:
-                number: 8080
-            {{ else }}
               name: {{ $.Release.Name }}-static
               port:
                 number: 8081
-            {{ end }}
           pathType: ImplementationSpecific
         - path: /media/
           backend:
