@@ -32,9 +32,6 @@ spec:
       - name: rp-conf
         configMap:
           name: {{ .Release.Name }}-static-config
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
       containers:
       - name: static
         image: {{ .Values.studio.static.image }}
@@ -51,8 +48,6 @@ spec:
         - name: rp-conf
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
-        - name: mediavol
-          mountPath: /etc/nginx/html/media
         resources:
           limits:
             cpu: {{ .Values.studio.static.resources.limits.cpu }}
@@ -62,4 +57,3 @@ spec:
             memory: {{ .Values.studio.static.resources.requests.memory }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
-
