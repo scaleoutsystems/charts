@@ -4,9 +4,10 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
-  {{- with .Values.ingress.annotations }}
-     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_uri ~ ^/api/internal) { return 403; } 
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-set-headers: X-Forwarded-Proto:$scheme
   labels:
     io.kompose.service: {{ .Release.Name }}-ingress
 spec:

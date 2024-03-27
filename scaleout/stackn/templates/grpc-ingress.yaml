@@ -4,6 +4,12 @@ metadata:
   name: {{ .Release.Name }}-grpc-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_uri ~* "^/fedn.Connector/AcceptingClients") { return 403; }
+      if ($request_uri ~* "^/fedn.Connector/ListActiveClients") { return 403; }
+      if ($request_uri ~* "^/fedn.Control/Start") { return 403; }
+      if ($request_uri ~* "^/fedn.Control/Stop") { return 403; }
+      if ($request_uri ~* "^/fedn.Control/FlushAggregationQueue") { return 403; }
+      if ($request_uri ~* "^/fedn.Control/SetAggregator") { return 403; }
       if ($http_grpc_server) { grpc_pass grpc://$http_grpc_server.default.svc.cluster.local:80; }
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-set-headers: X-Forwarded-Proto:$scheme

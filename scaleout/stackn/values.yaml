@@ -202,7 +202,6 @@ grpc_domain: grpc.studio.127.0.0.1.nip.io # domain for grpc servers (combiners i
 session_cookie_domain: .127.0.0.1.nip.io # domain for session cookie, should be .domain
 ingress:
   enabled: true
-  annotations: {}
   hosts:
     - host: studio.127.0.0.1.nip.io
   tls:
