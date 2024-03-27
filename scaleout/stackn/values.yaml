@@ -114,8 +114,6 @@ studio: # studio values
   superuserEmail: admin@test.com
   eventListenerUsername: ""
   eventListenerUserPassword: ""
-  logCollectorUsername: ""
-  logCollectorUserPassword: ""
   version: studio
   securityContext:
     enabled: true

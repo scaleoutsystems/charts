@@ -179,13 +179,6 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: studio-event-listener-user-password
-        - name: LOG_COLLECTOR_USERNAME
-          value: {{ .Values.studio.logCollectorUsername | quote }}
-        - name: LOG_COLLECTOR_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: studio-log-collector-user-password
         - name: GET_HOSTS_FROM
           value: dns
         {{ if .Values.studio.cloudnativepg.enabled }}
