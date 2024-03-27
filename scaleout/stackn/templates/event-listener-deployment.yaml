@@ -44,13 +44,6 @@ spec:
               - all
         {{- end }}
         env:
-        - name: EVENT_LISTENER_USERNAME
-          value: {{ .Values.studio.eventListenerUsername | quote }}
-        - name: EVENT_LISTENER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "stackn.secretName" . }}
-              key: studio-event-listener-user-password
         - name: STUDIO_SERVICE_NAME
           value: {{ .Values.eventListener.studioServiceName | quote }}
         - name: STUDIO_SERVICE_PORT
@@ -59,8 +52,6 @@ spec:
           value: {{ .Values.eventListener.appStatusEndpoint | quote }}
         - name: APP_STATUSES_ENDPOINT
           value: {{ .Values.eventListener.appStatusesEndpoint | quote }}
-        - name: TOKEN_ENDPOINT
-          value: {{ .Values.eventListener.tokenEndpoint | quote }}
       restartPolicy: Always
       securityContext:
         fsGroup: {{ .Values.studio.securityContext.fsGroup }}
