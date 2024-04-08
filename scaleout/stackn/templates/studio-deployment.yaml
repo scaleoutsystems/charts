@@ -30,7 +30,22 @@ spec:
       initContainers:
         - name: wait-for-db
           image: postgres
+          {{ if .Values.studio.cloudnativepg.enabled }}
+          env:
+          - name: POSTGRES_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+                key: port
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+                key: host
+          command: ['sh', '-c', 'until pg_isready --host=$POSTGRES_HOST --port=$POSTGRES_PORT; do echo waiting for database; sleep 2; done;']
+          {{ else }}
           command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
+          {{ end }}
           resources:
             limits:
               cpu: "100m"
@@ -166,6 +181,33 @@ spec:
               key: studio-event-listener-user-password
         - name: GET_HOSTS_FROM
           value: dns
+        {{ if .Values.studio.cloudnativepg.enabled }}
+        - name: POSTGRES_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: dbname
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: password
+        - name: POSTGRES_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: port
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: host 
+        {{ else }}
         - name: POSTGRES_NAME
           value: {{ .Values.postgresql.auth.database }}
         - name: POSTGRES_USER
@@ -179,6 +221,7 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: password
+        {{ end }}
         - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
@@ -204,19 +247,17 @@ spec:
         - name: S3HOST
           value: {{ .Values.studio.minio.host }}
         - name: S3PORT
-          value: "{{ .Values.studio.minio.port }}"
-        - name: S3SECRET_NAME
-          value: {{ .Values.studio.minio.secretName }}
+          value: "{{ .Values.studio.minio.port | default 9000 }}"
         - name: S3ACCESS_KEY
           valueFrom:
             secretKeyRef:
               name: {{ .Values.studio.minio.secretName }}
-              key: accessKey
+              key: CONSOLE_ACCESS_KEY
         - name: S3SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: {{ .Values.studio.minio.secretName }}
-              key: secretKey
+              key: CONSOLE_SECRET_KEY
         {{ if .Values.studio.argocd.enabled }}
         - name: ARGO_CD_ENABLED
           value: "true"
@@ -269,11 +310,6 @@ spec:
         image: {{ .Values.studio.image.repository }}
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
-        {{ if .Values.studio.media.storage.mountStudio }}
-        volumeMounts:
-          - name: mediavol
-            mountPath: {{ .Values.studio.media.mount_path }}
-        {{ end }}
         resources:
           limits:
             cpu: {{ .Values.studio.resources.limits.cpu }}
@@ -308,9 +344,3 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
-      {{ if .Values.studio.media.storage.mountStudio }}
-      volumes:
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-{{ .Values.studio.media.storage.claimName }}
-      {{ end }}
