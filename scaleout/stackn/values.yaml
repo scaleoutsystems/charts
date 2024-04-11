@@ -179,8 +179,8 @@ studio: # studio values
   # Secret should have entries CLUSTER_ACCESS_KEY and CLUSTER_SECRET_KEY
   minio_backup:
     enabled: true
-    host: minio-fedn-hl
-    secretName: minio-fedn-user-0
+    host: minio-system-hl.minio-system.svc.cluster.local
+    secretName: minio-system-user-0
     port: "9000"
 
   harbor:
@@ -263,6 +263,14 @@ postgresql:
 # Please also observe the version we are using in requirements.yaml
 
 mongodb:
+  backups:
+    enabled: false
+    image: harbor.scaleoutsystems.com/studio/mongo-backup:0.1.0
+    backupSchedule: "*/30 * * * *" # backup schedule for mongodb
+  restoreFromFile:
+    enabled: false
+    image: harbor.scaleoutsystems.com/studio/mongo-restore:0.1.0
+    backupFileName: ""
   enabled: true
   commonAnnotations: {"reloader.stakater.com/auto": "true"}
   podLabels: {"app":"stackn-studio","allow-api-access": "true"}
