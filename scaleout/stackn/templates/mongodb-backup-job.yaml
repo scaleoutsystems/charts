@@ -1,0 +1,47 @@
+{{ if .Values.mongodb.backups.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mongodb-backup-to-minio
+spec:
+  schedule: {{ .Values.mongodb.backups.backupSchedule | default "*/30 * * * *" | quote}}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: {{ .Values.imagePullSecrets.name }}
+          containers:
+          - name: mongo-backup
+            image: {{ .Values.mongodb.backups.image }}
+            imagePullPolicy: Always
+            env:
+            - name: MONGO_SERVICE_HOST
+              value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+            - name: MONGO_SERVICE_PORT
+              value: {{ .Values.mongodb.service.ports.mongodb | quote }}
+            - name: MONGO_USERNAME
+              value: {{ .Values.mongodb.auth.rootUser | quote }}
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
+                  key: mongodb-root-password
+            - name: S3HOST
+              value: http://{{ .Values.studio.minio_backup.host }}
+            - name: S3PORT
+              value: {{ .Values.studio.minio_backup.port | quote }}
+            - name : S3BUCKET
+              value: mongodb-backups
+            - name: S3ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.studio.minio_backup.secretName }}
+                  key: CONSOLE_ACCESS_KEY
+            - name: S3SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.studio.minio_backup.secretName }}
+                  key: CONSOLE_SECRET_KEY
+          restartPolicy: OnFailure
+{{ end }}
