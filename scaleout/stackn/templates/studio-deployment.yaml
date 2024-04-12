@@ -293,6 +293,10 @@ spec:
             secretKeyRef:
               name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
               key: mongodb-root-password
+        - name: MONGO_REPLICA_COUNT
+          value: {{ .Values.mongodb.replicaCount | default "1" | quote }}
+        - name: MONGO_REPLICA_SET_NAME
+          value: {{ .Values.mongodb.replicaSetName | default "rs0" }}
         {{ end }}
         {{ if .Values.studio.harbor.enabled }}
         - name: HARBOR_ENABLED
