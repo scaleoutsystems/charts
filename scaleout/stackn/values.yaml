@@ -272,6 +272,7 @@ mongodb:
     image: harbor.scaleoutsystems.com/studio/mongo-restore:0.1.0
     backupFileName: ""
   enabled: true
+  replicaSetName: "rs0"
   commonAnnotations: {"reloader.stakater.com/auto": "true"}
   podLabels: {"app":"stackn-studio","allow-api-access": "true"}
 
