@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-studio-envs
+data:
+  {{ if .Values.studio.debug }}
+  DEBUG: "true"
+  {{ else }}
+  DEBUG: "false"
+  {{ end }}
+  DOMAIN: {{ .Values.domain }}
+  AUTH_DOMAIN: {{ .Release.Name }}-studio.{{ .Values.namespace | default "default"}}.svc.{{ .Values.cluster_domain | default "cluster.local"}}
+  STUDIO_URL: http://{{ .Release.Name }}-studio:8080
+  GRPC_DOMAIN: {{ .Values.grpc_domain | quote }}
+  RELEASE_NAME: {{ .Release.Name }}
+  SERVICE_NAME: {{ .Values.studio.servicename }}
+  NAMESPACE: {{ .Values.namespace | default "default" }}
+  CLUSTER_DOMAIN: {{ .Values.cluster_domain | default "cluster.local"}}
+  STORAGE_CLASS: {{ .Values.studio.storage.storageClass }}
+  INIT: {{ .Values.studio.init | quote }}
+  CSRF_TRUSTED_ORIGINS: {{ .Values.studio.csrf_trusted_origins | quote}}
+  KUBE_API_REQUEST_TIMEOUT: {{ .Values.studio.kube_api_request_timeout | quote }}
+  EMAIL_SERVICE_ENABLED: {{ .Values.studio.emailService.enabled | quote}}
+  EMAIL_HOST: {{ .Values.studio.emailService.host | quote}}
+  EMAIL_PORT: {{ .Values.studio.emailService.port | quote }}
+  EMAIL_DOMAIN_NAME: {{ .Values.studio.emailService.domainName | quote}}
+  EMAIL_MAILGUN_API: {{ .Values.studio.emailService.apiEndpoint | quote}}
+  NOTIFY_ON_ACCOUNT_REGISTER_LIST: "{{ range $index, $elem := .Values.studio.emailService.notifyOnAccountRegisterList }}{{ if $index }},{{ end }}{{ $elem }}{{ end }}"
+  VERSION: {{ .Values.studio.version | quote  }}
+  DEFAULT_FROM_EMAIL: {{ .Values.studio.emailService.smtpEmailFrom | quote}}
+  SESSION_COOKIE_DOMAIN: {{ .Values.session_cookie_domain | quote }}
+  STUDIO_ACCESSMODE: {{ .Values.accessmode }}
+  CUSTOM_MIGRATIONS: "{{- if .Values.studio.custom_migrations.enabled }}{{- range $key, $value := .Values.studio.custom_migrations.apps }}{{ $key }}:{{ $value }},{{- end }}{{- end }}"
+  ENABLE_PROJECT_EXTRA_SETTINGS: {{ .Values.studio.enable_project_extra_settings | quote }}
+  {{ if .Values.studio.discord.alert_on_new_user }}
+  DISCORD_ALERT_ON_NEW_USER: "true"
+  {{ else }}
+  DISCORD_ALERT_ON_NEW_USER: "false"
+  {{ end }}
+  DISCORD_ALERT_WEBHOOK_URL: {{ .Values.studio.discord.alert_webhook_url | quote }}
+  DISCORD_ALERT_ON_NEW_USER_MESSAGE: {{ .Values.studio.discord.alert_on_new_user_message | quote }}
+  {{ if .Values.studio.inactive_users }}
+  INACTIVE_USERS: "true"
+  {{ else }}
+  INACTIVE_USERS: "false"
+  {{ end }}
+  CUSTOM_APPS: "{{- if .Values.studio.custom_apps.enabled }}{{- range .Values.studio.custom_apps.apps }}{{ . }},{{- end }}{{- end }}"
+  {{ if .Values.studio.auth_user_model.override }}
+  AUTH_USER_MODEL: {{ .Values.studio.auth_user_model.model | quote }}
+  {{ else }}
+  AUTH_USER_MODEL: ""
+  {{ end }}
+  {{ if .Values.studio.disabledAppInstanceFields.enabled }}  
+  DISABLED_APP_INSTANCE_FIELDS: "{{- range .Values.studio.disabledAppInstanceFields.fields }}{{ . }},{{- end }}"
+  {{- end }}
+  {{ if .Values.studio.jwt_auth.enabled }}
+  ENABLE_JWT: "true"
+  {{ if .Values.studio.jwt_auth.public_key }}
+  VERIFYING_KEY: {{ .Values.studio.jwt_auth.public_key | quote }}
+  {{ end }}
+  JWT_AUTH_ALGORITHM: {{ .Values.studio.jwt_auth.algorithm | quote }}
+  {{ if .Values.studio.jwt_auth.statelessUser }}
+  JWT_STATELESS_USER_AUTH: "true"
+  {{ end }}
+  {{ end }}
+  DJANGO_SUPERUSER: {{ include "stackn.studio.superuser" . }}
+  DJANGO_SUPERUSER_EMAIL: {{ include "stackn.studio.superuser.email" . }}
+  EVENT_LISTENER_USERNAME: {{ .Values.studio.eventListenerUsername | quote }}
+  GET_HOSTS_FROM: dns
+  {{ if .Values.studio.cloudnativepg.enabled }}
+  {{ else }}
+  POSTGRES_NAME: {{ .Values.postgresql.auth.database }}
+  POSTGRES_USER: {{ .Values.postgresql.auth.username }}
+  POSTGRES_HOST: {{ .Values.postgresql.fullnameOverride }}
+  POSTGRES_PORT: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
+  {{ end }}
+  S3HOST: {{ .Values.studio.minio.host }}
+  S3PORT: "{{ .Values.studio.minio.port | default 9000 }}"
+  {{ if .Values.studio.argocd.enabled }}
+  ARGO_CD_ENABLED: "true"
+  ARGO_CD_API_URL: {{ .Values.studio.argocd.url | default "" }}
+  ARGO_CD_PROJECT: {{ .Values.studio.argocd.project | default "default" }}
+  ARGO_CD_APP_NAMESPACE: {{ .Values.studio.argocd.namespace | default "default" }}
+  ARGO_CD_SERVER: {{ .Values.studio.argocd.server | default "https://kubernetes.default.svc" }}
+  {{ end }}
+  CHART_REPO: {{ .Values.studio.project.repo }}
+  CHART_PATH: {{ .Values.studio.project.path }}
+  CHART_REVISION: {{ .Values.studio.project.revision | quote}}
+  {{ if .Values.mongodb.enabled }}
+  MONGO_SERVICE_HOST: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+  MONGO_SERVICE_PORT: {{ .Values.mongodb.service.ports.mongodb | quote }}
+  MONGO_USERNAME: {{ .Values.mongodb.auth.rootUser }}
+  MONGO_ARCHITECTURE: {{ .Values.mongodb.architecture | default "standalone" }}
+  MONGO_REPLICA_COUNT: {{ .Values.mongodb.replicaCount | default "1" | quote }}
+  MONGO_REPLICA_SET_NAME: {{ .Values.mongodb.replicaSetName | default "rs0" }}
+  {{ end }}
+  {{ if .Values.studio.harbor.enabled }}
+  HARBOR_ENABLED: "true"
+  HARBOR_HOST: {{ .Values.studio.project.repo }}
+  HARBOR_PATH: {{ .Values.studio.project.path }}
+  {{ end }}
