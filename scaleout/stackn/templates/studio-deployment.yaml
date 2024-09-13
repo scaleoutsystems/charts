@@ -102,6 +102,12 @@ spec:
           value: {{ .Values.studio.emailService.apiEndpoint | quote}}
         - name: NOTIFY_ON_ACCOUNT_REGISTER_LIST
           value: "{{ range $index, $elem := .Values.studio.emailService.notifyOnAccountRegisterList }}{{ if $index }},{{ end }}{{ $elem }}{{ end }}"
+        - name: WELCOME_EMAIL_ON_NEW_USER
+        {{ if .Values.studio.welcomeEmail.enabled }}
+          value: "true"
+        {{ else }}
+          value: "false"
+        {{ end }}
         - name: VERSION
           value: {{ .Values.studio.version | quote  }}
         - name: DEFAULT_FROM_EMAIL
