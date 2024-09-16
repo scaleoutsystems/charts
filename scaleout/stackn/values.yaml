@@ -147,6 +147,8 @@ studio: # studio values
     apiKey: ''
     notifyOnAccountRegisterList:
       - ''
+  welcomeEmail:
+    enabled: false
   disabledAppInstanceFields: # disabled app instance fields for studio. Do not change unless you know what you are doing.
     enabled: false
     fields:
