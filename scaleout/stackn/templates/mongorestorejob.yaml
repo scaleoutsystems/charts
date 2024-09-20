@@ -1,4 +1,4 @@
-{{ if .Values.mongodb.restoreFromFile.enabled }}
+{{ if eq .Values.mongodb.restoreFromFile.enabled true }}
 apiVersion: batch/v1
 kind: Job
 metadata:
