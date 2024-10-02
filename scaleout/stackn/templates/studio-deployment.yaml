@@ -111,6 +111,8 @@ spec:
           value: "{{ .Values.studio.sentry.controller_dsn }}"
         - name: SENTRY_COMBINER_DSN
           value: "{{ .Values.studio.sentry.combiner_dsn }}"
+        - name: SENTRY_ENVIRONMENT
+          value: "{{ .Values.studio.sentry.environment }}"
         {{ end }}
         - name: WELCOME_EMAIL_ON_NEW_USER
         {{ if .Values.studio.welcomeEmail.enabled }}
