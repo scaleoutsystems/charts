@@ -102,6 +102,16 @@ spec:
           value: {{ .Values.studio.emailService.apiEndpoint | quote}}
         - name: NOTIFY_ON_ACCOUNT_REGISTER_LIST
           value: "{{ range $index, $elem := .Values.studio.emailService.notifyOnAccountRegisterList }}{{ if $index }},{{ end }}{{ $elem }}{{ end }}"
+        {{ if .Values.studio.sentry.enabled }}
+        - name: SENTRY_ENABLED
+          value: "true"
+        - name: SENTRY_STUDIO_DSN
+          value: "{{ .Values.studio.sentry.studio_dsn }}"
+        - name: SENTRY_CONTROLLER_DSN
+          value: "{{ .Values.studio.sentry.controller_dsn }}"
+        - name: SENTRY_COMBINER_DSN
+          value: "{{ .Values.studio.sentry.combiner_dsn }}"
+        {{ end }}
         - name: WELCOME_EMAIL_ON_NEW_USER
         {{ if .Values.studio.welcomeEmail.enabled }}
           value: "true"
