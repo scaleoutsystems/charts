@@ -171,6 +171,7 @@ studio: # studio values
     studio_dsn: ""
     controller_dsn: ""
     combiner_dsn: ""
+    environment: ""
 
   project:
     repo: "harbor.scaleoutsystems.com"
