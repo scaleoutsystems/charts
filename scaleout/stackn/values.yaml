@@ -166,6 +166,12 @@ studio: # studio values
     namespace: "default"
     server: "https://kubernetes.default.svc"
   
+  sentry:
+    enabled: false
+    studio_dsn: ""
+    controller_dsn: ""
+    combiner_dsn: ""
+
   project:
     repo: "harbor.scaleoutsystems.com"
     path: "chart/fedn"
