@@ -28,20 +28,20 @@ spec:
                   name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
                   key: mongodb-root-password
             - name: S3HOST
-              value: http://{{ .Values.studio.minio_backup.host }}
+              value: {{ .Values.studio.minio_backup.host }}
             - name: S3PORT
               value: {{ .Values.studio.minio_backup.port | quote }}
             - name : S3BUCKET
-              value: mongodb-backups
+              value: studio-mongodb-backups
             - name: S3ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.studio.minio_backup.secretName }}
-                  key: CONSOLE_ACCESS_KEY
+                  key: access_key
             - name: S3SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.studio.minio_backup.secretName }}
-                  key: CONSOLE_SECRET_KEY
+                  key: secret_key
           restartPolicy: OnFailure
 {{ end }}
