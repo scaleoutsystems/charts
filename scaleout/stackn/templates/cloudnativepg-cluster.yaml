@@ -12,14 +12,14 @@ spec:
     barmanObjectStore:
       destinationPath: s3://studio-backups
       serverName: {{ .Values.studio.cloudnativepg.clusterName }}
-      endpointURL: http://{{ .Values.studio.minio_backup.host }}:{{ .Values.studio.minio_backup.port }}
+      endpointURL: {{ .Values.studio.minio_backup.host }}:{{ .Values.studio.minio_backup.port }}
       s3Credentials:
         accessKeyId:
           name: {{ .Values.studio.minio_backup.secretName }}
-          key: CONSOLE_ACCESS_KEY
+          key: access_key
         secretAccessKey:
           name: {{ .Values.studio.minio_backup.secretName }}
-          key: CONSOLE_SECRET_KEY
+          key: secret_key
   {{ end }}
 ---
 # Base backup runs at midnight every day
