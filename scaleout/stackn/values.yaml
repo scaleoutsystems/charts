@@ -185,10 +185,10 @@ studio: # studio values
     secretName: minio-fedn-user-0
     port: "9000"
 
-  # Secret should have entries CLUSTER_ACCESS_KEY and CLUSTER_SECRET_KEY
+  # Secret should have entries access_key and secret_key
   minio_backup:
     enabled: true
-    host: minio-system-hl.minio-system.svc.cluster.local
+    host: http://minio-system-hl.minio-system.svc.cluster.local
     secretName: minio-system-user-0
     port: "9000"
 
