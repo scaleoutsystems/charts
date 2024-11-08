@@ -166,6 +166,9 @@ studio: # studio values
     namespace: "default"
     server: "https://kubernetes.default.svc"
   
+  recaptcha:
+    enabled: false
+
   sentry:
     enabled: false
     studio_dsn: ""
