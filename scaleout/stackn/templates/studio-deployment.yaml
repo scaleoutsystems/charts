@@ -293,6 +293,20 @@ spec:
               name: {{ include "stackn.secretName" . }}
               key: studio-argocd-token
         {{ end }}
+        {{ if .Values.studio.recaptcha.enabled }}
+        - name: RECAPTCHA_ENABLED
+          value: "true"
+        - name: RECAPTCHA_SITE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: recaptcha-keys
+              key: site-key
+        - name: RECAPTCHA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: recaptcha-keys
+              key: secret-key
+        {{ end }}
         - name: CHART_REPO
           value: {{ .Values.studio.project.repo }}
         - name: CHART_PATH
