@@ -10,7 +10,7 @@ metadata:
       if ($request_uri ~* "^/fedn.Control/Stop") { return 403; }
       if ($request_uri ~* "^/fedn.Control/FlushAggregationQueue") { return 403; }
       if ($request_uri ~* "^/fedn.Control/SetAggregator") { return 403; }
-      if ($http_grpc_server) { grpc_pass grpc://$http_grpc_server.default.svc.cluster.local:80; }
+      if ($http_grpc_server) { grpc_pass grpc://$http_grpc_server.default.svc.cluster.local:12080; }
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-set-headers: X-Forwarded-Proto:$scheme
     nginx.ingress.kubernetes.io/server-snippet: |
