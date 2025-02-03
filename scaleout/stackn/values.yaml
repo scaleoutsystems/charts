@@ -88,7 +88,7 @@ studio: # studio values
     replicas: 1 # number of static replicas
     strategy: # strategy for static
       type: Recreate # type of strategy
-    image: harbor.scaleoutsystems.com/studio/studio-nginx:0.10.0-beta.1 # image for static
+    # image: harbor.scaleoutsystems.com/studio/studio-nginx:0.17.0 # image for static, use this value if you want to override default (usually you should not)
     pullPolicy: IfNotPresent # pull policy for static
     resources: # resources for static
       limits: # limits for static
@@ -98,7 +98,7 @@ studio: # studio values
         cpu: "100m" # cpu request for static
         memory: "256Mi" # memory request for static
   image: #tell which image to deploy for studio
-    repository: harbor.scaleoutsystems.com/studio/studio:0.10.0-beta.1 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: harbor.scaleoutsystems.com/studio/studio:0.17.0 # This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -194,6 +194,7 @@ studio: # studio values
     host: http://minio-system-hl.minio-system.svc.cluster.local
     secretName: minio-system-user-0
     port: "9000"
+    mongodb_bucket: studio-mongodb-backups
 
   harbor:
     enabled: true
@@ -300,7 +301,7 @@ eventListener:
   appStatusEndpoint: "api/internal/app/status"
   appStatusesEndpoint: "api/internal/app/statuses"
   image: 
-    repository: harbor.scaleoutsystems.com/studio/studio-kube-controller:0.10.0-beta.1
+    repository: harbor.scaleoutsystems.com/studio/studio-kube-controller:main
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
 
 

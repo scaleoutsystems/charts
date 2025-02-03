@@ -23,7 +23,7 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
       containers:
-      - image: {{ .Values.eventListener.image.repository }}
+      - image: "{{ .Values.eventListener.image.repository | default "harbor.scaleoutsystems.com/studio/studio-kube-controller:{{ .Chart.AppVersion }}" }}"
         imagePullPolicy: {{ .Values.eventListener.image.pullPolicy }}
         name: studio-event-listener
         resources:
