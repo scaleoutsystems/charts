@@ -34,7 +34,7 @@ spec:
           name: {{ .Release.Name }}-static-config
       containers:
       - name: static
-        image: "{{ .Values.studio.static.image | default "harbor.scaleoutsystems.com/studio/studio-nginx:{{ .Chart.AppVersion }}" }}"
+        image: '{{ .Values.studio.static.image | default (printf "harbor.scaleoutsystems.com/studio/studio-nginx:%s" .Chart.AppVersion) }}'
         imagePullPolicy: {{ .Values.studio.static.pullPolicy }}
         # securityContext:
         #   runAsUser: 101

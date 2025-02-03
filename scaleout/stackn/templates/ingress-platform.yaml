@@ -30,6 +30,13 @@ spec:
         - path: /
           backend:
             service:
+              name: fedn-frontend-service
+              port:
+                number: 80
+          pathType: ImplementationSpecific
+        - path: /api/
+          backend:
+            service:
               name: {{ $.Release.Name }}-studio
               port:
                 number: 8080

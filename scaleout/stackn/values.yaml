@@ -114,7 +114,7 @@ studio: # studio values
   superuserEmail: admin@test.com
   eventListenerUsername: ""
   eventListenerUserPassword: ""
-  version: studio
+  #version: studio
   securityContext:
     enabled: true
     runAsUser: 1000
