@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fedn-frontend-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fedn-frontend
+  template:
+    metadata:
+      labels:
+        app: fedn-frontend
+    spec:
+      imagePullSecrets:
+      - name: harborsecret
+      containers:
+      - name: fedn-frontend
+        imagePullPolicy: Always
+        image: harbor.scaleoutsystems.com/stefan-dev/studio-front:latest # Replace with your image name
+        ports:
+        - containerPort: 3000
+        env:
+        # - name: NODE_ENV
+        #   value: "development" # Ensures it's in dev mode
+        - name: API_URL
+          value: "http://studio-studio:8080"
+        - name: NEXT_PUBLIC_USE_FEDN_PROXY
+          value: "true"
