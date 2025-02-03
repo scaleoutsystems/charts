@@ -133,6 +133,7 @@ studio: # studio values
   csrf_trusted_origins: # csrf trusted origins for studio. Add extra trusted origins for CSRF protection.
   kube_api_request_timeout: 1 # timeout for kubernetes api requests, such as request to create/delete resources
   static: # static values for studio, ngnix server for serving static files and media files
+    enabled: false # enable static for studio
     replicas: 1 # number of static replicas
     strategy: # strategy for static
       type: Recreate # type of strategy
