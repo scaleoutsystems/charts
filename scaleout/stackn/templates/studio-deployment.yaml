@@ -345,7 +345,7 @@ spec:
         - name: HARBOR_PATH
           value: {{ .Values.studio.project.path }}
         {{ end }}
-        image: "{{ .Values.studio.image.repository | default "harbor.scaleoutsystems.com/studio/studio:{{ .Chart.AppVersion }}" }}"
+        image: "{{ .Values.studio.image.repository | default "harbor.scaleoutsystems.com/studio/studio:{{ .Chart.appVersion }}" }}"
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         resources:
