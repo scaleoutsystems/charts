@@ -42,7 +42,7 @@ spec:
           value: "development"
         {{ end }}
         - name: API_URL
-          value: "http://frontend-frontend:8080"
+          value: "http://studio-studio:8080"
         - name: NEXT_PUBLIC_USE_FEDN_PROXY
           value: "true"
         {{ if .Values.frontend.recaptcha.enabled }}
