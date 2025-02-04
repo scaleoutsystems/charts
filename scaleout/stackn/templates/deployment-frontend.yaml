@@ -42,7 +42,9 @@ spec:
           value: "development"
         {{ end }}
         - name: API_URL
-          value: "http://studio-studio:8080"
+          value: {{ printf "http://%s-%s:8080" .Release.Name .Values.studio.servicename | quote }}
+        - name: NEXT_PUBLIC_API_DOMAIN
+          value: {{ .Values.domain | quote }}
         - name: NEXT_PUBLIC_USE_FEDN_PROXY
           value: "true"
         {{ if .Values.frontend.recaptcha.enabled }}

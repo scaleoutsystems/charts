@@ -99,6 +99,16 @@ frontend:
     periodSeconds: 20
   automountServiceAccountToken: false # automount service account token for frontend
   debug: false # dev mode for frontend
+  ingress: # ingress for frontend
+    enabled: true # enable ingress for frontend
+    hosts:  
+      - "fedn.scaleoutsystems.com" # host for frontend
+    tls: # tls for frontend
+      enabled: true # enable tls for frontend
+      hosts:
+        - "fedn.scaleoutsystems.com"
+      existingSecret: "fedn-tls" # name of existing secret containing tls certificate
+
 
 
 studio: # studio values
