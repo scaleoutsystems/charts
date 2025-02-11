@@ -345,6 +345,10 @@ spec:
         - name: HARBOR_PATH
           value: {{ .Values.studio.project.path }}
         {{ end }}
+        {{ if .Values.frontend.ingress.enabled }}
+        - name: FRONTEND_DOMAIN
+          value: {{ (index .Values.frontend.ingress.hosts 0) }}
+        {{ end }}
         image: '{{ .Values.studio.image.repository | default (printf "harbor.scaleoutsystems.com/studio/studio:%s" .Chart.AppVersion) }}'  
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
