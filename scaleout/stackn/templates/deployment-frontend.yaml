@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fedn-frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: fedn-frontend
+  strategy:
+    type: {{ .Values.frontend.strategy.type }}
+  template:
+    metadata:
+      labels:
+        app: fedn-frontend
+    spec:
+      automountServiceAccountToken: {{ .Values.frontend.automountServiceAccountToken }}
+      {{- if .Values.frontend.securityContext.enabled }}
+      securityContext:
+        runAsUser: {{ .Values.frontend.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.frontend.securityContext.runAsGroup }}
+        fsGroup:  {{ .Values.frontend.securityContext.fsGroup }}
+        allowPrivilegeEscalation: {{ .Values.frontend.securityContext.allowPrivilegeEscalation }}
+        privileged: {{ .Values.frontend.securityContext.privileged }}
+        readOnlyRootFilesystem: {{ .Values.frontend.securityContext.readOnlyRootFilesystem }}
+        runAsNonRoot: {{ .Values.frontend.securityContext.runAsNonRoot }}
+        capabilities:
+          drop:
+            - ALL
+      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.frontend.image.pullSecret }}
+      containers:
+      - name: fedn-frontend
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        image: {{ .Values.frontend.image.repository | default "harbor.scaleoutsystems.com/fedn/fedn-front-end:main" }}
+        ports:
+        - containerPort: 3000
+        env:
+        {{ if .Values.frontend.debug }}
+        - name: NODE_ENV
+          value: "development"
+        {{ end }}
+        - name: API_URL
+          value: {{ printf "http://%s-%s:8080" .Release.Name .Values.studio.servicename | quote }}
+        - name: NEXT_PUBLIC_API_DOMAIN
+          value: {{ .Values.domain | quote }}
+        - name: NEXT_PUBLIC_USE_FEDN_PROXY
+          value: "true"
+        {{ if .Values.frontend.recaptcha.enabled }}
+        - name: RECAPTCHA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.frontend.recaptcha.existingSecret }}
+              key: {{ .Values.frontend.recaptcha.existingSecretKey }}
+        - name: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+          value: {{ .Values.frontend.recaptcha.siteKey }}
+        - name: NEXT_PUBLIC_RECAPTCHA_ACTION)
+          value: {{ .Values.frontend.recaptcha.action }}
+        {{ end }}
+        resources:
+          limits:
+            cpu: {{ .Values.frontend.resources.limits.cpu }}
+            memory: {{ .Values.frontend.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.frontend.resources.requests.cpu }}
+            memory: {{ .Values.frontend.resources.requests.memory }}
+         {{- if .Values.frontend.readinessProbe.enabled }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.frontend.readinessProbe.tcpSocket.port }}
+          initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}
+        {{- end }}
+        {{- if .Values.frontend.livenessProbe.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.frontend.livenessProbe.tcpSocket.port }}
+          initialDelaySeconds: {{ .Values.frontend.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
+        {{- end }}

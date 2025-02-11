@@ -32,7 +32,7 @@ spec:
             - name: S3PORT
               value: {{ .Values.studio.minio_backup.port | quote }}
             - name : S3BUCKET
-              value: studio-mongodb-backups
+              value: {{ .Values.studio.minio_backup.mongodb_bucket }}
             - name: S3ACCESS_KEY
               valueFrom:
                 secretKeyRef:

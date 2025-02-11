@@ -52,6 +52,64 @@ networkPolicy: # network policy for stackn
     - 172.0.0.0/20
   ingress_controller_namespace: kube-system # namespace for ingress controller
 
+frontend:
+  service: 
+    name: fedn-frontend-service # name of frontend service
+    port: 80 # port for frontend service
+  replicas: 1 # number of frontend replicas
+  strategy: # strategy for frontend
+    type: RollingUpdate # type of strategy
+  image: # image for frontend
+    repository: harbor.scaleoutsystems.com/fedn/fedn-front-end:main
+    pullPolicy: Always # pull policy for frontend
+    pullSecret: harborsecret # pull secret for frontend
+  resources: # resources for frontend
+    limits: # limits for frontend
+      cpu: "1000m" # cpu limit for frontend
+      memory: "1Gi" # memory limit for frontend
+    requests: # requests for frontend
+      cpu: "100m" # cpu request for frontend
+      memory: "128Mi" # memory request for frontend
+  recaptcha: # recaptcha for frontend
+    enabled: false # enable recaptcha for frontend
+    existingSecret: "google-recaptcha-secret" # name of existing secret containing recaptcha secret
+    existingSecretKey: "key" # key in existing secret containing recaptcha secret
+    siteKey: "" # site key for recaptcha
+    action: "userRegister" # action for recaptcha
+  securityContext: # security context for frontend
+    enabled: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    privileged: false
+  readinessProbe: # readiness probe for frontend
+    enabled: true
+    tcpSocket:
+      port: 3000
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  livenessProbe: # liveness probe for frontend
+    enabled: true
+    tcpSocket:
+      port: 3000
+    initialDelaySeconds: 20
+    periodSeconds: 20
+  automountServiceAccountToken: false # automount service account token for frontend
+  debug: false # dev mode for frontend
+  ingress: # ingress for frontend
+    enabled: true # enable ingress for frontend
+    hosts:  
+      - "fedn.scaleoutsystems.com" # host for frontend
+    tls: # tls for frontend
+      enabled: true # enable tls for frontend
+      hosts:
+        - "fedn.scaleoutsystems.com"
+      existingSecret: "fedn-tls" # name of existing secret containing tls certificate
+
+
 
 studio: # studio values
   servicename: studio # name of studio service
@@ -85,10 +143,11 @@ studio: # studio values
   csrf_trusted_origins: # csrf trusted origins for studio. Add extra trusted origins for CSRF protection.
   kube_api_request_timeout: 1 # timeout for kubernetes api requests, such as request to create/delete resources
   static: # static values for studio, ngnix server for serving static files and media files
+    enabled: false # enable static for studio
     replicas: 1 # number of static replicas
     strategy: # strategy for static
       type: Recreate # type of strategy
-    image: harbor.scaleoutsystems.com/studio/studio-nginx:0.10.0-beta.1 # image for static
+    # image: harbor.scaleoutsystems.com/studio/studio-nginx:0.17.0 # image for static, use this value if you want to override default (usually you should not)
     pullPolicy: IfNotPresent # pull policy for static
     resources: # resources for static
       limits: # limits for static
@@ -98,7 +157,7 @@ studio: # studio values
         cpu: "100m" # cpu request for static
         memory: "256Mi" # memory request for static
   image: #tell which image to deploy for studio
-    repository: harbor.scaleoutsystems.com/studio/studio:0.10.0-beta.1 #This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: harbor.scaleoutsystems.com/studio/studio:0.17.0 # This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
@@ -114,7 +173,7 @@ studio: # studio values
   superuserEmail: admin@test.com
   eventListenerUsername: ""
   eventListenerUserPassword: ""
-  version: studio
+  #version: studio
   securityContext:
     enabled: true
     runAsUser: 1000
@@ -194,6 +253,7 @@ studio: # studio values
     host: http://minio-system-hl.minio-system.svc.cluster.local
     secretName: minio-system-user-0
     port: "9000"
+    mongodb_bucket: studio-mongodb-backups
 
   harbor:
     enabled: true
@@ -300,7 +360,7 @@ eventListener:
   appStatusEndpoint: "api/internal/app/status"
   appStatusesEndpoint: "api/internal/app/statuses"
   image: 
-    repository: harbor.scaleoutsystems.com/studio/studio-kube-controller:0.10.0-beta.1
+    repository: harbor.scaleoutsystems.com/studio/studio-kube-controller:main
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
 
 

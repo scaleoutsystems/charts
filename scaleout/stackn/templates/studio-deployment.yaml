@@ -121,7 +121,7 @@ spec:
           value: "false"
         {{ end }}
         - name: VERSION
-          value: {{ .Values.studio.version | quote  }}
+          value: "{{ .Values.studio.version | default .Chart.AppVersion  }}"
         - name: DEFAULT_FROM_EMAIL
           value: {{ .Values.studio.emailService.smtpEmailFrom | quote}}
         - name: SESSION_COOKIE_DOMAIN
@@ -345,7 +345,7 @@ spec:
         - name: HARBOR_PATH
           value: {{ .Values.studio.project.path }}
         {{ end }}
-        image: {{ .Values.studio.image.repository }}
+        image: '{{ .Values.studio.image.repository | default (printf "harbor.scaleoutsystems.com/studio/studio:%s" .Chart.AppVersion) }}'  
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
         resources:

@@ -1,0 +1,32 @@
+{{- if .Values.frontend.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fedn-frontend-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+   {{- range .Values.frontend.ingress.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $.Values.frontend.service.name }}
+                port:
+                  number: {{ $.Values.frontend.service.port }}
+    {{- end }}
+  {{- if .Values.frontend.ingress.tls.enabled }}
+  tls:
+  - hosts:
+      {{- range .Values.frontend.ingress.tls.hosts }}
+      - {{ . | quote }}
+      {{- end }}
+    secretName: {{ .Values.frontend.ingress.tls.existingSecret }}
+  {{- end }}
+{{- end }}

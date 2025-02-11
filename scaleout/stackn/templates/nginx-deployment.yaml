@@ -1,3 +1,4 @@
+{{ if .Values.studio.static.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -34,7 +35,7 @@ spec:
           name: {{ .Release.Name }}-static-config
       containers:
       - name: static
-        image: {{ .Values.studio.static.image }}
+        image: '{{ .Values.studio.static.image | default (printf "harbor.scaleoutsystems.com/studio/studio-nginx:%s" .Chart.AppVersion) }}'
         imagePullPolicy: {{ .Values.studio.static.pullPolicy }}
         # securityContext:
         #   runAsUser: 101
@@ -57,3 +58,4 @@ spec:
             memory: {{ .Values.studio.static.resources.requests.memory }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
+{{ end }}
