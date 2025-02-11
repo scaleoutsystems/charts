@@ -362,6 +362,7 @@ eventListener:
   image: 
     repository: harbor.scaleoutsystems.com/studio/studio-kube-controller:main
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
+    pullSecret: ghcrsecret
 
 
 # Will be added in future realease, for now keep "enabled:false"
