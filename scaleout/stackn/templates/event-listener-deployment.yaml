@@ -21,7 +21,7 @@ spec:
       automountServiceAccountToken: true
       serviceAccountName: studio
       imagePullSecrets:
-        - name: {{ .Values.imagePullSecrets.name }}
+        - name: {{ .Values.eventListener.image.pullSecret }}
       containers:
       - image: "{{ .Values.eventListener.image.repository | default "harbor.scaleoutsystems.com/studio/studio-kube-controller:{{ .Chart.AppVersion }}" }}"
         imagePullPolicy: {{ .Values.eventListener.image.pullPolicy }}
