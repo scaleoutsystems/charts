@@ -1,3 +1,4 @@
+{{- if .Values.studio.static.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,3 +13,4 @@ spec:
     pod: nginx-static
 status:
   loadBalancer: {}
+{{ end }}
