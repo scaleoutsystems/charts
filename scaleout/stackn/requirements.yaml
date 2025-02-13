@@ -1,41 +1,23 @@
 # version x.x.x corresponds to "latest"
 dependencies:
-  # - name: openfaas
-  #   version: 5.6.5
-  #   repository: "https://openfaas.github.io/faas-netes/"
-  #   condition: openfaas.enabled
-
-  # - name: argo-events
-  #   version: 0.14.0
-  #   repository: "https://argoproj.github.io/argo-helm"
-  #   condition: argo-events.enabled
-
-  # - name: argo
-  #   version: 0.7.3
-  #   repository: "https://argoproj.github.io/argo-helm"
-  #   condition: argo.enabled
-
-  - name: prometheus
-    version: 13.8.0
-    repository: https://prometheus-community.github.io/helm-charts
-    condition: prometheus.enabled
-  
-  - name: grafana
-    version: 6.8.4
-    repository: https://grafana.github.io/helm-charts
-    condition: grafana.enabled
 
   - name: reloader
-    version: v0.0.86
+    version: v1.0.15
     repository: https://stakater.github.io/stakater-charts
     condition: reloader.enabled
 
-  - name: postgresql-ha
-    version: 9.2.0
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql-ha.enabled
-
   - name: postgresql
-    version: 11.6.14
+    version: 12.2.7
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
+    
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-common
+    version: 2.14.1
+  
+  - name: mongodb
+    repository: https://charts.bitnami.com/bitnami
+    version: 14.4.6
+    condition: mongodb.enabled

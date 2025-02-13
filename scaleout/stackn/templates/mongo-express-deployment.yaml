@@ -1,0 +1,62 @@
+{{ if .Values.mongoexpress.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-mongo-express
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: {{ .Values.mongoexpress.replicas }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      app: stackn-studio
+      pod: mongo-express
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name }}
+        app: stackn-studio
+        networking/allow-internet-egress: "false"
+        type: app
+        pod: mongo-express
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        env:
+        - name: DB_SERVICE
+          value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+        - name: DB_PORT
+          value: {{ .Values.mongodb.service.ports.mongodb | quote }}
+        command:  ["sh", "-c", "until nc -z $DB_SERVICE $DB_PORT > /dev/null; do echo Waiting for master.; sleep 2; done;"]
+      containers:
+      - name: mongo-express
+        image: mongo-express:latest
+        env:
+        - name: ME_CONFIG_MONGODB_ENABLE_ADMIN
+          value: "true"
+        - name: ME_CONFIG_BASICAUTH
+          value: "false"
+        - name: ME_CONFIG_BASICAUTH_USERNAME
+          value: ""
+        - name: ME_CONFIG_BASICAUTH_PASSWORD
+          value: ""
+        - name: ME_CONFIG_MONGODB_AUTH_USERNAME
+          value: {{ .Values.mongodb.auth.rootUser }}
+        - name: ME_CONFIG_MONGODB_AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
+              key: mongodb-root-password
+        - name: ME_CONFIG_MONGODB_SERVER
+          value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+        - name: ME_CONFIG_MONGODB_PORT
+          value: {{ .Values.mongodb.service.ports.mongodb | quote }}
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8081
+{{- end }}

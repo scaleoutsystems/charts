@@ -1,0 +1,58 @@
+{{ if and .Values.studio.cloudnativepg.enabled .Values.studio.cloudnativepg.create_new }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.studio.cloudnativepg.clusterName }}
+spec:
+  instances: {{ .Values.studio.cloudnativepg.spec.instances }}
+  storage:
+    size: {{ .Values.studio.cloudnativepg.spec.storage.size }}
+  {{ if  .Values.studio.minio_backup.enabled }}
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://studio-backups
+      serverName: {{ .Values.studio.cloudnativepg.clusterName }}
+      endpointURL: {{ .Values.studio.minio_backup.host }}:{{ .Values.studio.minio_backup.port }}
+      s3Credentials:
+        accessKeyId:
+          name: {{ .Values.studio.minio_backup.secretName }}
+          key: access_key
+        secretAccessKey:
+          name: {{ .Values.studio.minio_backup.secretName }}
+          key: secret_key
+  {{ end }}
+---
+# Base backup runs at midnight every day
+{{ if .Values.studio.minio_backup.enabled}}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: base-backup
+spec:
+  schedule: "0 0 0 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: studio-db
+{{ end }}
+{{ end }}
+
+
+
+# Example of how to bootstrap from backups for a cluster
+# called studio-cluster2
+  # bootstrap:
+  #     recovery:
+  #       source: studio-cluster2
+
+  # externalClusters:
+  #   - name: studio-cluster2
+  #     barmanObjectStore:
+  #       destinationPath: s3://studio-backups
+  #       endpointURL: http://minio-fedn-hl:9000
+  #       s3Credentials:
+  #         accessKeyId:
+  #           name: aws-creds
+  #           key: ACCESS_KEY_ID
+  #         secretAccessKey:
+  #           name: aws-creds
+  #           key: ACCESS_SECRET_KEY

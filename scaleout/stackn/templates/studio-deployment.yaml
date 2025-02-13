@@ -10,7 +10,7 @@ metadata:
 spec:
   replicas: {{ .Values.studio.replicas }}
   strategy:
-    type: Recreate
+    type: {{ .Values.studio.strategy.type }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-studio
@@ -19,11 +19,33 @@ spec:
       labels:
         io.kompose.service: {{ .Release.Name }}-studio
         name: {{ .Release.Name }}-studio
+        web: studio-web
+        app: stackn-studio
+        allow-api-access: "true"
+        networking/allow-internet-egress: "true"
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: {{ .Values.studio.securityContext.fsGroup }}
       initContainers:
         - name: wait-for-db
           image: postgres
-          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
+          {{ if .Values.studio.cloudnativepg.enabled }}
+          env:
+          - name: POSTGRES_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+                key: port
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+                key: host
+          command: ['sh', '-c', 'until pg_isready --host=$POSTGRES_HOST --port=$POSTGRES_PORT; do echo waiting for database; sleep 2; done;']
+          {{ else }}
+          command: ['sh', '-c', 'until pg_isready --host={{ .Values.postgresql.fullnameOverride }} --port={{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for database; sleep 2; done;']
+          {{ end }}
           resources:
             limits:
               cpu: "100m"
@@ -35,13 +57,130 @@ spec:
       - args:
         - sh
         - scripts/run_web.sh
+        ports:
+        - containerPort: 8080
         env:
-        {{ if .Values.studio.debug }}
         - name: DEBUG
+        {{ if .Values.studio.debug }}
           value: "true"
+        {{ else }}
+          value: "false"
         {{ end }}
+        - name: DOMAIN
+          value: {{ .Values.domain }}
+        - name: AUTH_DOMAIN
+          value: {{ .Release.Name }}-studio.{{ .Values.namespace | default "default"}}.svc.{{ .Values.cluster_domain | default "cluster.local"}}
+        - name: STUDIO_URL
+          value: http://{{ .Release.Name }}-studio:8080
+        - name: GRPC_DOMAIN
+          value: {{ .Values.grpc_domain | quote }}
+        - name: RELEASE_NAME
+          value: {{ .Release.Name }}
+        - name: SERVICE_NAME
+          value: {{ .Values.studio.servicename }}
+        - name: NAMESPACE
+          value: {{ .Values.namespace | default "default" }}
+        - name: CLUSTER_DOMAIN
+          value: {{ .Values.cluster_domain | default "cluster.local"}}
+        - name: STORAGE_CLASS
+          value: {{ .Values.studio.storage.storageClass }}
         - name: INIT
           value: {{ .Values.studio.init | quote }}
+        - name: CSRF_TRUSTED_ORIGINS
+          value: {{ .Values.studio.csrf_trusted_origins | quote}}
+        - name: KUBE_API_REQUEST_TIMEOUT
+          value: {{ .Values.studio.kube_api_request_timeout | quote }}
+        - name: EMAIL_SERVICE_ENABLED
+          value: {{ .Values.studio.emailService.enabled | quote}}
+        - name: EMAIL_HOST
+          value: {{ .Values.studio.emailService.host | quote}}
+        - name: EMAIL_PORT
+          value: {{ .Values.studio.emailService.port | quote }}
+        - name: EMAIL_DOMAIN_NAME
+          value: {{ .Values.studio.emailService.domainName | quote}}
+        - name: EMAIL_MAILGUN_API
+          value: {{ .Values.studio.emailService.apiEndpoint | quote}}
+        - name: NOTIFY_ON_ACCOUNT_REGISTER_LIST
+          value: "{{ range $index, $elem := .Values.studio.emailService.notifyOnAccountRegisterList }}{{ if $index }},{{ end }}{{ $elem }}{{ end }}"
+        {{ if .Values.studio.sentry.enabled }}
+        - name: SENTRY_ENABLED
+          value: "true"
+        - name: SENTRY_STUDIO_DSN
+          value: "{{ .Values.studio.sentry.studio_dsn }}"
+        - name: SENTRY_CONTROLLER_DSN
+          value: "{{ .Values.studio.sentry.controller_dsn }}"
+        - name: SENTRY_COMBINER_DSN
+          value: "{{ .Values.studio.sentry.combiner_dsn }}"
+        - name: SENTRY_ENVIRONMENT
+          value: "{{ .Values.studio.sentry.environment }}"
+        {{ end }}
+        - name: WELCOME_EMAIL_ON_NEW_USER
+        {{ if .Values.studio.welcomeEmail.enabled }}
+          value: "true"
+        {{ else }}
+          value: "false"
+        {{ end }}
+        - name: VERSION
+          value: "{{ .Values.studio.version | default .Chart.AppVersion  }}"
+        - name: DEFAULT_FROM_EMAIL
+          value: {{ .Values.studio.emailService.smtpEmailFrom | quote}}
+        - name: SESSION_COOKIE_DOMAIN
+          value: {{ .Values.session_cookie_domain | quote }}
+        - name: STUDIO_ACCESSMODE
+          value: {{ .Values.accessmode }}
+        - name: CUSTOM_MIGRATIONS
+          value: "{{- if .Values.studio.custom_migrations.enabled }}{{- range $key, $value := .Values.studio.custom_migrations.apps }}{{ $key }}:{{ $value }},{{- end }}{{- end }}"
+        - name: ENABLE_PROJECT_EXTRA_SETTINGS
+          value: {{ .Values.studio.enable_project_extra_settings | quote }}
+        - name: DISCORD_ALERT_ON_NEW_USER
+        {{ if .Values.studio.discord.alert_on_new_user }}
+          value: "true"
+        {{ else }}
+          value: "false"
+        {{ end }}
+        - name: DISCORD_ALERT_WEBHOOK_URL
+          value: {{ .Values.studio.discord.alert_webhook_url | quote }}
+        - name: DISCORD_ALERT_ON_NEW_USER_MESSAGE
+          value: {{ .Values.studio.discord.alert_on_new_user_message | quote }}
+        - name: INACTIVE_USERS
+        {{ if .Values.studio.inactive_users }}
+          value: "true"
+        {{ else }}
+          value: "false"
+        {{ end }}
+        - name: CUSTOM_APPS
+          value: "{{- if .Values.studio.custom_apps.enabled }}{{- range .Values.studio.custom_apps.apps }}{{ . }},{{- end }}{{- end }}"
+        - name: AUTH_USER_MODEL
+        {{ if .Values.studio.auth_user_model.override }}
+          value: {{ .Values.studio.auth_user_model.model | quote }}
+        {{ else }}
+          value: ""
+        {{ end }}
+        {{ if .Values.studio.disabledAppInstanceFields.enabled }}  
+        - name: DISABLED_APP_INSTANCE_FIELDS
+          value: "{{- range .Values.studio.disabledAppInstanceFields.fields }}{{ . }},{{- end }}"
+        {{- end }}
+        {{ if .Values.studio.jwt_auth.enabled }}
+        - name: ENABLE_JWT
+          value: "true"
+        {{ if .Values.studio.jwt_auth.existingSecret }}
+        - name: SIGNING_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.jwt_auth.existingSecret }}
+              key: private_key
+        {{ end }}
+        {{ if .Values.studio.jwt_auth.public_key }}
+        - name: VERIFYING_KEY
+          value: {{ .Values.studio.jwt_auth.public_key | quote }}
+        {{ end }}
+        - name: JWT_AUTH_ALGORITHM
+          value: {{ .Values.studio.jwt_auth.algorithm | quote }}
+        {{ if .Values.studio.jwt_auth.statelessUser }}
+        - name: JWT_STATELESS_USER_AUTH
+          value: "true"
+        {{ end }}
+        {{ end }}
         - name: DJANGO_SUPERUSER
           value: {{ include "stackn.studio.superuser" . }}
         - name: DJANGO_SUPERUSER_EMAIL
@@ -51,32 +190,168 @@ spec:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
               key: studio-superuser-password
+        - name: EVENT_LISTENER_USERNAME
+          value: {{ .Values.studio.eventListenerUsername | quote }}
+        - name: EVENT_LISTENER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-event-listener-user-password
         - name: GET_HOSTS_FROM
           value: dns
+        {{ if .Values.studio.cloudnativepg.enabled }}
+        - name: POSTGRES_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: dbname
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: password
+        - name: POSTGRES_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: port
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.cloudnativepg.clusterName }}-app
+              key: host 
+        {{ else }}
+        - name: POSTGRES_NAME
+          value: {{ .Values.postgresql.auth.database }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.auth.username }}
+        - name: POSTGRES_HOST
+          value: {{ .Values.postgresql.fullnameOverride }}
+        - name: POSTGRES_PORT
+          value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.postgres.secretName" . }}
               key: password
-        - name: RABBITMQ_DEFAULT_PASS
+        {{ end }}
+        - name: DJANGO_SECRET
           valueFrom:
             secretKeyRef:
               name: {{ include "stackn.secretName" . }}
-              key: rabbit-password
-        - name: KUBECONFIG
-          value: {{ .Values.studio.kubeconfig_file | quote }}
-        image: {{ .Values.studio.image.repository }}
+              key: django-secret-key
+        {{ if .Values.studio.emailService.enabled }}
+        - name: EMAIL_HOST_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: email-host-user
+        - name: EMAIL_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: email-host-password
+        - name: EMAIL_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: email-api-key
+        {{ end }}
+        - name: S3HOST
+          value: {{ .Values.studio.minio.host }}
+        - name: S3PORT
+          value: "{{ .Values.studio.minio.port | default 9000 }}"
+        - name: S3ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.minio.secretName }}
+              key: CONSOLE_ACCESS_KEY
+        - name: S3SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.studio.minio.secretName }}
+              key: CONSOLE_SECRET_KEY
+        {{ if .Values.studio.argocd.enabled }}
+        - name: ARGO_CD_ENABLED
+          value: "true"
+        - name: ARGO_CD_API_URL
+          value: {{ .Values.studio.argocd.url | default "" }}
+        - name: ARGO_CD_PROJECT
+          value: {{ .Values.studio.argocd.project | default "default" }}
+        - name: ARGO_CD_APP_NAMESPACE
+          value: {{ .Values.studio.argocd.namespace | default "default" }}
+        - name: ARGO_CD_SERVER
+          value: {{ .Values.studio.argocd.server | default "https://kubernetes.default.svc" }}
+        - name: ARGO_CD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: studio-argocd-token
+        {{ end }}
+        {{ if .Values.studio.recaptcha.enabled }}
+        - name: RECAPTCHA_ENABLED
+          value: "true"
+        - name: RECAPTCHA_SITE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: recaptcha-keys
+              key: site-key
+        - name: RECAPTCHA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: recaptcha-keys
+              key: secret-key
+        {{ end }}
+        - name: CHART_REPO
+          value: {{ .Values.studio.project.repo }}
+        - name: CHART_PATH
+          value: {{ .Values.studio.project.path }}
+        - name: CHART_REVISION
+          value: {{ .Values.studio.project.revision | quote}}
+        {{ if .Values.mongodb.enabled }}
+        - name: MONGO_SERVICE_HOST
+          value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+        - name: MONGO_SERVICE_PORT
+          value: {{ .Values.mongodb.service.ports.mongodb | quote }}
+        - name: MONGO_USERNAME
+          value: {{ .Values.mongodb.auth.rootUser }}
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
+              key: mongodb-root-password
+        - name: MONGO_ARCHITECTURE
+          value: {{ .Values.mongodb.architecture | default "standalone" }}
+        - name: MONGO_REPLICA_COUNT
+          value: {{ .Values.mongodb.replicaCount | default "1" | quote }}
+        - name: MONGO_REPLICA_SET_NAME
+          value: {{ .Values.mongodb.replicaSetName | default "rs0" }}
+        {{ end }}
+        {{ if .Values.studio.harbor.enabled }}
+        - name: HARBOR_ENABLED
+          value: "true"
+        - name: HARBOR_CREDS
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "stackn.secretName" . }}
+              key: harbor-creds
+        - name: HARBOR_HOST
+          value: {{ .Values.studio.project.repo }}
+        - name: HARBOR_PATH
+          value: {{ .Values.studio.project.path }}
+        {{ end }}
+        {{ if .Values.frontend.ingress.enabled }}
+        - name: FRONTEND_DOMAIN
+          value: {{ (index .Values.frontend.ingress.hosts 0) }}
+        {{ end }}
+        image: '{{ .Values.studio.image.repository | default (printf "harbor.scaleoutsystems.com/studio/studio:%s" .Chart.AppVersion) }}'  
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
-        volumeMounts:
-          - name: kubeconfig
-            mountPath: {{ .Values.studio.kubeconfig_dir | quote }}
-            readOnly: true
-          - mountPath: /app/studio/settings.py
-            subPath: settings.py
-            name: {{ .Release.Name}}-settings-configmap
-          - name: mediavol
-            mountPath: {{ .Values.studio.media.mount_path }}
         resources:
           limits:
             cpu: {{ .Values.studio.resources.limits.cpu }}
@@ -84,22 +359,30 @@ spec:
           requests:
             cpu: {{ .Values.studio.resources.requests.cpu }}
             memory: {{ .Values.studio.resources.requests.memory }}
-
-    {{- with .Values.imagePullSecrets }}
+        {{- if .Values.studio.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.studio.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.studio.securityContext.runAsGroup }}
+          allowPrivilegeEscalation: {{ .Values.studio.securityContext.allowPrivilegeEscalation }}
+          privileged: {{ .Values.studio.securityContext.privileged }}
+          capabilities:
+            drop:
+              - all
+        {{- end }}
+        {{- if .Values.studio.readinessProbe.enabled }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.studio.readinessProbe.tcpSocket.port }}
+          initialDelaySeconds: {{ .Values.studio.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.studio.readinessProbe.periodSeconds }}
+        {{- end }}
+        {{- if .Values.studio.livenessProbe.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.studio.livenessProbe.tcpSocket.port }}
+          initialDelaySeconds: {{ .Values.studio.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.studio.livenessProbe.periodSeconds }}
+        {{- end }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        - name: {{ .Values.imagePullSecrets.name }}
       restartPolicy: Always
-      volumes:
-      - name: kubeconfig
-        secret:
-          secretName: {{ .Release.Name }}-chart-controller-secret
-      - name: {{ .Release.Name}}-settings-configmap
-        configMap:
-          name: {{ .Release.Name}}-settings-configmap
-          items:
-          - key: settings.py
-            path: settings.py
-      - name: mediavol
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-studio-media

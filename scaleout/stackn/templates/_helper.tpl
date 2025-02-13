@@ -25,7 +25,7 @@ Get the STACKn password secret.
 {{- else if .Values.existingSecret -}}
     {{- printf "%s" (tpl .Values.existingSecret $) -}}
 {{- else -}}
-    stackn
+    {{ include "common.names.fullname" . }}
 {{- end -}}
 {{- end -}}
 
@@ -101,7 +101,6 @@ Return postgres secret
     {* HOLDER FOR HA MODE IN FUTURE RELEASE *}
 {{- end -}}
 {{- end -}}
-
 {{/*
 Return STACKn studio storageClass
 */}}
@@ -125,28 +124,5 @@ Return STACKn studio media storageClass
     {{- .Values.studio.media.storage.storageClass -}}
 {{- else -}}
     {{- .Values.global.postgresql.storageClass -}}
-{{- end -}}
-{{- end -}}
-
-
-{{/*
-Return STACKn rabbit password
-*/}}
-{{- define "stackn.rabbit.password" -}}
-{{- if .Values.rabbit.password -}}
-    {{- .Values.rabbit.password -}}
-{{- else -}}
-    {{- randAlphaNum 10 -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Return STACKn rabbit username
-*/}}
-{{- define "stackn.rabbit.username" -}}
-{{- if .Values.rabbit.username -}}
-    {{- .Values.rabbit.username -}}
-{{- else -}}
-    admin
 {{- end -}}
 {{- end -}}

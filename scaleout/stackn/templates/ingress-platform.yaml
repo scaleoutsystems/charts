@@ -4,13 +4,14 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
-  {{- with .Values.ingress.annotations }}
-     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_uri ~ ^/api/internal) { return 403; } 
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-set-headers: X-Forwarded-Proto:$scheme
   labels:
     io.kompose.service: {{ .Release.Name }}-ingress
 spec:
-  # ingressClassName: public
+  ingressClassName: nginx
   {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -29,22 +30,24 @@ spec:
         - path: /
           backend:
             service:
+              name: fedn-frontend-service
+              port:
+                number: 80
+          pathType: ImplementationSpecific
+        - path: /api/
+          backend:
+            service:
               name: {{ $.Release.Name }}-studio
               port:
                 number: 8080
           pathType: ImplementationSpecific
+        {{- if $.Values.studio.static.enabled }}
         - path: /static/
           backend:
             service:
-            {{ if $.Values.studio.debug }}
-              name: {{ $.Release.Name }}-studio
-              port:
-                number: 8080
-            {{ else }}
               name: {{ $.Release.Name }}-static
               port:
                 number: 8081
-            {{ end }}
           pathType: ImplementationSpecific
         - path: /media/
           backend:
@@ -53,6 +56,7 @@ spec:
               port:
                 number: 8081
           pathType: ImplementationSpecific
+        {{- end }}
   {{- end }}
 {{- end }}
 

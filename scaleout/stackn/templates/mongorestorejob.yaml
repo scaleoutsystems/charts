@@ -1,0 +1,55 @@
+{{ if eq .Values.mongodb.restoreFromFile.enabled true }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-restore-job
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecrets.name }}
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        env:
+        - name: DB_SERVICE
+          value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+        - name: DB_PORT
+          value: {{ .Values.mongodb.service.ports.mongodb | quote }}
+        command:  ["sh", "-c", "until nc -z $DB_SERVICE $DB_PORT > /dev/null; do echo Waiting for master.; sleep 2; done;"]
+      containers:
+      - name: mongo-restore
+        image: {{ .Values.mongodb.restoreFromFile.image }}
+        imagePullPolicy: Always
+        env:
+          - name: MONGO_SERVICE_HOST
+            value: {{ include "mongodb.service.nameOverride" .Subcharts.mongodb }}
+          - name: MONGO_SERVICE_PORT
+            value: {{ .Values.mongodb.service.ports.mongodb | quote }}
+          - name: MONGO_USERNAME
+            value: {{ .Values.mongodb.auth.rootUser | quote }}
+          - name: MONGO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "mongodb.fullname" .Subcharts.mongodb }}
+                key: mongodb-root-password
+          - name: S3HOST
+            value: {{ .Values.studio.minio_backup.host }}
+          - name: S3PORT
+            value: {{ .Values.studio.minio_backup.port | quote }}
+          - name : S3BUCKET
+            value: mongodb-backups
+          - name: S3ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.studio.minio_backup.secretName }}
+                key: access_key
+          - name: S3SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.studio.minio_backup.secretName }}
+                key: secret_key
+          - name: BACKUPFILENAME
+            value: {{ .Values.mongodb.restoreFromFile.backupFileName }}
+      restartPolicy: OnFailure
+{{ end }}
