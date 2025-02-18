@@ -270,6 +270,7 @@ studio: # studio values
       instances: 3
       storage:
         size: 20Gi
+  extraDomain: "" # extra domain for studio, used in allowed hosts in Django settings
  
 # Pull secrets for studio, used to pull images from private repositories such as Harbor
 # To create a pull secret run: $ kubectl create secret docker-registry <secret-name> --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword>
