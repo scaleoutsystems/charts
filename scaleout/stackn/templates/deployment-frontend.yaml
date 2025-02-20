@@ -55,7 +55,7 @@ spec:
               key: {{ .Values.frontend.recaptcha.existingSecretKey }}
         - name: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
           value: {{ .Values.frontend.recaptcha.siteKey }}
-        - name: NEXT_PUBLIC_RECAPTCHA_ACTION)
+        - name: NEXT_PUBLIC_RECAPTCHA_ACTION
           value: {{ .Values.frontend.recaptcha.action }}
         {{ end }}
         resources:
