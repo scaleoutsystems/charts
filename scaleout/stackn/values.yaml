@@ -74,8 +74,6 @@ frontend:
     enabled: false # enable recaptcha for frontend
     existingSecret: "google-recaptcha-secret" # name of existing secret containing recaptcha secret
     existingSecretKey: "key" # key in existing secret containing recaptcha secret
-    siteKey: "" # site key for recaptcha
-    action: "userRegister" # action for recaptcha
   securityContext: # security context for frontend
     enabled: true
     runAsUser: 1001
