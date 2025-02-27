@@ -351,6 +351,13 @@ spec:
         - name: FRONTEND_DOMAIN
           value: {{ (index .Values.frontend.ingress.hosts 0) }}
         {{ end }}
+        - name: OTEL_EXPORTER_OTLP_HEADERS
+          valueFrom:
+            secretKeyRef:
+              name: honeycomb-logs
+              key: header
+              optional: true
+
         image: '{{ .Values.studio.image.repository | default (printf "harbor.scaleoutsystems.com/studio/studio:%s" .Chart.AppVersion) }}'  
         imagePullPolicy: {{ .Values.studio.image.pullPolicy }}
         name: {{ .Release.Name }}-studio
