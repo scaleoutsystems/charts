@@ -351,6 +351,10 @@ spec:
         - name: FRONTEND_DOMAIN
           value: {{ (index .Values.frontend.ingress.hosts 0) }}
         {{ end }}
+        - name: OTEL_SERVICE_NAME
+          value: "fedn-studio"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "https://api.honeycomb.io"
         - name: OTEL_EXPORTER_OTLP_HEADERS
           valueFrom:
             secretKeyRef:
