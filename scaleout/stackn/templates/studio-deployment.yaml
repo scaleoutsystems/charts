@@ -115,6 +115,10 @@ spec:
           value: "{{ .Values.studio.sentry.combiner_dsn }}"
         - name: SENTRY_ENVIRONMENT
           value: "{{ .Values.studio.sentry.environment }}"
+        - name: SERVER_FUNCTIONS_ENABLED
+          values: "{{ .Values.studio.server-functions.enabled }}"
+        - name: SERVER_FUNCTIONS_GVISOR
+          values: "{{ .Values.studio.server-functions.gvisor }}"
         {{ end }}
         - name: WELCOME_EMAIL_ON_NEW_USER
         {{ if .Values.studio.welcomeEmail.enabled }}
