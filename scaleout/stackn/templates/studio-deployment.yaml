@@ -116,9 +116,9 @@ spec:
         - name: SENTRY_ENVIRONMENT
           value: "{{ .Values.studio.sentry.environment }}"
         - name: SERVER_FUNCTIONS_ENABLED
-          values: "{{ .Values.studio.server-functions.enabled }}"
+          values: "{{ .Values.studio.serverfunctions.enabled }}"
         - name: SERVER_FUNCTIONS_GVISOR
-          values: "{{ .Values.studio.server-functions.gvisor }}"
+          values: "{{ .Values.studio.serverfunctions.gvisor }}"
         {{ end }}
         - name: WELCOME_EMAIL_ON_NEW_USER
         {{ if .Values.studio.welcomeEmail.enabled }}

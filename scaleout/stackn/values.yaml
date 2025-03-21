@@ -226,7 +226,7 @@ studio: # studio values
   recaptcha:
     enabled: false
 
-  server-functions:
+  serverfunctions:
     enabled: false
     gvisor: false
 
