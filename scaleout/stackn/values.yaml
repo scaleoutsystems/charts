@@ -226,6 +226,10 @@ studio: # studio values
   recaptcha:
     enabled: false
 
+  serverfunctions:
+    enabled: false
+    gvisor: false
+
   sentry:
     enabled: false
     studio_dsn: ""
