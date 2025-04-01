@@ -60,7 +60,7 @@ frontend:
   strategy: # strategy for frontend
     type: RollingUpdate # type of strategy
   image: # image for frontend
-    repository: harbor.scaleoutsystems.com/fedn/fedn-front-end:main
+    repository: harbor.scaleoutsystems.com/fedn/fedn-front-end@sha256:90e9bab13b23bc16c8220ce8dca1756c49e5ba864113d42023425beca038eaae
     pullPolicy: Always # pull policy for frontend
     pullSecret: harborsecret # pull secret for frontend
   resources: # resources for frontend
@@ -155,7 +155,7 @@ studio: # studio values
         cpu: "100m" # cpu request for static
         memory: "256Mi" # memory request for static
   image: #tell which image to deploy for studio
-    repository: harbor.scaleoutsystems.com/studio/studio:0.17.0 # This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
+    repository: harbor.scaleoutsystems.com/studio/studio:0.18.5 # This image can be built from Dockerfile inside stackn/components/studio (https://github.com/scaleoutsystems/stackn)
     pullPolicy: IfNotPresent # used to ensure that each time we redeploy always pull the latest image
   resources:
     limits:
