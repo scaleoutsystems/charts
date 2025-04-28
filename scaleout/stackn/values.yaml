@@ -118,6 +118,7 @@ studio: # studio values
   init: true # init studio script (deprecated)
   enable_project_extra_settings: false # enable project extra settings. Do not change unless you know what you are doing.
   inactive_users: False # inactive users by default. When set to True, users will be inactive by default and need to be activated by an admin.
+  projects_per_user_limit: 1 # Number of projects limit for non-authorized users.
   custom_apps: # custom apps for studio. Do not change unless you know what you are doing.
     enabled: true
     apps:

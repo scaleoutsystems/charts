@@ -120,6 +120,8 @@ spec:
           values: "{{ .Values.studio.serverfunctions.enabled }}"
         - name: SERVER_FUNCTIONS_GVISOR
           values: "{{ .Values.studio.serverfunctions.gvisor }}"
+        - name: PROJECTS_PER_USER_LIMIT
+          values: "{{ .Values.studio.projects_per_user_limit }}"
         - name: WELCOME_EMAIL_ON_NEW_USER
         {{ if .Values.studio.welcomeEmail.enabled }}
           value: "true"
