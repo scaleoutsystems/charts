@@ -53,7 +53,7 @@ spec:
         - name: OTEL_SERVICE_NAME
           value: "fedn-frontend"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: "https://api.honeycomb.io/1/events"
+          value: "https://api.honeycomb.io"
         - name: OTEL_EXPORTER_OTLP_HEADERS
           valueFrom:
             secretKeyRef:
