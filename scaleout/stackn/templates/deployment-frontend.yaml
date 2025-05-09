@@ -50,6 +50,16 @@ spec:
               name: {{ .Values.frontend.recaptcha.existingSecret }}
               key: {{ .Values.frontend.recaptcha.existingSecretKey }}
         {{ end }}
+        - name: OTEL_SERVICE_NAME
+          value: "fedn-frontend"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "https://api.honeycomb.io/1/events"
+        - name: OTEL_EXPORTER_OTLP_HEADERS
+          valueFrom:
+            secretKeyRef:
+              name: honeycomb-logs
+              key: header
+              optional: true
         resources:
           limits:
             cpu: {{ .Values.frontend.resources.limits.cpu }}
