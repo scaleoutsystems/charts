@@ -106,6 +106,7 @@ frontend:
       hosts:
         - "fedn.scaleoutsystems.com"
       existingSecret: "fedn-tls" # name of existing secret containing tls certificate
+  disableSignup: false
 
 
 

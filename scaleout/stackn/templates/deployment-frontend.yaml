@@ -60,6 +60,8 @@ spec:
               name: honeycomb-logs
               key: header
               optional: true
+        - name: DISABLE_SIGNUP
+          value: {{ .Values.frontend.disableSignup | quote }}
         resources:
           limits:
             cpu: {{ .Values.frontend.resources.limits.cpu }}
