@@ -340,6 +340,11 @@ postgresql:
 # Please also observe the version we are using in requirements.yaml
 
 mongodb:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mongodb
+    tag: 7.0.4-debian-11-r2
+    pullPolicy: IfNotPresent
   backups:
     enabled: false
     image: harbor.scaleoutsystems.com/studio/mongo-backup:0.1.0
