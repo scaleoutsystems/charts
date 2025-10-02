@@ -307,6 +307,11 @@ ingress:
 # Please also observe the version we are using in requirements.yaml
 
 postgresql:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/postgresql
+    tag: 15.2.0-debian-11-r16
+    pullPolicy: IfNotPresent
   enabled: true
   fullnameOverride: studio-postgres
   commonAnnotations: {"reloader.stakater.com/auto": "true"}
